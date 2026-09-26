@@ -7,6 +7,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<h1>Main Page</h1>} />
+        <Route path="/about" element={<h1>About Page</h1>} />
       </Routes>
     </>
   );
