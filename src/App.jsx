@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { Routes, Route } from "react-router";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <h1>Welcome to Lorelight</h1>
+
+      <Routes>
+        <Route path="/" element={<h1>Main Page</h1>} />
+      </Routes>
     </>
   );
 }
