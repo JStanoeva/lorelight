@@ -364,5 +364,7 @@ Authorization is enforced in the database with Row Level Security, not only in t
 - A Lore Entry is public only when both the entry and its Project are public. Owners can also read their own private rows.
 - Only the owner can create, update or delete their lore and projects, and lore can only be written into the author's own Projects.
 - Users can only add or remove their own appreciations and Constellation saves, and only for public lore. Constellations are publicly visible on creator profiles; saved lore that becomes private is removed from them automatically.
+- Table privileges add a second layer under RLS: guests can only read, and ids, owners, usernames and timestamps can't be changed through the API.
+- Check constraints mirror the form validation rules (lengths, categories, tags, username format), so invalid data is rejected even if the frontend is bypassed.
 
 The database schema, constraints, triggers and policies are stored as numbered SQL files in `supabase/migrations/`, with demo content in `supabase/seed.sql`.
