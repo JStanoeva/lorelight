@@ -70,7 +70,7 @@ Lorelight is a worldbuilding platform for writing, organizing and sharing fictio
 **Application Category / Topic:** Worldbuilding platform (content creation and sharing)
 
 **Main Purpose:**
-Lorelight gives writers, game masters and worldbuilders one place to keep the lore of their fictional worlds. Users create Projects for their worlds, write Lore Entries inside them, and decide what is private or public, either per entry or for a whole Project. Public lore appears in a searchable catalog, where other users can appreciate (like) entries and save them to their personal Constellation (pin board) for inspiration.
+Lorelight gives writers, game masters and worldbuilders one place to keep the lore of their fictional worlds. Users create Projects for their worlds, write Lore Entries inside them, and decide what is private or public, either per entry or for a whole Project. Public lore appears in a searchable catalog, where other users can appreciate (like) entries and save them to their personal Constellation (pin board) for inspiration. Lorelight is free to use.
 
 ---
 
@@ -141,6 +141,8 @@ Lorelight gives writers, game masters and worldbuilders one place to keep the lo
 
 That is 15 routes: 5 public pages, 7 pages for logged-in users (2 of them author-only), 2 guest-only pages and a Not Found fallback. The dynamic pages (loading data from the backend) are the Lore Catalog, Lore Details, Project Details, Creator Profile, My Projects and My Constellation.
 
+The Home page (`/`) is a static introduction that loads no data: a hero with sign-up and login actions for guests (create and explore actions for logged-in users), three expandable previews (Create, Share, Explore), every lore category with a link to the filtered catalog, a short FAQ and a closing call to action. On Home, the header also links to the About, Categories and FAQ sections and highlights the one in view.
+
 ### Nested & Parameterized Routes
 
 - **Nested routing:** yes. All routes render inside `MainLayout` (header, `<Outlet />`, footer). `AuthGuard` and `GuestGuard` are layout routes whose child routes render through `<Outlet />`.
@@ -184,6 +186,8 @@ The main CRUD collection is **Lore Entries** (`lore_entries`). Projects (`projec
 ### Create (POST)
 
 Logged-in users open **Create Lore** from the header or with the "Add Lore" button on one of their Projects (which pre-selects that Project). Every entry belongs to a Project, so the form collects the Project (required), title, category, description, tags, an optional image URL and a public/private setting. Users without any Projects see a prompt to create one first. On submit, `loreService.createLore()` inserts the row with the current user as `author_id`, and the user is redirected to the new entry's details page.
+
+New Projects and Lore Entries are private until their owner makes them public.
 
 ### Read (GET)
 
@@ -254,11 +258,11 @@ Invalid fields show a message under the input. The submit button is disabled whi
 
 - **Hooks used:**
   - `useState` — form fields, loading and error states, UI toggles
-  - `useEffect` — data fetching, auth subscription
+  - `useEffect` — data fetching, auth subscription, a scroll-spy observer
   - `useContext` — reading `AuthContext` through the `useAuth` hook
   - `useCallback` — a stable `refetch` function returned by the data hooks
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
-  - Custom hooks — `useAuth`, `useLoreList`, `useLoreEntry`, `useProjects`
+  - Custom hooks — `useAuth`, `useLoreList`, `useLoreEntry`, `useProjects`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
   - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.
@@ -294,7 +298,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - The catalog, projects and Constellation show a friendly empty state with a call to action.
   - Searches without results suggest clearing the filters.
   - Missing or private records (including anything inside a private Project) show a "not found" state.
-  - If a saved entry becomes private, it is removed from every Constellation automatically, so no one sees a broken card.
+  - If a saved entry becomes private, directly or because its Project becomes private, it is removed from every Constellation automatically, so no one sees a broken card.
   - Unknown URLs show the Not Found page.
 
 ---
@@ -316,6 +320,7 @@ src/
 ├── app/            # App, routes, providers, layout, app-level pages
 ├── features/
 │   ├── auth/           # AuthContext, guards, login/register, auth service
+│   ├── home/           # Home page sections (static content, no data)
 │   ├── lore/           # catalog, details, lore forms, lore service
 │   ├── projects/       # project pages, forms, project service
 │   ├── constellation/  # saved lore

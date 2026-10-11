@@ -26,6 +26,11 @@
     @apply border border-danger/60 text-danger not-disabled:hover:bg-danger/10;
   }
 
+  /* Larger call-to-action size (48px tall). Defined after .btn so its padding and size win. */
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
   /* Surfaces */
   .card {
     @apply rounded-xl border border-night-700 bg-night-800 p-5 shadow-lg shadow-black/20;
@@ -72,7 +77,10 @@
     @apply rounded-md px-3 py-2 text-sm font-medium text-parchment-300 no-underline transition-colors hover:text-parchment-100;
   }
 
-  .nav-link.active {
-    @apply text-gold-400;
+  /* The current page (NavLink adds "active") or the Home section in view: colour plus underline,
+     so colour is never the only signal */
+  .nav-link.active,
+  .nav-link[aria-current="true"] {
+    @apply text-gold-400 underline decoration-gold-400/60 decoration-1 underline-offset-8;
   }
 }

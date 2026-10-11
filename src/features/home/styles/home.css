@@ -1,0 +1,290 @@
+@reference "../../../index.css";
+
+/*
+  Home page shell and the pieces shared by several Home sections.
+  Classes here never carry outer vertical margins: spacing between blocks is set with
+  utilities in the JSX (mt-*), which always win over this layer.
+*/
+@layer components {
+  /* Page shell. clip (not hidden) stops oversized glows from causing horizontal scroll
+     without creating a scroll container, so the sticky header and the hero still work. */
+  .home-page {
+    overflow-x: clip;
+  }
+
+  /* relative: content paints above any absolute decorative layer placed before it */
+  .home-container {
+    @apply relative mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  .home-section {
+    @apply relative isolate py-20 sm:py-24 lg:py-28;
+  }
+
+  /* Section hazes: soft violet light instead of boxes or hard borders */
+  .about-section {
+    background-image: radial-gradient(
+      ellipse 50% 40% at 8% 0%,
+      color-mix(in oklab, var(--color-lantern-700) 30%, transparent),
+      transparent 70%
+    );
+  }
+
+  /* The "sky band" */
+  .categories-section {
+    background-color: var(--color-night-950);
+    background-image: radial-gradient(
+      ellipse 80% 60% at 50% 45%,
+      color-mix(in oklab, var(--color-lantern-900) 60%, transparent),
+      transparent 75%
+    );
+  }
+
+  .faq-section {
+    background-image: radial-gradient(
+      ellipse 40% 50% at 0% 50%,
+      color-mix(in oklab, var(--color-lantern-900) 50%, transparent),
+      transparent 70%
+    );
+  }
+
+  /* Chapter headings (SectionHeading) */
+  .section-heading {
+    @apply mx-auto max-w-2xl text-center;
+  }
+
+  /* lantern-300 is only used as text on solid night surfaces, where it stays above 7.4:1 */
+  .section-eyebrow {
+    @apply text-xs font-semibold tracking-[0.24em] text-lantern-300 uppercase;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.875rem, 1.4rem + 1.6vw, 2.5rem);
+    line-height: 1.15;
+    text-wrap: balance;
+    color: var(--color-parchment-100);
+  }
+
+  .section-intro {
+    @apply text-base leading-[1.7] text-pretty text-parchment-300 sm:text-lg;
+  }
+
+  /* StarRule: hairline, star, mirrored hairline */
+  .star-rule {
+    @apply flex items-center justify-center gap-3;
+  }
+
+  .star-rule-line {
+    width: 3rem;
+    height: 1px;
+    background-image: linear-gradient(to right, transparent, var(--color-lantern-500));
+  }
+
+  .star-rule-line-end {
+    background-image: linear-gradient(to left, transparent, var(--color-lantern-500));
+  }
+
+  .star-rule-star {
+    flex: none;
+    width: 0.625rem;
+    height: 0.875rem;
+    color: var(--color-lantern-300);
+    filter: drop-shadow(0 0 6px var(--color-lantern-500));
+  }
+
+  /* Star field shared by the hero, Categories and the closing strip. Each gradient draws one
+     dot that repeats on its own coprime tile size, so the pattern never visibly repeats.
+     Positions are hand-written, so the output is the same on every render. */
+  .starfield,
+  .starfield-twinkle {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .starfield {
+    --star: var(--color-parchment-100);
+    opacity: 0.85;
+    background-image:
+      radial-gradient(circle at 20% 30%, var(--star) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, color-mix(in oklab, var(--star) 70%, transparent) 0 0.7px, transparent 1.2px),
+      radial-gradient(circle at 45% 85%, color-mix(in oklab, var(--color-lantern-300) 90%, transparent) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 85% 15%, color-mix(in oklab, var(--color-parchment-300) 90%, transparent) 0 1.1px, transparent 1.8px),
+      radial-gradient(circle at 10% 70%, color-mix(in oklab, var(--star) 55%, transparent) 0 0.6px, transparent 1.1px),
+      radial-gradient(circle at 55% 40%, var(--star) 0 1.2px, transparent 2px),
+      radial-gradient(circle at 33% 52%, color-mix(in oklab, var(--star) 60%, transparent) 0 0.7px, transparent 1.2px),
+      radial-gradient(circle at 78% 88%, color-mix(in oklab, var(--star) 80%, transparent) 0 0.9px, transparent 1.4px);
+    background-size: 211px 199px, 257px 241px, 313px 307px, 379px 367px, 163px 157px, 431px 419px, 283px 271px, 347px 331px;
+  }
+
+  .starfield-twinkle {
+    background-image:
+      radial-gradient(circle at 30% 20%, var(--color-parchment-100) 0 1.3px, transparent 2.2px),
+      radial-gradient(circle at 75% 70%, var(--color-lantern-300) 0 1.2px, transparent 2px);
+    background-size: 347px 331px, 457px 443px;
+  }
+
+  /* Categories: a faint, still field that fades out towards the edges */
+  .categories-stars {
+    opacity: 0.3;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000, transparent);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000, transparent);
+  }
+
+  /* Closing strip: stars only in the top half */
+  .closing-stars {
+    opacity: 0.4;
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 50%);
+    mask-image: linear-gradient(to bottom, #000, transparent 50%);
+  }
+
+  /* Call-to-action pair (HomeCtas): stacked and full width on phones, one centred row from sm */
+  .home-ctas {
+    @apply mx-auto flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center;
+  }
+
+  /* FAQ: a single column of questions separated by hairlines */
+  .faq-list {
+    @apply mx-auto max-w-3xl border-t border-night-700;
+  }
+
+  .faq-item {
+    @apply border-b border-night-700;
+  }
+
+  /* Resets the base Cinzel h3: Cinzel is too heavy at question length. text-pretty avoids a
+     single word on the last line. */
+  .faq-question {
+    @apply font-body text-[1.0625rem] leading-snug font-semibold text-pretty;
+  }
+
+  .faq-button {
+    @apply flex min-h-14 w-full items-center justify-between gap-6 py-4 text-left text-parchment-100 transition-colors hover:text-gold-300;
+  }
+
+  /* A plus made of two gold bars that turns into a cross when open. The bars are borders, not
+     backgrounds, so they stay visible in forced-colors mode. */
+  .faq-icon {
+    position: relative;
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .faq-icon::before,
+  .faq-icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin-top: -1px;
+    border-top: 2px solid var(--color-gold-400);
+    border-radius: 1px;
+  }
+
+  .faq-icon::after {
+    rotate: 90deg;
+  }
+
+  .faq-button[aria-expanded="true"] .faq-icon {
+    rotate: 45deg;
+  }
+
+  .faq-answer {
+    @apply max-w-prose pr-10 pb-6 leading-[1.7] text-parchment-300;
+  }
+
+  /* Closing strip: the light returns, held by the lantern, and fades into the night-900 footer */
+  .closing {
+    @apply relative isolate overflow-hidden py-24 text-center sm:py-32;
+    background-image:
+      radial-gradient(ellipse 55% 60% at 50% 38%, color-mix(in oklab, var(--color-lantern-500) 20%, transparent), transparent 70%),
+      linear-gradient(to bottom, var(--color-night-950) 70%, var(--color-night-900));
+  }
+
+  .closing-content {
+    @apply relative mx-auto max-w-2xl px-4;
+  }
+
+  /* In the logo PNG, the star's crossing point sits 50% across and about 65% down */
+  .closing-lantern {
+    @apply relative isolate mx-auto w-36 sm:w-44;
+  }
+
+  /* Halo behind the lantern. closest-side makes the glow fade out before the nearest edge of its
+     box (the bottom one), so the box never shows as a hard line. */
+  .closing-lantern::before {
+    content: "";
+    position: absolute;
+    inset: -70%;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(
+      closest-side circle at 50% 64%,
+      color-mix(in oklab, var(--color-gold-400) 30%, transparent),
+      color-mix(in oklab, var(--color-lantern-500) 22%, transparent) 55%,
+      transparent
+    );
+  }
+
+  /* Bloom in front of the star */
+  .closing-lantern::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 65%;
+    width: 40%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    opacity: 0.8;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--color-gold-300) 70%, transparent),
+      transparent 70%
+    );
+  }
+
+  .closing-lantern img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.45));
+  }
+
+  .closing-text {
+    @apply mx-auto max-w-lg text-base leading-[1.7] text-pretty text-parchment-300 sm:text-lg;
+  }
+
+  /* All Home motion is opt-in: with reduced motion the page is completely still */
+  @media (prefers-reduced-motion: no-preference) {
+    /* Smooth scrolling only while the Home page is mounted */
+    html:has(.home-page) {
+      scroll-behavior: smooth;
+    }
+
+    .starfield-twinkle {
+      animation: star-twinkle 5s ease-in-out infinite alternate;
+    }
+
+    .faq-icon {
+      transition: rotate 200ms ease-out;
+    }
+  }
+}
+
+/* Shared with hero.css (the hero's bright flares) */
+@keyframes star-twinkle {
+  from {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

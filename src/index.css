@@ -19,7 +19,7 @@
   --color-danger: #f4a3a3;
   --color-success: #86d9b4;
 
-  /* Sampled from the lantern logo. Decorative only (glows, gradients, borders), not for text. */
+  /* Sampled from the lantern logo. Decorative, plus lantern-300 for small labels on solid night surfaces (≥ 7.4:1). */
   --color-lantern-900: #1d0d43;
   --color-lantern-700: #392781;
   --color-lantern-500: #7a4faf;
@@ -30,8 +30,14 @@
 }
 
 @layer base {
+  :root {
+    --header-height: 4rem;
+  }
+
   html {
     color-scheme: dark;
+    /* Fragment jumps and keyboard focus stop below the sticky header, on every page */
+    scroll-padding-top: var(--header-height);
   }
 
   body {

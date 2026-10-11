@@ -8,11 +8,13 @@ export default function ScrollToTop() {
 
   useEffect(() => {
     if (hash) {
+      // Default behavior follows the CSS, so on Home this glides (unless reduced motion is on)
       document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView();
       return;
     }
 
-    window.scrollTo(0, 0);
+    // "instant": a page change never animates, even where smooth scrolling is turned on
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [pathname, hash]);
 
   return null;

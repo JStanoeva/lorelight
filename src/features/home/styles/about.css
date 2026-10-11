@@ -1,0 +1,168 @@
+@reference "../../../index.css";
+
+/*
+  About section: the three cards and the panel they open.
+  Violet marks the selected card; gold stays reserved for the hint and the focus ring.
+*/
+@layer components {
+  /* isolate: the glow layer below (z-index -1) paints over the card's background but under its text */
+  .about-card {
+    @apply relative isolate flex h-full w-full flex-col gap-3 rounded-2xl border border-night-700 bg-night-900/70 p-6 text-left hover:border-lantern-500/60 motion-safe:hover:-translate-y-0.5;
+  }
+
+  /* A soft violet glow at the top of each card. --glow-x / --glow-y are left free so a later
+     pointer effect can move it without touching this rule. */
+  .about-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: radial-gradient(
+      240px circle at var(--glow-x, 50%) var(--glow-y, 0%),
+      color-mix(in oklab, var(--color-lantern-500) 16%, transparent),
+      transparent 70%
+    );
+  }
+
+  .about-card[aria-expanded="true"] {
+    @apply border-lantern-500 bg-night-800;
+    box-shadow:
+      0 0 0 1px var(--color-lantern-500),
+      0 12px 40px -12px color-mix(in oklab, var(--color-lantern-500) 50%, transparent);
+  }
+
+  /* From md up the open panel sits under the row of cards, so the open card points down at it
+     with a small notch: a rotated square whose two lower edges continue the card's border. */
+  @media (width >= 48rem) {
+    .about-card[aria-expanded="true"]::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 0.875rem;
+      height: 0.875rem;
+      translate: -50% calc(50% + 2px);
+      rotate: 45deg;
+      pointer-events: none;
+      background-color: var(--color-night-800);
+      border-right: 2px solid var(--color-lantern-500);
+      border-bottom: 2px solid var(--color-lantern-500);
+    }
+  }
+
+  .about-card-icon {
+    @apply flex size-12 items-center justify-center rounded-xl bg-lantern-900/80 text-lantern-300 ring-1 ring-lantern-500/40;
+  }
+
+  .about-card-title {
+    @apply font-display text-[1.375rem] leading-tight font-bold text-parchment-100;
+  }
+
+  .about-card-summary {
+    @apply text-[0.9375rem] leading-relaxed text-parchment-300;
+  }
+
+  /* mt-auto keeps the hint at the bottom, so it lines up across cards of different heights */
+  .about-card-hint {
+    @apply mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-gold-400;
+  }
+
+  /* Only on devices that can hover, so a tap on a phone doesn't leave the hint highlighted */
+  @media (hover: hover) {
+    .about-card:hover .about-card-hint {
+      @apply text-gold-300;
+    }
+  }
+
+  .about-card-chevron {
+    @apply size-4 flex-none;
+  }
+
+  .about-card[aria-expanded="true"] .about-card-chevron {
+    rotate: 180deg;
+  }
+
+  /* The panel shell, with a violet hairline over the middle of its top border */
+  .about-panel {
+    @apply relative min-w-0 rounded-2xl border border-night-700 bg-night-900/85 p-6 sm:p-8 lg:p-10;
+  }
+
+  .about-panel::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    pointer-events: none;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--color-lantern-500) 60%, transparent),
+      transparent
+    );
+  }
+
+  /* Text first, preview second; side by side from md */
+  .about-panel-inner {
+    @apply grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center;
+  }
+
+  .about-panel-lead {
+    @apply font-display text-xl leading-tight font-bold text-parchment-100 md:text-2xl;
+  }
+
+  .about-panel-body {
+    @apply max-w-prose text-base leading-[1.7] text-parchment-300;
+  }
+
+  .about-panel-points {
+    @apply flex max-w-prose flex-col gap-2.5;
+  }
+
+  .about-panel-point {
+    @apply flex items-start gap-3 text-[0.9375rem] leading-relaxed text-parchment-300;
+  }
+
+  /* 9 × 13px star bullets, nudged down to sit on the first line of text */
+  .bullet-star {
+    @apply mt-1.5 h-[0.8125rem] w-[0.5625rem] flex-none text-lantern-300;
+  }
+
+  /* min-h-11: a 44px touch target */
+  .about-panel-link {
+    @apply inline-flex min-h-11 items-center gap-1 font-semibold underline-offset-4 hover:underline;
+  }
+
+  /* Motion is opt-in: with reduced motion the cards, chevrons and panels change without moving */
+  @media (prefers-reduced-motion: no-preference) {
+    .about-card {
+      transition-property: border-color, background-color, box-shadow, translate;
+      transition-duration: 200ms;
+      transition-timing-function: ease-out;
+    }
+
+    .about-card-chevron {
+      transition: rotate 200ms ease-out;
+    }
+
+    .about-panel {
+      animation: panel-in 240ms ease-out;
+    }
+  }
+}
+
+/* Plays each time a panel is shown, because the element goes from display: none to visible */
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
