@@ -312,15 +312,15 @@ The project uses a feature-first structure: each domain owns its pages, componen
 
 ```
 src/
-├── app/            # App component, router, global providers
+├── app/            # App, routes, providers, layout, app-level pages
 ├── features/
-│   ├── auth/           # AuthContext, login/register, auth service
+│   ├── auth/           # AuthContext, guards, login/register, auth service
 │   ├── lore/           # catalog, details, lore forms, lore service
 │   ├── projects/       # project pages, forms, project service
 │   ├── constellation/  # saved lore
 │   ├── appreciation/   # appreciate button and service
 │   └── profile/        # creator profiles
-├── shared/         # layout, header, footer, guards, shared UI and hooks
+├── shared/         # shared UI components, hooks and utilities
 ├── lib/            # Supabase client
 └── main.jsx
 ```
