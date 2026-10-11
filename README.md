@@ -12,7 +12,7 @@ Lorelight is a worldbuilding platform for writing, organizing and sharing fictio
 
 ### Prerequisites
 
-- Node.js 20.19 or newer
+- Node.js 22.22 or newer
 - npm
 - A Supabase project (URL + anon key)
 
@@ -57,6 +57,7 @@ Lorelight is a worldbuilding platform for writing, organizing and sharing fictio
 | `npm run dev`     | Starts the development server           |
 | `npm run build`   | Creates the production build in `dist/` |
 | `npm run preview` | Serves the production build locally     |
+| `npm run lint`    | Checks the code with ESLint             |
 
 ---
 
