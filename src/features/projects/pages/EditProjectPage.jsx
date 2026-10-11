@@ -1,7 +1,7 @@
 export default function EditProjectPage() {
   return (
-    <section>
-      <h1>Edit Project</h1>
+    <section className="page">
+      <h1 className="page-title">Edit Project</h1>
     </section>
   );
 }

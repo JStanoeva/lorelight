@@ -1,7 +1,7 @@
 export default function ConstellationPage() {
   return (
-    <section>
-      <h1>My Constellation</h1>
+    <section className="page">
+      <h1 className="page-title">My Constellation</h1>
     </section>
   );
 }

@@ -1,7 +1,7 @@
 export default function CreateLorePage() {
   return (
-    <section>
-      <h1>Create Lore</h1>
+    <section className="page">
+      <h1 className="page-title">Create Lore</h1>
     </section>
   );
 }

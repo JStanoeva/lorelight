@@ -1,7 +1,7 @@
 export default function LoreDetailsPage() {
   return (
-    <section>
-      <h1>Lore Details</h1>
+    <section className="page">
+      <h1 className="page-title">Lore Details</h1>
     </section>
   );
 }

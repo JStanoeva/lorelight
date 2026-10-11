@@ -1,1 +1,91 @@
 @import "tailwindcss";
+@import "./styles/components.css";
+
+@theme {
+  /* "Starlit archive": midnight surfaces, parchment text, a golden accent */
+  --color-night-950: #0b1020;
+  --color-night-900: #121a33;
+  --color-night-800: #1b2447;
+  --color-night-700: #2c3769;
+  --color-night-500: #5f6ca8;
+
+  --color-parchment-100: #f3ead7;
+  --color-parchment-300: #cfc4ab;
+  --color-parchment-500: #a59a80;
+
+  --color-gold-400: #e8c170;
+  --color-gold-300: #f2d38f;
+
+  --color-danger: #f4a3a3;
+  --color-success: #86d9b4;
+
+  /* Sampled from the lantern logo. Decorative only (glows, gradients, borders), not for text. */
+  --color-lantern-900: #1d0d43;
+  --color-lantern-700: #392781;
+  --color-lantern-500: #7a4faf;
+  --color-lantern-300: #d3a3ec;
+
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-night-950);
+    color: var(--color-parchment-100);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Cinzel is only used at 20px and larger, where it stays readable. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+  }
+
+  h2 {
+    font-size: var(--text-2xl);
+  }
+
+  h3 {
+    font-size: var(--text-xl);
+  }
+
+  a {
+    color: var(--color-gold-400);
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    color: var(--color-gold-300);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-gold-400);
+    color: var(--color-night-950);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}

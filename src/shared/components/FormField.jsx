@@ -7,6 +7,7 @@ export default function FormField({
   error,
   hint,
   as: Control = "input",
+  className,
   children,
   ...controlProps
 }) {
@@ -16,18 +17,29 @@ export default function FormField({
   const describedBy = [hint && hintId, error && errorId].filter(Boolean).join(" ");
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id}>{label}</label>
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="label">
+        {label}
+      </label>
       <Control
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
+        className={className ? `input ${className}` : "input"}
         {...controlProps}
       >
         {children}
       </Control>
-      {hint && <p id={hintId}>{hint}</p>}
-      {error && <p id={errorId}>{error}</p>}
+      {hint && (
+        <p id={hintId} className="field-hint">
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={errorId} className="field-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

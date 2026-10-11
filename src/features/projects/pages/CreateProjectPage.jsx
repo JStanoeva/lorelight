@@ -1,7 +1,7 @@
 export default function CreateProjectPage() {
   return (
-    <section>
-      <h1>Create Project</h1>
+    <section className="page">
+      <h1 className="page-title">Create Project</h1>
     </section>
   );
 }

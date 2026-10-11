@@ -1,5 +1,9 @@
 import NotFoundState from "../../shared/components/NotFoundState.jsx";
 
 export default function NotFoundPage() {
-  return <NotFoundState />;
+  return (
+    <section className="page">
+      <NotFoundState />
+    </section>
+  );
 }

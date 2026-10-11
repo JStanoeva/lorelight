@@ -1,7 +1,7 @@
 export default function HomePage() {
   return (
-    <section>
-      <h1>Lorelight</h1>
+    <section className="page">
+      <h1 className="page-title">Lorelight</h1>
     </section>
   );
 }

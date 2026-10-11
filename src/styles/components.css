@@ -1,0 +1,78 @@
+@layer components {
+  /* Page layout */
+  .page {
+    @apply mx-auto w-full max-w-6xl px-4 py-10 sm:px-6;
+  }
+
+  .page-title {
+    @apply text-3xl text-parchment-100 sm:text-4xl;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-colors disabled:opacity-60;
+  }
+
+  /* not-disabled: keeps hover effects off disabled buttons (links are never disabled) */
+  .btn-primary {
+    @apply bg-gold-400 text-night-950 not-disabled:hover:bg-gold-300;
+  }
+
+  .btn-ghost {
+    @apply border border-night-500 text-parchment-100 not-disabled:hover:border-gold-400 not-disabled:hover:text-gold-300;
+  }
+
+  .btn-danger {
+    @apply border border-danger/60 text-danger not-disabled:hover:bg-danger/10;
+  }
+
+  /* Surfaces */
+  .card {
+    @apply rounded-xl border border-night-700 bg-night-800 p-5 shadow-lg shadow-black/20;
+  }
+
+  .dialog {
+    @apply m-auto w-[min(28rem,calc(100%-2rem))] rounded-xl border border-night-700 bg-night-800 p-6 text-parchment-100 shadow-2xl shadow-black/40;
+  }
+
+  .dialog::backdrop {
+    background-color: rgb(5 8 18 / 0.75);
+    backdrop-filter: blur(2px);
+  }
+
+  /* Forms */
+  .label {
+    @apply text-sm font-medium text-parchment-100;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-night-500 bg-night-900 px-3 py-2 text-parchment-100 placeholder:text-parchment-500 focus:border-gold-400 aria-invalid:border-danger;
+  }
+
+  .field-hint {
+    @apply text-sm text-parchment-500;
+  }
+
+  .field-error {
+    @apply text-sm text-danger;
+  }
+
+  /* Messages */
+  .alert-error {
+    @apply rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-danger;
+  }
+
+  /* Small labels such as categories and visibility */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1;
+  }
+
+  /* Header navigation (NavLink adds the "active" class) */
+  .nav-link {
+    @apply rounded-md px-3 py-2 text-sm font-medium text-parchment-300 no-underline transition-colors hover:text-parchment-100;
+  }
+
+  .nav-link.active {
+    @apply text-gold-400;
+  }
+}

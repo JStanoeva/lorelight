@@ -40,20 +40,22 @@ export default function ConfirmDialog({
       aria-labelledby={titleId}
       onCancel={handleEscape}
       onClose={onCancel}
-      className="m-auto max-w-md p-6"
+      className="dialog"
     >
-      <h2 id={titleId}>{title}</h2>
-      <div className="mt-3">{children}</div>
+      <h2 id={titleId} className="text-xl">
+        {title}
+      </h2>
+      <div className="mt-3 text-parchment-300">{children}</div>
       {error && (
-        <p role="alert" className="mt-3">
+        <p role="alert" className="alert-error mt-4 text-sm">
           {error}
         </p>
       )}
       <div className="mt-6 flex justify-end gap-3">
-        <button type="button" onClick={onCancel} disabled={isPending}>
+        <button type="button" onClick={onCancel} disabled={isPending} className="btn btn-ghost">
           {cancelLabel}
         </button>
-        <button type="button" onClick={onConfirm} disabled={isPending}>
+        <button type="button" onClick={onConfirm} disabled={isPending} className="btn btn-danger">
           {isPending ? pendingLabel : confirmLabel}
         </button>
       </div>
