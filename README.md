@@ -2,7 +2,7 @@
 
 Lorelight is a worldbuilding platform for writing, organizing and sharing fictional lore. Creators organize their worlds into Projects, write Lore Entries (characters, locations, factions, artifacts and more) inside them, choose what stays private and what gets published, and discover other creators' public lore.
 
-**Live app:** https://YOUR-DEPLOY-URL.vercel.app
+**Live app:** https://lorelight.vercel.app
 
 **Demo account:** `demo@lorelight.app` / `YOUR-DEMO-PASSWORD`
 
