@@ -102,7 +102,7 @@ Lorelight gives writers, game masters and worldbuilders one place to keep the lo
 1. **App load:** `AuthContext` subscribes to Supabase's `onAuthStateChange`, whose first event delivers the stored session. Until it arrives, `isAuthLoading` is `true` and the route guards show a loader instead of redirecting.
 2. **Status check:** once the session is known, `AuthContext` exposes the current `user` (or `null`) to the whole app. The same listener keeps running, so every login, logout or token refresh updates the app automatically.
 3. **Successful login / registration:** Supabase returns a session, the context updates, the header switches to the logged-in navigation, and `GuestGuard` redirects the user to the page they originally tried to open (or to `/lore`). On registration, the form first checks that the username is still available; after sign-up, a database trigger creates the user's `profiles` row with that username and uses it as the initial display name.
-4. **Logout:** the user is first sent to the home page, then the Supabase session is cleared and the context resets `user` to `null`.
+4. **Logout:** the user is first sent to the home page, then the Supabase session is cleared on this device and the context resets `user` to `null`.
 
 ### Session Persistence
 
@@ -141,7 +141,7 @@ Lorelight gives writers, game masters and worldbuilders one place to keep the lo
 
 That is 15 routes: 5 public pages, 7 pages for logged-in users (2 of them author-only), 2 guest-only pages and a Not Found fallback. The dynamic pages (loading data from the backend) are the Lore Catalog, Lore Details, Project Details, Creator Profile, My Projects and My Constellation.
 
-The Home page (`/`) is a static introduction that loads no data: a hero with sign-up and login actions for guests (create and explore actions for logged-in users), three expandable previews (Create, Share, Explore), every lore category with a link to the filtered catalog, a short FAQ and a closing call to action. On Home, the header also links to the About, Categories and FAQ sections and highlights the one in view.
+The Home page (`/`) is a static introduction that loads no data: a hero with sign-up and login actions for guests (create and explore actions for logged-in users), three expandable previews (Create, Share, Explore), every lore category with a link to the filtered catalog, a short FAQ and a closing call to action. On Home, the header also links to the About, Categories and FAQ sections and highlights the one in view (for logged-in users, these links appear in the menu on small screens and in the header bar on screens at least 1280 px wide).
 
 ### Nested & Parameterized Routes
 
@@ -271,7 +271,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** Header (navigation and logout), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, Lore/Project forms (author id), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, Lore/Project forms (author id), and the appreciation and Constellation buttons.
 
 ### Component Styling
 

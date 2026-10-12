@@ -8,8 +8,10 @@ export default function ScrollToTop() {
 
   useEffect(() => {
     if (hash) {
+      // Section ids are plain words, so the hash is used as it is. Decoding it would throw
+      // on a broken link such as "/lore#%" and crash the whole app.
       // Default behavior follows the CSS, so on Home this glides (unless reduced motion is on)
-      document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView();
+      document.getElementById(hash.slice(1))?.scrollIntoView();
       return;
     }
 

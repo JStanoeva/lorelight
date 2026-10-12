@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router";
+import AuthProvider from "../features/auth/context/AuthProvider.jsx";
 import AuthGuard from "../features/auth/guards/AuthGuard.jsx";
 import GuestGuard from "../features/auth/guards/GuestGuard.jsx";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
@@ -21,7 +22,7 @@ import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 export default function App() {
   return (
-    <>
+    <AuthProvider>
       <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
@@ -52,6 +53,6 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
-    </>
+    </AuthProvider>
   );
 }

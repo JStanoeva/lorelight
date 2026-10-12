@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router";
 import { useActiveSection } from "../../shared/hooks/useActiveSection.js";
 import { useIsBelowHeader } from "../../shared/hooks/useIsBelowHeader.js";
+import { useAuth } from "../../features/auth/hooks/useAuth.js";
 import {
   HERO_EYEBROW_ID,
   HOME_SPY_SECTION_IDS,
 } from "../../features/home/constants/homeSections.js";
+import GuestNavLinks from "./GuestNavLinks.jsx";
 import HomeSectionLinks from "./HomeSectionLinks.jsx";
+import UserNavLinks from "./UserNavLinks.jsx";
 
 // Every other page, and Home as soon as any hero text reaches the bar
 const FROSTED_CLASSES = "border-night-700 bg-night-900/90 backdrop-blur";
@@ -16,7 +19,8 @@ const TRANSPARENT_CLASSES = "border-transparent bg-transparent";
 // From lg up there is no dropdown, so these classes do nothing there.
 const MENU_OPEN_CLASSES = "max-lg:border-night-700 max-lg:bg-night-900/90 max-lg:backdrop-blur";
 
-export default function Header({ isHome = false }) {
+export default function Header({ isHome = false, isLoggingOut = false, onLogout }) {
+  const { user, isAuthLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const activeSectionId = useActiveSection(HOME_SPY_SECTION_IDS, isHome);
   // The bar turns frosted the moment the hero's first line of text reaches it,
@@ -28,6 +32,11 @@ export default function Header({ isHome = false }) {
     ? `${TRANSPARENT_CLASSES} ${MENU_OPEN_CLASSES}`
     : TRANSPARENT_CLASSES;
   const surfaceClasses = isTransparent ? transparentClasses : FROSTED_CLASSES;
+
+  // While the stored session is being restored, neither set of account links shows,
+  // so a logged-in user never sees the guest links flash on refresh
+  const isLoggedIn = !isAuthLoading && Boolean(user);
+  const isGuest = !isAuthLoading && !user;
 
   function toggleMenu() {
     setIsMenuOpen((isOpen) => !isOpen);
@@ -45,6 +54,11 @@ export default function Header({ isHome = false }) {
     if (isHome) {
       window.scrollTo({ top: 0 });
     }
+  }
+
+  function handleLogoutClick() {
+    closeMenu();
+    onLogout();
   }
 
   function handleKeyDown(event) {
@@ -113,25 +127,32 @@ export default function Header({ isHome = false }) {
           id="main-menu"
           className={`${isMenuOpen ? "flex" : "hidden"} absolute inset-x-0 top-full max-h-[calc(100svh-var(--header-height))] flex-col overflow-y-auto border-b border-night-700 bg-night-900 p-4 shadow-lg shadow-black/40 lg:static lg:flex lg:max-h-none lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none`}
         >
+          {/* A logged-in user's links are longer, so for them (and until the session is known)
+              the section links only fit inline in the bar from xl up */}
           {isHome && (
-            <HomeSectionLinks activeSectionId={activeSectionId} onNavigate={closeMenu} />
+            <HomeSectionLinks
+              activeSectionId={activeSectionId}
+              onNavigate={closeMenu}
+              isInlineFromXl={!isGuest}
+            />
           )}
 
           {/* py-3 gives 44px touch targets in the dropdown; lg:py-2 keeps the inline row compact */}
           <nav aria-label="Main" className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-2">
-            <NavLink to="/lore" onClick={closeMenu} className="nav-link py-3 lg:py-2">
+            {/* end: /lore/create and /lore/:id/edit aren't the catalog page */}
+            <NavLink to="/lore" end onClick={closeMenu} className="nav-link py-3 lg:py-2">
               Lore Catalog
             </NavLink>
-            <NavLink to="/login" onClick={closeMenu} className="nav-link py-3 lg:py-2">
-              Login
-            </NavLink>
-            <Link
-              to="/register"
-              onClick={closeMenu}
-              className="btn btn-primary py-3 lg:ml-2 lg:py-2"
-            >
-              Register
-            </Link>
+            {isLoggedIn && (
+              <UserNavLinks
+                user={user}
+                isHome={isHome}
+                isLoggingOut={isLoggingOut}
+                onNavigate={closeMenu}
+                onLogout={handleLogoutClick}
+              />
+            )}
+            {isGuest && <GuestNavLinks onNavigate={closeMenu} />}
           </nav>
         </div>
       </div>

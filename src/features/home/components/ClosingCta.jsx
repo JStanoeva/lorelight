@@ -2,7 +2,7 @@ import { SECTION_IDS } from "../constants/homeSections.js";
 import HomeCtas from "./HomeCtas.jsx";
 
 // The last call to action before the footer, with the same CTA pair as the hero.
-export default function ClosingCta({ isLoggedIn = false }) {
+export default function ClosingCta({ isLoggedIn = false, isAuthLoading = false }) {
   return (
     <section id={SECTION_IDS.closing} aria-labelledby="closing-title" className="closing">
       <div className="starfield closing-stars" aria-hidden="true" />
@@ -30,7 +30,8 @@ export default function ClosingCta({ isLoggedIn = false }) {
             Start with one character, one place or one forgotten war, and share it when you're ready.
           </p>
 
-          <div className="mt-10">
+          {/* Until the session is known, the buttons keep their space but stay hidden */}
+          <div className={`mt-10 ${isAuthLoading ? "invisible" : ""}`}>
             <HomeCtas isLoggedIn={isLoggedIn} />
           </div>
         </div>

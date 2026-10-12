@@ -72,9 +72,10 @@
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1;
   }
 
-  /* Header navigation (NavLink adds the "active" class) */
+  /* Header navigation (NavLink adds the "active" class). The Logout button uses it too
+     and is disabled while logging out. */
   .nav-link {
-    @apply rounded-md px-3 py-2 text-sm font-medium text-parchment-300 no-underline transition-colors hover:text-parchment-100;
+    @apply rounded-md px-3 py-2 text-sm font-medium text-parchment-300 no-underline transition-colors not-disabled:hover:text-parchment-100 disabled:opacity-60;
   }
 
   /* The current page (NavLink adds "active") or the Home section in view: colour plus underline,

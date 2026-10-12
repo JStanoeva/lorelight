@@ -9,7 +9,12 @@ import "../styles/hero.css";
 // No z-index is needed: positioned children paint in DOM order, so the painted sky comes
 // first, then the readability scrim, then the text. An animated canvas can be layered between
 // the painting and the scrim, and the scrim keeps the text readable on top of it.
-export default function HeroSection({ isLoggedIn = false }) {
+export default function HeroSection({ isLoggedIn = false, isAuthLoading = false }) {
+  // Until the session is known, the actions keep their space but stay hidden ("invisible" also
+  // takes them out of the tab order), so nobody sees the wrong buttons flash
+  const ctaVisibility = isAuthLoading ? "invisible" : "";
+  const isGuest = !isAuthLoading && !isLoggedIn;
+
   return (
     <section
       id={SECTION_IDS.hero}
@@ -33,17 +38,17 @@ export default function HeroSection({ isLoggedIn = false }) {
           Keep the lore of your fictional worlds in one place. Write in private, publish when
           you're ready, and explore what other creators share.
         </p>
-        <div className="mt-9 flex w-full justify-center">
+        <div className={`mt-9 flex w-full justify-center ${ctaVisibility}`}>
           <HomeCtas isLoggedIn={isLoggedIn} />
         </div>
-        {!isLoggedIn && (
-          <p className="mt-5 text-sm text-parchment-300">
-            Just here to read?{" "}
-            <Link to="/lore" className="underline">
-              Browse the Lore Catalog
-            </Link>
-          </p>
-        )}
+        {/* Always rendered, so the hero never shifts when the session arrives,
+            but only guests can see it */}
+        <p className={`mt-5 text-sm text-parchment-300 ${isGuest ? "" : "invisible"}`}>
+          Just here to read?{" "}
+          <Link to="/lore" className="underline">
+            Browse the Lore Catalog
+          </Link>
+        </p>
       </div>
 
       <a href={`#${SECTION_IDS.about}`} className="hero-cue relative mt-8 mb-6">
