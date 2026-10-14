@@ -72,7 +72,9 @@ export default function MainLayout() {
         </div>
       )}
 
-      <main className="flex-1">
+      {/* A column, so a page can stretch to fill the space above the footer (the Login and
+          Register sky does) */}
+      <main className="flex flex-1 flex-col">
         <Outlet />
       </main>
       <Footer />

@@ -241,10 +241,10 @@ All forms use controlled inputs (`value` + `onChange`) and submit through the `o
 - **Tags:** optional; up to 10 tags; each tag up to 30 characters; stored in lowercase; duplicates are removed.
 - **Image / cover URL:** optional; if filled in, must be a valid `http(s)` URL.
 - **Project title:** required; 3–80 characters. **Project description:** optional; up to 1,000 characters.
-- **Username** (register, multiple rules): required; 3–30 characters; letters and numbers only (no spaces or special characters); must not already be taken (case-insensitive).
+- **Username** (register, multiple rules): required; 3–30 characters; letters (a–z) and numbers only (no spaces or special characters); saved in lowercase; must not already be taken (case-insensitive).
 - **Display name** (edit profile): required; 1–50 characters; any characters allowed. **Bio:** optional; up to 500 characters.
 - **Email:** required; valid email format.
-- **Password** (register, multiple rules): required; at least 8 characters; at least one uppercase letter, one lowercase letter, one number and one special character; must match the Repeat Password field. A checklist under the field shows all rules from the start and marks each one as met while the user types.
+- **Password** (register, multiple rules): required; at least 8 characters; at most 72 characters (fewer with accented or non-Latin letters, which take more space); at least one uppercase letter, one lowercase letter, one number and one special character; must match the Repeat Password field. A checklist under the field shows all rules from the start and marks each one as met while the user types. A five-star strength meter fills in as rules are met, and both password fields have a show/hide button.
 
 The same length limits are enforced by database check constraints, so invalid data is rejected even if the form is bypassed.
 
@@ -261,8 +261,10 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useEffect` — data fetching, auth subscription, a scroll-spy observer
   - `useContext` — reading `AuthContext` through the `useAuth` hook
   - `useCallback` — a stable `refetch` function returned by the data hooks
+  - `useRef` — the confirmation dialog element, and the password input (keeping the cursor in place when the password is shown or hidden)
+  - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
-  - Custom hooks — `useAuth`, `useLoreList`, `useLoreEntry`, `useProjects`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useAuthForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
   - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.

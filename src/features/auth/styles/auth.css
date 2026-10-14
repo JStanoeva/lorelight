@@ -1,0 +1,627 @@
+/*
+  Login and Register: the starry page, the card, the password field with its show/hide toggle,
+  the strength constellation, the rules checklist and the "passwords match" hint.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+
+  Colour rules:
+  - Gold means "action": the submit button, links, the focus ring and the toggle's hover.
+  - A met rule is a status, so its star is success green (never gold).
+  - The strength constellation lights in lantern-300 while the password is incomplete and turns
+    success green only at 5 of 5, because only then can the form be sent.
+  - Unlit stars are hollow outlines and lit stars are filled, so the shape changes as well as
+    the colour.
+  Tailwind outputs a theme variable (like --color-success) only when a source file mentions
+  it. It reads this file too, so every theme colour used here is defined in the build.
+*/
+@layer components {
+  /* ===== Page (AuthPanel) ===== */
+
+  /* flex-grow 1 fills the rest of <main> (a column in MainLayout), so the sky reaches the footer.
+     isolation keeps the sky's z-index: -1 inside this box instead of behind the page. */
+  .auth-page {
+    position: relative;
+    isolation: isolate;
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2.5rem 1rem 4rem;
+    background-color: var(--color-night-950);
+    background-image:
+      radial-gradient(70% 22rem at 50% 0%, color-mix(in oklab, var(--color-lantern-700) 34%, transparent), transparent 72%),
+      radial-gradient(60% 18rem at 50% 100%, color-mix(in oklab, var(--color-lantern-900) 70%, transparent), transparent 75%);
+  }
+
+  @media (width >= 40rem) {
+    .auth-page {
+      padding-top: 3.5rem;
+      padding-bottom: 5rem;
+    }
+  }
+
+  /* A still star field behind the card: each gradient is one dot that repeats on its own
+     tile size (the sizes share no common factor), so the pattern never visibly repeats.
+     It fades out towards the bottom. */
+  .auth-sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .auth-sky::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background-image:
+      radial-gradient(circle at 20% 30%, var(--color-parchment-100) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, color-mix(in oklab, var(--color-parchment-100) 70%, transparent) 0 0.7px, transparent 1.2px),
+      radial-gradient(circle at 45% 85%, color-mix(in oklab, var(--color-lantern-300) 90%, transparent) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 85% 15%, color-mix(in oklab, var(--color-parchment-300) 90%, transparent) 0 1.1px, transparent 1.8px),
+      radial-gradient(circle at 10% 70%, color-mix(in oklab, var(--color-parchment-100) 55%, transparent) 0 0.6px, transparent 1.1px),
+      radial-gradient(circle at 55% 40%, var(--color-parchment-100) 0 1.2px, transparent 2px);
+    background-size: 211px 199px, 257px 241px, 313px 307px, 379px 367px, 163px 157px, 431px 419px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 90%);
+    mask-image: linear-gradient(to bottom, #000 30%, transparent 90%);
+  }
+
+  /* Three of the logo's stars, far out on wide screens only. -59% puts the star's crossing
+     point (12, 20 in its 24 × 34 box) on the given position. */
+  .auth-flare {
+    position: absolute;
+    display: none;
+    height: auto;
+    aspect-ratio: 24 / 34;
+    translate: -50% -59%;
+    color: var(--color-lantern-300);
+    filter: drop-shadow(0 0 6px var(--color-lantern-500));
+  }
+
+  @media (width >= 64rem) {
+    .auth-flare {
+      display: block;
+    }
+  }
+
+  .auth-flare-1 {
+    left: 16%;
+    top: 22%;
+    width: 0.875rem;
+    opacity: 0.55;
+  }
+
+  .auth-flare-2 {
+    left: 83%;
+    top: 13%;
+    width: 0.5625rem;
+    opacity: 0.4;
+  }
+
+  .auth-flare-3 {
+    left: 79%;
+    top: 61%;
+    width: 1rem;
+    opacity: 0.5;
+  }
+
+  /* ===== Card (AuthPanel) ===== */
+
+  .auth-card {
+    position: relative;
+    width: 100%;
+    max-width: 30rem;
+    padding: 2rem 1.25rem 1.75rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 1rem;
+    background-color: var(--color-night-900);
+    /* Violet light falling on the top of the card */
+    background-image: radial-gradient(90% 9rem at 50% 0%, color-mix(in oklab, var(--color-lantern-700) 24%, transparent), transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--color-parchment-100) 5%, transparent),
+      0 32px 64px -32px rgb(0 0 0 / 0.75);
+  }
+
+  @media (width >= 30rem) {
+    .auth-card {
+      padding: 2.5rem 2.25rem 2rem;
+    }
+  }
+
+  /* Starlight catching the top edge */
+  .auth-card::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 18%;
+    right: 18%;
+    height: 1px;
+    pointer-events: none;
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklab, var(--color-lantern-300) 80%, transparent),
+      transparent
+    );
+  }
+
+  .auth-head {
+    text-align: center;
+  }
+
+  /* Hairline, the logo's star, mirrored hairline (the same ornament as the Home chapters) */
+  .auth-emblem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .auth-emblem-line {
+    width: 2.5rem;
+    height: 1px;
+    background-image: linear-gradient(to right, transparent, var(--color-lantern-500));
+  }
+
+  .auth-emblem-line-end {
+    background-image: linear-gradient(to left, transparent, var(--color-lantern-500));
+  }
+
+  .auth-emblem-star {
+    flex: none;
+    width: 0.875rem;
+    height: 1.25rem;
+    color: var(--color-lantern-300);
+    filter: drop-shadow(0 0 8px var(--color-lantern-500));
+  }
+
+  /* Cinzel never goes below 24px. The title stays at 24px up to a 400px-wide screen, so
+     "Create your account" (about 285px wide at 24px) fits on one line at 375px. At 360px it
+     may wrap; text-wrap: balance then splits it into two even lines. It grows to 32px by a
+     600px-wide screen. */
+  .auth-title {
+    margin-top: 1rem;
+    font-size: clamp(1.5rem, 0.5rem + 4vw, 2rem);
+    line-height: 1.2;
+    text-wrap: balance;
+    color: var(--color-parchment-100);
+  }
+
+  .auth-subtitle {
+    max-width: 24rem;
+    margin: 0.5rem auto 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    text-wrap: balance;
+    color: var(--color-parchment-300);
+  }
+
+  /* Server error above the form (.alert-error gives the colours) */
+  .auth-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .auth-alert-icon {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* ===== Form ===== */
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  /* One field: label, control and messages, with the same spacing as FormField (flex-col
+     gap-1.5). Register also wraps PasswordInput and PasswordChecklist in one, so the rules
+     panel sits close under the password field. */
+  .auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  /* 44px tall: a comfortable tap target, and the height the password toggle fills */
+  .auth-input {
+    min-height: 2.75rem;
+  }
+
+  /* Hints and errors that wrap on a phone don't leave one word alone on the last line */
+  .auth-form .field-hint,
+  .auth-form .field-error {
+    text-wrap: pretty;
+  }
+
+  .auth-submit {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .auth-submit:disabled {
+    cursor: progress;
+  }
+
+  .auth-switch {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-parchment-300);
+  }
+
+  /* Gold alone is too close to the parchment text around it (WCAG 1.4.1), so the link is
+     underlined. The padding makes a 44px tall target; the negative margin keeps the line height. */
+  .auth-switch a {
+    display: inline-block;
+    padding: 0.75rem 0.125rem;
+    margin-block: -0.75rem;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--color-gold-400) 55%, transparent);
+    text-underline-offset: 4px;
+  }
+
+  .auth-switch a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* ===== Password field with show/hide toggle (PasswordInput) ===== */
+
+  .pw-input-wrap {
+    position: relative;
+  }
+
+  /* Room for the toggle, so the text never runs under it (.input sets padding-inline) */
+  .pw-input {
+    padding-inline-end: 3rem;
+  }
+
+  /* Edge adds its own reveal button to password inputs; ours replaces it */
+  .pw-input::-ms-reveal,
+  .pw-input::-ms-clear {
+    display: none;
+  }
+
+  /* A 44 × 44 hit area that fills the right end of the input */
+  .pw-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    border-radius: 0.5rem;
+    color: var(--color-parchment-300);
+  }
+
+  .pw-toggle:hover {
+    color: var(--color-gold-300);
+  }
+
+  /* The ring sits inside the input, around the icon */
+  .pw-toggle:focus-visible {
+    outline-offset: -5px;
+  }
+
+  .pw-toggle-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ===== Password panel: strength constellation + rules checklist (PasswordChecklist) ===== */
+
+  /* A darker well, like a window onto the night sky */
+  .pw-panel {
+    margin-top: 0.25rem;
+    padding: 0.875rem 1rem 1rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 0.75rem;
+    background-color: var(--color-night-950);
+    background-image: radial-gradient(90% 70% at 15% 0%, color-mix(in oklab, var(--color-lantern-900) 80%, transparent), transparent 75%);
+  }
+
+  .pw-panel-complete {
+    border-color: color-mix(in oklab, var(--color-success) 45%, var(--color-night-700));
+  }
+
+  /* Shared star shape for the meter and the rules: hollow until lit */
+  .pw-star-path {
+    fill: transparent;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+
+  .pw-meter-star-lit .pw-star-path,
+  .pw-rule-met .pw-star-path {
+    fill: currentColor;
+  }
+
+  /* Strength: the five-star constellation on the left, the word on the right */
+  .pw-meter {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* Stars and line ends share the same percentages, so the drawing scales with the width
+     (StrengthMeter) */
+  .pw-meter-sky {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 15rem;
+    height: 2.5rem;
+  }
+
+  .pw-meter-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Lines and stars take their colour from `color` (forced-colours mode overrides it below) */
+  .pw-meter-line {
+    color: var(--color-night-700);
+    stroke: currentColor;
+    stroke-width: 1;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .pw-meter-line-lit {
+    color: color-mix(in oklab, var(--color-lantern-300) 70%, transparent);
+    stroke-width: 1.25;
+  }
+
+  .pw-meter-sky-complete .pw-meter-line-lit {
+    color: color-mix(in oklab, var(--color-success) 80%, transparent);
+  }
+
+  /* The crossing point is 58% down the padded 28 × 38 box */
+  .pw-meter-star {
+    position: absolute;
+    height: auto;
+    aspect-ratio: 28 / 38;
+    translate: -50% -58%;
+    transform-origin: 50% 58%;
+    color: var(--color-night-500);
+  }
+
+  .pw-meter-star-lit {
+    color: var(--color-lantern-300);
+    filter: drop-shadow(0 0 4px var(--color-lantern-500));
+  }
+
+  .pw-meter-sky-complete .pw-meter-star-lit {
+    color: var(--color-success);
+    filter: drop-shadow(0 0 5px color-mix(in oklab, var(--color-success) 55%, transparent));
+  }
+
+  .pw-meter-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: auto;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .pw-meter-caption {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-parchment-500);
+  }
+
+  .pw-meter-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    color: var(--color-parchment-100);
+  }
+
+  .pw-meter-value-empty {
+    font-weight: 500;
+    color: var(--color-parchment-500);
+  }
+
+  .pw-meter-value-strong {
+    color: var(--color-success);
+  }
+
+  /* Checklist: one star per rule */
+  .pw-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-night-700);
+  }
+
+  .pw-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-parchment-500);
+  }
+
+  .pw-rule-met {
+    color: var(--color-success);
+  }
+
+  .pw-rule-star {
+    flex: none;
+    width: 0.9375rem;
+    height: 1.25rem;
+    transform-origin: 50% 58%;
+  }
+
+  .pw-rule-star .pw-star-path {
+    stroke-width: 2.5;
+  }
+
+  .pw-rule-met .pw-rule-star {
+    filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-success) 45%, transparent));
+  }
+
+  /* ===== Repeat password: the match hint (PasswordMatchHint) ===== */
+
+  /* The live region stays in the page while empty (so its changes are announced), but an
+     empty box must not add a gap to the field: this cancels the .auth-field gap above it. */
+  .pw-match-region:empty {
+    margin-top: -0.375rem;
+  }
+
+  .pw-match {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-parchment-300);
+  }
+
+  .pw-match-ok {
+    color: var(--color-success);
+  }
+
+  .pw-match-icon {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .pw-match-ne {
+    fill: none;
+    stroke: var(--color-parchment-500);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .pw-match-check {
+    fill: none;
+    stroke: var(--color-night-950);
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Forced colours: no glows; the hollow/filled shapes still tell the states apart */
+  @media (forced-colors: active) {
+    /* SVG keeps author colours in forced-colours mode, so the meter is recoloured with system
+       colours: unlit parts muted, lit parts in the text colour */
+    .pw-meter-star,
+    .pw-meter-line {
+      color: GrayText;
+    }
+
+    .pw-meter-star-lit,
+    .pw-meter-line-lit,
+    .pw-meter-sky-complete .pw-meter-star-lit,
+    .pw-meter-sky-complete .pw-meter-line-lit {
+      color: CanvasText;
+    }
+
+    /* Some high-contrast themes make GrayText bright, so unlit lines are also dashed */
+    .pw-meter-line:not(.pw-meter-line-lit) {
+      stroke-dasharray: 2 3;
+    }
+
+    .auth-flare {
+      display: none;
+    }
+
+    .auth-emblem-star,
+    .pw-meter-star-lit,
+    .pw-meter-sky-complete .pw-meter-star-lit,
+    .pw-rule-met .pw-rule-star {
+      filter: none;
+    }
+
+    .pw-match-ne {
+      stroke: currentColor;
+    }
+
+    .pw-match-check {
+      stroke: Canvas;
+    }
+  }
+
+  /* All motion is opt-in, one-shot, and under half a second */
+  @media (prefers-reduced-motion: no-preference) {
+    .pw-toggle {
+      transition: color 150ms ease-out;
+    }
+
+    .pw-rule,
+    .pw-meter-value,
+    .pw-match {
+      transition: color 200ms ease-out;
+    }
+
+    .pw-rule-star,
+    .pw-meter-star {
+      transition:
+        color 250ms ease-out,
+        filter 250ms ease-out;
+    }
+
+    .pw-star-path {
+      transition: fill 250ms ease-out;
+    }
+
+    .pw-meter-line {
+      transition: color 300ms ease-out;
+    }
+
+    .pw-panel {
+      transition: border-color 300ms ease-out;
+    }
+
+    /* A star "ignites" once when its rule is met (the class is added) */
+    .pw-rule-met .pw-rule-star,
+    .pw-meter-star-lit {
+      animation: pw-ignite 450ms ease-out;
+    }
+  }
+}
+
+@keyframes pw-ignite {
+  0% {
+    scale: 0.55;
+  }
+
+  55% {
+    scale: 1.25;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
