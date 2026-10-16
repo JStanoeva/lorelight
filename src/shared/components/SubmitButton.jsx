@@ -1,6 +1,7 @@
-// The full-width submit button of the Login and Register forms, disabled while the request runs.
-export default function AuthSubmitButton({ isPending, label, pendingLabel }) {
-  // Clicking moves focus to the button, so the field being left shows its error, which pushes
+// A form's submit button, disabled while the request runs. Login and Register pass a bigger,
+// full-width style through `className`.
+export default function SubmitButton({ isPending, label, pendingLabel, className = "btn btn-primary" }) {
+  // Clicking moves focus to the button, so the field being left shows its error, which can push
   // the button down between mousedown and mouseup, and the click is lost. Preventing the
   // default keeps focus where it is. Enter and keyboard activation are unaffected.
   function handleMouseDown(event) {
@@ -9,12 +10,7 @@ export default function AuthSubmitButton({ isPending, label, pendingLabel }) {
 
   return (
     <>
-      <button
-        type="submit"
-        disabled={isPending}
-        onMouseDown={handleMouseDown}
-        className="btn btn-primary btn-lg auth-submit"
-      >
+      <button type="submit" disabled={isPending} onMouseDown={handleMouseDown} className={className}>
         {isPending ? pendingLabel : label}
       </button>
 

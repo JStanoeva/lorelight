@@ -1,19 +1,19 @@
 import { useState } from "react";
 import FormField from "../../../shared/components/FormField.jsx";
+import SubmitButton from "../../../shared/components/SubmitButton.jsx";
+import { useForm } from "../../../shared/hooks/useForm.js";
 import AuthAlert from "../components/AuthAlert.jsx";
 import AuthPanel from "../components/AuthPanel.jsx";
-import AuthSubmitButton from "../components/AuthSubmitButton.jsx";
 import AuthSwitchLink from "../components/AuthSwitchLink.jsx";
 import PasswordInput from "../components/PasswordInput.jsx";
 import { useAuth } from "../hooks/useAuth.js";
-import { useAuthForm } from "../hooks/useAuthForm.js";
 import { getAuthErrorField, getAuthErrorMessage, validateLogin } from "../utils/authValidation.js";
 
 const INITIAL_VALUES = { email: "", password: "" };
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const { values, getShownError, handleChange, handleBlur, validateBeforeSubmit } = useAuthForm(
+  const { values, getShownError, handleChange, handleBlur, validateBeforeSubmit } = useForm(
     INITIAL_VALUES,
     validateLogin,
   );
@@ -80,7 +80,12 @@ export default function LoginPage() {
           autoComplete="current-password"
         />
 
-        <AuthSubmitButton isPending={isPending} label="Log in" pendingLabel="Logging in…" />
+        <SubmitButton
+          isPending={isPending}
+          label="Log in"
+          pendingLabel="Logging in…"
+          className="btn btn-primary btn-lg auth-submit"
+        />
       </form>
 
       <AuthSwitchLink question="New to Lorelight?" to="/register" label="Create an account" />

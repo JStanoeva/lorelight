@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { flushSync } from "react-dom";
 
-// Form state shared by Login and Register: the field values (controlled inputs), the fields
-// the user has left at least once (touched), and whether a submit was tried.
-// `validate(values)` returns an errors object. It runs on every render, so the errors always
-// match the current values and are never stored in state.
-export function useAuthForm(initialValues, validate) {
+// Form state for every form (Login, Register, Project, later Lore and Profile): the field values
+// (controlled inputs), the fields the user has left at least once (touched), and whether
+// a submit was tried. `validate(values)` returns an errors object. It runs on every render,
+// so the errors always match the current values and are never stored in state.
+export function useForm(initialValues, validate) {
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -19,8 +19,9 @@ export function useAuthForm(initialValues, validate) {
   }
 
   function handleChange(event) {
-    const { name, value } = event.target;
-    setValues((current) => ({ ...current, [name]: value }));
+    const { name, type, value, checked } = event.target;
+    // A checkbox reports its state in `checked`, every other control in `value`
+    setValues((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
   }
 
   function handleBlur(event) {

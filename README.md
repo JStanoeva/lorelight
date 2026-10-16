@@ -240,7 +240,8 @@ All forms use controlled inputs (`value` + `onChange`) and submit through the `o
 - **Lore description** (multiple rules): required; at least 20 characters; at most 5,000 characters.
 - **Tags:** optional; up to 10 tags; each tag up to 30 characters; stored in lowercase; duplicates are removed.
 - **Image / cover URL:** optional; if filled in, must be a valid `http(s)` URL.
-- **Project title:** required; 3–80 characters. **Project description:** optional; up to 1,000 characters.
+- **Project title:** required; 3–80 characters; leading and trailing spaces are removed. **Project description:** optional; up to 1,000 characters.
+- **Project format:** required; must be one of the predefined formats. **Project genre:** optional ("No genre"); if chosen, must be one of the predefined genres.
 - **Username** (register, multiple rules): required; 3–30 characters; letters (a–z) and numbers only (no spaces or special characters); saved in lowercase; must not already be taken (case-insensitive).
 - **Display name** (edit profile): required; 1–50 characters; any characters allowed. **Bio:** optional; up to 500 characters.
 - **Email:** required; valid email format.
@@ -264,7 +265,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useRef` — the confirmation dialog element, and the password input (keeping the cursor in place when the password is shown or hidden)
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
-  - Custom hooks — `useAuth`, `useAuthForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
   - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.

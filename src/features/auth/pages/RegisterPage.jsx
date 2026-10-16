@@ -1,14 +1,14 @@
 import { useId, useState } from "react";
 import FormField from "../../../shared/components/FormField.jsx";
+import SubmitButton from "../../../shared/components/SubmitButton.jsx";
+import { useForm } from "../../../shared/hooks/useForm.js";
 import AuthAlert from "../components/AuthAlert.jsx";
 import AuthPanel from "../components/AuthPanel.jsx";
-import AuthSubmitButton from "../components/AuthSubmitButton.jsx";
 import AuthSwitchLink from "../components/AuthSwitchLink.jsx";
 import PasswordChecklist from "../components/PasswordChecklist.jsx";
 import PasswordInput from "../components/PasswordInput.jsx";
 import PasswordMatchHint from "../components/PasswordMatchHint.jsx";
 import { useAuth } from "../hooks/useAuth.js";
-import { useAuthForm } from "../hooks/useAuthForm.js";
 import { authService } from "../services/authService.js";
 import {
   NO_SESSION_MESSAGE,
@@ -23,7 +23,7 @@ const INITIAL_VALUES = { username: "", email: "", password: "", repeatPassword: 
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const { values, getShownError, handleChange, handleBlur, validateBeforeSubmit } = useAuthForm(
+  const { values, getShownError, handleChange, handleBlur, validateBeforeSubmit } = useForm(
     INITIAL_VALUES,
     validateRegister,
   );
@@ -151,10 +151,11 @@ export default function RegisterPage() {
           <PasswordMatchHint id={matchId} state={matchState} />
         </PasswordInput>
 
-        <AuthSubmitButton
+        <SubmitButton
           isPending={isPending}
           label="Create account"
           pendingLabel="Creating account…"
+          className="btn btn-primary btn-lg auth-submit"
         />
       </form>
 
