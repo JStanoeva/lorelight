@@ -264,7 +264,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useRef` — the confirmation dialog element, and the password input (keeping the cursor in place when the password is shown or hidden)
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
-  - Custom hooks — `useAuth`, `useAuthForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useAuthForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
   - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.
@@ -273,7 +273,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, Lore/Project forms (author id), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Lore/Project forms (author id), and the appreciation and Constellation buttons.
 
 ### Component Styling
 
@@ -299,6 +299,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 - **Empty or missing data states:**
   - The catalog, projects and Constellation show a friendly empty state with a call to action.
   - Searches without results suggest clearing the filters.
+  - Projects without a cover image, or whose image fails to load, show a generated pattern that is unique to each Project instead of a broken image.
   - Missing or private records (including anything inside a private Project) show a "not found" state.
   - If a saved entry becomes private, directly or because its Project becomes private, it is removed from every Constellation automatically, so no one sees a broken card.
   - Unknown URLs show the Not Found page.

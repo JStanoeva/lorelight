@@ -1,0 +1,118 @@
+/*
+  "Archive Sigil" image placeholder (ImagePlaceholder.jsx). Every colour comes from currentColor:
+  a lore category class, or a seeded gold for projects.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+*/
+@layer components {
+  .sigil {
+    --sigil-bg: #0d1328;
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--sigil-bg);
+    /* Lets the rules at the bottom react to the placeholder's own size, not the window's */
+    container: sigil / size;
+  }
+
+  .sigil-layer {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sigil-texture-ink {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+  }
+
+  /* Strokes keep the same pixel width whether the sigil is 64 px or 1100 px wide */
+  .sigil-line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .sigil-line--bold {
+    stroke-width: 1.35px;
+  }
+
+  .sigil-beads {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .sigil-beads--large {
+    stroke-width: 3.4px;
+  }
+
+  .sigil-hub {
+    fill: var(--sigil-bg);
+  }
+
+  .sigil-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 42%, rgb(11 16 32 / 0.72) 100%);
+  }
+
+  /* Thin rules near the edge, like the tooled border of an old book cover */
+  .sigil-frame {
+    position: absolute;
+    inset: 8px;
+    border: 1px solid currentColor;
+    opacity: 0.2;
+  }
+
+  .sigil-frame--double {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Large banners: slightly heavier lines so the engraving doesn't look faint */
+  @container sigil (min-width: 640px) {
+    .sigil-line {
+      stroke-width: 1.3px;
+    }
+
+    .sigil-line--bold {
+      stroke-width: 1.8px;
+    }
+
+    .sigil-beads {
+      stroke-width: 3px;
+    }
+
+    .sigil-beads--large {
+      stroke-width: 4.6px;
+    }
+
+    .sigil-frame {
+      inset: 14px;
+    }
+  }
+
+  /* Tiny squares: drop the fine details that would turn into noise */
+  @container sigil (max-width: 120px) {
+    .sigil-detail,
+    .sigil-frame {
+      display: none;
+    }
+
+    .sigil-beads--large {
+      stroke-width: 2.4px;
+    }
+  }
+}

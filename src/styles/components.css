@@ -36,6 +36,18 @@
     @apply rounded-xl border border-night-700 bg-night-800 p-5 shadow-lg shadow-black/20;
   }
 
+  /* Cards that open a page (ProjectCard, later LoreCard). The title's .card-link stretches over the
+     whole card, so the card is one click target while the link's name stays just the title.
+     outline-hidden: invisible normally (the gold ring shows focus), but High Contrast mode draws it,
+     because that mode removes the ring's box-shadow. */
+  .card-interactive {
+    @apply relative overflow-hidden rounded-xl border border-night-700 bg-night-800 shadow-lg shadow-black/20 transition-colors hover:border-night-500 has-[.card-link:focus-visible]:border-gold-400 has-[.card-link:focus-visible]:ring-2 has-[.card-link:focus-visible]:ring-gold-400 has-[.card-link:focus-visible]:outline-hidden;
+  }
+
+  .card-link {
+    @apply text-parchment-100 no-underline transition-colors after:absolute after:inset-0 hover:text-gold-300 focus-visible:outline-none;
+  }
+
   .dialog {
     @apply m-auto w-[min(28rem,calc(100%-2rem))] rounded-xl border border-night-700 bg-night-800 p-6 text-parchment-100 shadow-2xl shadow-black/40;
   }
