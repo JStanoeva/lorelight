@@ -1,0 +1,86 @@
+/*
+  LoreCard: a lore entry as a card (Project Details, later the Catalog, profiles and Constellation).
+  The category colour arrives as currentColor through the category's text class.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+*/
+@layer components {
+  .lore-card {
+    isolation: isolate;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.125rem 1.125rem 1rem;
+  }
+
+  .lore-card-glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, currentColor, transparent 85%) top left / 100% 2px no-repeat,
+      radial-gradient(130% 90% at 0% 0%, color-mix(in srgb, currentColor 14%, transparent), transparent 62%);
+  }
+
+  .lore-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .lore-card-badge-star {
+    margin-right: 0.3125rem;
+  }
+
+  .lore-card-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-parchment-300);
+  }
+
+  .lore-card-title {
+    margin: 0.125rem 0 0;
+    font-size: 1.25rem;
+    overflow-wrap: anywhere;
+  }
+
+  .lore-card-excerpt {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-parchment-300);
+    overflow-wrap: anywhere;
+  }
+
+  .lore-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgb(44 55 105 / 0.7);
+    font-size: 0.75rem;
+    color: var(--color-parchment-500);
+  }
+
+  .lore-card-folder,
+  .lore-card-appreciations {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

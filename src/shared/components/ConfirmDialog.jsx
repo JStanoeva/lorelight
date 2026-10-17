@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef } from "react";
 
+// `isConfirmDisabled` blocks only the confirm button (e.g. while the dialog is still loading
+// something it needs); `isPending` blocks both buttons while the request runs.
 export default function ConfirmDialog({
   isOpen,
   title,
@@ -9,6 +11,7 @@ export default function ConfirmDialog({
   pendingLabel = "Deleting…",
   cancelLabel = "Cancel",
   isPending = false,
+  isConfirmDisabled = false,
   onConfirm,
   onCancel,
 }) {
@@ -34,12 +37,26 @@ export default function ConfirmDialog({
     }
   }
 
+  // Escape belongs to this dialog only, not to a drawer or menu the dialog sits in
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      event.stopPropagation();
+    }
+  }
+
+  // Closing through the dialog itself (like Escape does) lets the browser give focus back to the
+  // button that opened it; the "close" event then tells the parent through onCancel.
+  function handleCancelClick() {
+    dialogRef.current.close();
+  }
+
   return (
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
       onCancel={handleEscape}
       onClose={onCancel}
+      onKeyDown={handleKeyDown}
       className="dialog"
     >
       <h2 id={titleId} className="text-xl">
@@ -52,10 +69,15 @@ export default function ConfirmDialog({
         </p>
       )}
       <div className="mt-6 flex justify-end gap-3">
-        <button type="button" onClick={onCancel} disabled={isPending} className="btn btn-ghost">
+        <button type="button" onClick={handleCancelClick} disabled={isPending} className="btn btn-ghost">
           {cancelLabel}
         </button>
-        <button type="button" onClick={onConfirm} disabled={isPending} className="btn btn-danger">
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={isPending || isConfirmDisabled}
+          className="btn btn-danger"
+        >
           {isPending ? pendingLabel : confirmLabel}
         </button>
       </div>

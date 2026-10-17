@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import VisibilityBadge from "../../lore/components/VisibilityBadge.jsx";
 import CoverImage from "../../../shared/components/CoverImage.jsx";
 import { getFormatLabel, getGenreLabel } from "../utils/projectLabels.js";
 
@@ -29,17 +30,7 @@ export default function ProjectCard({ project, showVisibility = false }) {
               {project.title}
             </Link>
           </h2>
-          {showVisibility && (
-            <span
-              className={`badge shrink-0 ${
-                project.is_public
-                  ? "bg-success/10 text-success ring-success/30"
-                  : "bg-night-900 text-parchment-300 ring-night-500"
-              }`}
-            >
-              {project.is_public ? "Public" : "Private"}
-            </span>
-          )}
+          {showVisibility && <VisibilityBadge visibility={project.is_public ? "public" : "private"} />}
         </div>
 
         {details && <p className="text-sm text-parchment-500">{details}</p>}

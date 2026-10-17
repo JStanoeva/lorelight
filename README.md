@@ -193,7 +193,7 @@ New Projects and Lore Entries are private until their owner makes them public.
 
 - **Catalog:** `useLoreList(filters)` → `loreService.getPublicLore()` loads public entries with the active search, category and sort.
 - **Details:** `useLoreEntry(entryId)` → `loreService.getLoreById()`
-- **Project Details:** loads the project and its lore entries.
+- **Project Details:** loads the project, its folders and its lore entries.
 - **Profile:** loads a creator's Projects, Lore and Constellation (only public items for visitors; everything for the owner).
 - **My Constellation:** loads the current user's saved entries.
 
@@ -216,6 +216,8 @@ Deleting a **Project** opens a dialog with two choices:
 
 Making a **Project private** hides all of its Lore Entries from everyone else, without changing each entry's own public/private setting. Making the Project public again restores them.
 
+**Folders** organize the lore inside a Project (one level). The owner creates, renames and deletes them from the Project's sidebar. Deleting a folder never deletes lore: its entries move back to the top level of the Project.
+
 ---
 
 ## 8. Forms & Validation
@@ -227,10 +229,11 @@ Making a **Project private** hides all of its Lore Entries from everyone else, w
 - Create / Edit Lore Entry
 - Create / Edit Project
 - Edit Profile
-- Delete Project dialog (delete lore or move it to another Project)
+- Folder name (new folder / rename folder, inline in the Project sidebar)
+- Delete Project dialog (a controlled choice: delete the lore, or move it to another Project; confirmed with its Delete button)
 - Catalog search and filters
 
-All forms use controlled inputs (`value` + `onChange`) and submit through the `onSubmit` synthetic event.
+All forms use controlled inputs (`value` + `onChange`) and submit through the `onSubmit` synthetic event. Delete confirmations (such as the Delete Project dialog) are confirmed with a button click in a confirmation dialog.
 
 ### Validation Rules
 
@@ -241,6 +244,7 @@ All forms use controlled inputs (`value` + `onChange`) and submit through the `o
 - **Tags:** optional; up to 10 tags; each tag up to 30 characters; stored in lowercase; duplicates are removed.
 - **Image / cover URL:** optional; if filled in, must be a valid `http(s)` URL.
 - **Project title:** required; 3–80 characters; leading and trailing spaces are removed. **Project description:** optional; up to 1,000 characters.
+- **Folder name:** required; 1–50 characters; leading and trailing spaces are removed; must be unique within its Project (ignoring upper/lower case).
 - **Project format:** required; must be one of the predefined formats. **Project genre:** optional ("No genre"); if chosen, must be one of the predefined genres.
 - **Username** (register, multiple rules): required; 3–30 characters; letters (a–z) and numbers only (no spaces or special characters); saved in lowercase; must not already be taken (case-insensitive).
 - **Display name** (edit profile): required; 1–50 characters; any characters allowed. **Bio:** optional; up to 500 characters.
@@ -249,7 +253,7 @@ All forms use controlled inputs (`value` + `onChange`) and submit through the `o
 
 The same length limits are enforced by database check constraints, so invalid data is rejected even if the form is bypassed.
 
-Invalid fields show a message under the input. The submit button is disabled while a request is in progress, and server errors are shown above the form.
+Invalid fields show a message under the input. The submit button is disabled while a request is in progress, and server errors are shown above the form (or under the field in the small inline folder form).
 
 ---
 
@@ -261,11 +265,11 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useState` — form fields, loading and error states, UI toggles
   - `useEffect` — data fetching, auth subscription, a scroll-spy observer
   - `useContext` — reading `AuthContext` through the `useAuth` hook
-  - `useCallback` — a stable `refetch` function returned by the data hooks
-  - `useRef` — the confirmation dialog element, and the password input (keeping the cursor in place when the password is shown or hidden)
+  - `useCallback` — a stable `refetch` function returned by the data hooks (and `updateData` in `useProject`, which applies a just-saved folder change without reloading)
+  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), and the focus targets of the Project sidebar and its menus
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
-  - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
   - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.
@@ -274,7 +278,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Lore/Project forms (author id), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details (owner actions), Lore/Project forms (author id), and the appreciation and Constellation buttons.
 
 ### Component Styling
 

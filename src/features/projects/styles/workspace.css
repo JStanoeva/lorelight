@@ -1,0 +1,858 @@
+/*
+  Project workspace (Project Details, later Lore Details): the contents sidebar on the left
+  (a slide-over drawer below 1024 px) and the project overview with its lore grid on the right.
+  "ws" = workspace. Plain CSS (no @apply), so it needs no @reference. The rules sit in the
+  components layer, so a Tailwind utility on the same element always wins.
+*/
+@layer components {
+  /* ---------- Frame ---------- */
+  .ws {
+    display: grid;
+    grid-template-columns: 18rem minmax(0, 1fr);
+    min-height: calc(100dvh - var(--header-height));
+  }
+
+  /* ---------- Sidebar ---------- */
+  .ws-sidebar {
+    position: sticky;
+    top: var(--header-height);
+    align-self: start;
+    height: calc(100dvh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-right: 1px solid var(--color-night-700);
+    background:
+      radial-gradient(120% 16rem at 0% 0%, rgb(57 39 129 / 0.28), transparent 70%),
+      var(--color-night-900);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-night-700) transparent;
+  }
+
+  .ws-sidebar-head {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 1rem 1.125rem;
+    border-bottom: 1px solid var(--color-night-700);
+  }
+
+  .ws-sidebar-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 2rem;
+  }
+
+  .ws-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-parchment-500);
+    text-decoration: none;
+  }
+
+  .ws-back-link:hover {
+    color: var(--color-gold-300);
+  }
+
+  .ws-sidebar-project {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: -0.375rem;
+    padding: 0.375rem;
+    border-radius: 0.75rem;
+    color: var(--color-parchment-100);
+    text-decoration: none;
+  }
+
+  .ws-sidebar-project:hover {
+    color: var(--color-parchment-100);
+    background: rgb(27 36 71 / 0.7);
+  }
+
+  .ws-sidebar-emblem {
+    position: relative;
+    flex-shrink: 0;
+    width: 3rem;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 0.625rem;
+    border: 1px solid var(--color-night-700);
+    background: var(--color-night-950);
+    box-shadow: 0 0 0 3px rgb(11 16 32 / 0.6);
+  }
+
+  .ws-sidebar-project-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .ws-sidebar-project-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .ws-sidebar-project-meta {
+    font-size: 0.75rem;
+    color: var(--color-parchment-500);
+  }
+
+  /* "+ New" */
+  .ws-popover-anchor {
+    position: relative;
+  }
+
+  .ws-new-button {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .ws-new-caret {
+    margin-left: auto;
+    opacity: 0.7;
+  }
+
+  .ws-new-button[aria-expanded="true"] .ws-new-caret {
+    transform: rotate(180deg);
+  }
+
+  .ws-popover {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 0.375rem);
+    left: 0;
+    min-width: 12rem;
+    margin: 0;
+    padding: 0.375rem;
+    list-style: none;
+    border: 1px solid var(--color-night-500);
+    border-radius: 0.75rem;
+    background: var(--color-night-800);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7);
+  }
+
+  .ws-popover-wide {
+    right: 0;
+  }
+
+  .ws-popover-right {
+    left: auto;
+    right: 0;
+  }
+
+  .ws-popover-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--color-parchment-100);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .ws-popover-item.is-compact {
+    gap: 0.5rem;
+    padding-block: 0.4375rem;
+    white-space: nowrap;
+  }
+
+  .ws-popover-item:hover,
+  .ws-popover-item:focus-visible {
+    background: var(--color-night-700);
+    color: var(--color-parchment-100);
+  }
+
+  .ws-popover-item:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .ws-popover-item svg {
+    color: var(--color-gold-400);
+  }
+
+  .ws-popover-item.is-danger,
+  .ws-popover-item.is-danger svg {
+    color: var(--color-danger);
+  }
+
+  .ws-popover-item-title {
+    display: block;
+    font-weight: 600;
+  }
+
+  .ws-popover-item-hint {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-parchment-500);
+  }
+
+  .ws-popover-item:hover .ws-popover-item-hint,
+  .ws-popover-item:focus-visible .ws-popover-item-hint {
+    color: var(--color-parchment-300);
+  }
+
+  /* ---------- Tree ---------- */
+  .ws-tree {
+    flex: 1;
+    padding: 0.75rem 0.625rem 2rem;
+  }
+
+  /* The tree takes focus after a folder is deleted (see ProjectSidebar) */
+  .ws-tree:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .ws-tree-label {
+    margin: 0.75rem 0.5rem 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-parchment-500);
+  }
+
+  .ws-tree-label:first-child {
+    margin-top: 0.25rem;
+  }
+
+  .ws-tree-list,
+  .ws-folder-entries {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ws-tree-note {
+    margin: 0.25rem 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--color-parchment-500);
+  }
+
+  .ws-folder-row {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    border-radius: 0.5rem;
+  }
+
+  .ws-folder-row:hover {
+    background: rgb(27 36 71 / 0.8);
+  }
+
+  .ws-folder-toggle {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    min-height: 2.125rem;
+    padding: 0.25rem 0.375rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--color-parchment-100);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .ws-folder-toggle:focus-visible,
+  .ws-entry:focus-visible,
+  .ws-sidebar-project:focus-visible,
+  .ws-icon-button:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .ws-chevron {
+    color: var(--color-parchment-500);
+    transition: transform 0.15s ease;
+  }
+
+  .ws-folder-toggle[aria-expanded="true"] .ws-chevron {
+    transform: rotate(90deg);
+  }
+
+  .ws-folder-icon {
+    color: var(--color-lantern-300);
+  }
+
+  .ws-folder-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ws-folder-count {
+    min-width: 1.25rem;
+    padding: 0 0.375rem;
+    border-radius: 999px;
+    background: rgb(11 16 32 / 0.7);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    text-align: center;
+    color: var(--color-parchment-300);
+  }
+
+  /* Entries inside a folder hang from a thin guide line, like a file tree */
+  .ws-folder-entries {
+    position: relative;
+    margin: 0.125rem 0 0.375rem 1.0625rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid var(--color-night-700);
+  }
+
+  .ws-folder-entries[hidden] {
+    display: none;
+  }
+
+  .ws-icon-button {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.875rem;
+    height: 1.875rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--color-parchment-500);
+  }
+
+  .ws-icon-button:hover,
+  .ws-icon-button[aria-expanded="true"] {
+    background: var(--color-night-700);
+    color: var(--color-gold-300);
+  }
+
+  .ws-entry {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-parchment-300);
+    text-decoration: none;
+  }
+
+  .ws-entry:hover {
+    background: rgb(27 36 71 / 0.8);
+    color: var(--color-parchment-100);
+  }
+
+  /* The open entry (Lore Details): highlighted, with a slim gold ribbon hanging on its left,
+     like a bookmark in an old book */
+  .ws-entry.is-active {
+    background: linear-gradient(90deg, rgb(232 193 112 / 0.12), var(--color-night-800) 70%);
+    color: var(--color-gold-300);
+    font-weight: 600;
+  }
+
+  .ws-entry.is-active::before {
+    content: "";
+    position: absolute;
+    left: -0.6rem;
+    top: -0.2rem;
+    width: 0.4rem;
+    height: calc(100% + 0.6rem);
+    background: linear-gradient(180deg, var(--color-gold-300), var(--color-gold-400));
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 0.3rem), 0 100%);
+  }
+
+  .ws-entry-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ws-entry-lock {
+    display: inline-flex;
+    color: var(--color-parchment-500);
+  }
+
+  /* Filter box above the tree: narrows the entries by title while typing */
+  .ws-filter {
+    position: relative;
+    margin: 0.75rem 0.625rem 0;
+  }
+
+  .ws-filter-icon {
+    position: absolute;
+    left: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-parchment-500);
+    pointer-events: none;
+  }
+
+  .ws-filter-input {
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0.375rem 0.625rem 0.375rem 2rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 0.5rem;
+    background: var(--color-night-950);
+    color: var(--color-parchment-100);
+    font: inherit;
+    font-size: 0.875rem;
+  }
+
+  .ws-filter-input::placeholder {
+    color: var(--color-parchment-500);
+  }
+
+  .ws-filter-input:focus {
+    border-color: var(--color-gold-400);
+  }
+
+  .ws-filter-status {
+    margin: 0.375rem 1rem 0;
+    font-size: 0.75rem;
+    color: var(--color-parchment-500);
+  }
+
+  /* Stays in the page while empty (no space taken), so screen readers announce its changes */
+  .ws-filter-status:empty {
+    margin: 0;
+  }
+
+  /* Inline name inputs (new folder, rename) */
+  .ws-inline-form.is-invalid {
+    border-color: var(--color-danger);
+  }
+
+  .ws-inline-error {
+    margin: 0.25rem 0.5rem 0;
+    font-size: 0.8125rem;
+    color: var(--color-danger);
+  }
+
+  .ws-inline-form {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding: 0.1875rem 0.25rem 0.1875rem 0.5rem;
+    border: 1px solid var(--color-gold-400);
+    border-radius: 0.5rem;
+    background: var(--color-night-950);
+  }
+
+  .ws-inline-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.25rem;
+    border: 0;
+    background: transparent;
+    color: var(--color-parchment-100);
+    font: inherit;
+    font-size: 0.875rem;
+  }
+
+  .ws-inline-input::placeholder {
+    color: var(--color-parchment-500);
+  }
+
+  /* The form's gold border already shows focus */
+  .ws-inline-input:focus-visible {
+    outline: none;
+  }
+
+  .ws-inline-form .ws-icon-button {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+
+  /* ---------- Main column ---------- */
+  .ws-main {
+    min-width: 0;
+  }
+
+  .ws-content {
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: 2rem 2.5rem 4rem;
+  }
+
+  .ws-banner {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 1;
+    border: 1px solid var(--color-night-700);
+    border-radius: 1rem;
+    background: var(--color-night-900);
+    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.8);
+  }
+
+  .ws-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-top: 1.75rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-night-700);
+  }
+
+  .ws-head-text {
+    flex: 1 1 24rem;
+    min-width: 0;
+  }
+
+  .ws-kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .ws-details {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-lantern-300);
+  }
+
+  .ws-title {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .ws-byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-top: 0.875rem;
+    font-size: 0.875rem;
+    color: var(--color-parchment-500);
+  }
+
+  .ws-owner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+    border-radius: 999px;
+    text-decoration: none;
+  }
+
+  .ws-owner-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--color-lantern-500), var(--color-lantern-700));
+    color: var(--color-parchment-100);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .ws-owner-name {
+    font-weight: 600;
+    color: var(--color-parchment-100);
+  }
+
+  /* A very long name or username wraps instead of widening the page on phones */
+  .ws-owner-name,
+  .ws-owner-handle {
+    overflow-wrap: anywhere;
+  }
+
+  .ws-owner-handle {
+    color: var(--color-gold-400);
+  }
+
+  .ws-owner:hover .ws-owner-handle,
+  .ws-owner:hover .ws-owner-name {
+    color: var(--color-gold-300);
+    text-decoration: underline;
+  }
+
+  .ws-byline-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  /* Each dot sits before an item, so a wrapped line starts with a dot instead of ending with one */
+  .ws-byline-meta > span::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    margin-right: 0.75rem;
+    border-radius: 999px;
+    background: var(--color-night-500);
+    vertical-align: middle;
+  }
+
+  .ws-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .ws-description {
+    max-width: 68ch;
+    margin: 1.5rem 0 0;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-parchment-300);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- Lore grid ---------- */
+  .ws-lore {
+    margin-top: 2.75rem;
+  }
+
+  .ws-lore-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.875rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .ws-lore-title {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .ws-lore-count {
+    padding: 0.125rem 0.625rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-parchment-300);
+  }
+
+  .ws-lore-new {
+    margin-left: auto;
+  }
+
+  .ws-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ws-grid > li {
+    display: flex;
+  }
+
+  /* ---------- Empty state ---------- */
+  .ws-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 3rem 1.5rem;
+    border: 1px dashed var(--color-night-500);
+    border-radius: 1rem;
+    background: rgb(18 26 51 / 0.6);
+    text-align: center;
+  }
+
+  .ws-empty-star {
+    color: var(--color-lantern-300);
+  }
+
+  .ws-empty-title {
+    margin: 0.25rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-parchment-100);
+  }
+
+  .ws-empty-text {
+    margin: 0 0 0.75rem;
+    color: var(--color-parchment-300);
+  }
+
+  /* ---------- Wide screens: no mobile bar ---------- */
+  @media (width >= 64rem) {
+    .ws-mobile-bar,
+    .ws-drawer-close,
+    .ws-backdrop {
+      display: none;
+    }
+  }
+
+  /* ---------- Below 1024px: the sidebar becomes a slide-over drawer ---------- */
+  @media (width < 64rem) {
+    /* Keyboard focus and fragment jumps stop below the sticky Contents bar too (it sits under the header) */
+    .ws-main * {
+      scroll-margin-top: 3.75rem;
+    }
+
+    /* 16px text in the drawer's inputs, so phones don't zoom in when they get focus */
+    .ws-filter-input,
+    .ws-inline-input {
+      font-size: 1rem;
+    }
+
+    .ws {
+      display: block;
+    }
+
+    .ws-mobile-bar {
+      position: sticky;
+      top: var(--header-height);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--color-night-700);
+      background: rgb(11 16 32 / 0.88);
+      backdrop-filter: blur(8px);
+    }
+
+    .ws-contents-toggle {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2.5rem;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid var(--color-night-500);
+      border-radius: 0.5rem;
+      background: var(--color-night-900);
+      color: var(--color-parchment-100);
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .ws-contents-toggle:hover {
+      border-color: var(--color-gold-400);
+      color: var(--color-gold-300);
+    }
+
+    .ws-contents-count {
+      padding: 0 0.4375rem;
+      border-radius: 999px;
+      background: var(--color-night-700);
+      font-size: 0.75rem;
+      line-height: 1.25rem;
+    }
+
+    .ws-mobile-bar-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.875rem;
+      color: var(--color-parchment-500);
+    }
+
+    .ws-sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 60;
+      width: min(20rem, 88vw);
+      height: 100dvh;
+      border-right-color: var(--color-night-500);
+      box-shadow: 24px 0 48px -12px rgb(0 0 0 / 0.7);
+      transform: translateX(-100%);
+      /* Hidden only after the slide-out has finished, so it can't take focus while closed */
+      visibility: hidden;
+      transition:
+        transform 0.22s ease,
+        visibility 0s 0.22s;
+    }
+
+    /* Visible at once when opening, so focus can move to the close button straight away */
+    .ws-sidebar.is-open {
+      transform: none;
+      visibility: visible;
+      transition:
+        transform 0.22s ease,
+        visibility 0s;
+    }
+
+    .ws-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      background: rgb(5 8 18 / 0.72);
+      backdrop-filter: blur(2px);
+    }
+
+    .ws-content {
+      padding: 1.25rem 1.5rem 3rem;
+    }
+  }
+
+  @media (width < 40rem) {
+    .ws-content {
+      padding-inline: 1rem;
+    }
+
+    .ws-banner {
+      aspect-ratio: 2 / 1;
+      border-radius: 0.75rem;
+    }
+
+    .ws-head {
+      margin-top: 1.25rem;
+    }
+
+    /* Here the dates always wrap under the owner, so the first dot isn't needed */
+    .ws-byline-meta > span:first-child::before {
+      display: none;
+    }
+
+    .ws-lore-new {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ws-sidebar,
+    .ws-chevron {
+      transition: none;
+    }
+  }
+}
