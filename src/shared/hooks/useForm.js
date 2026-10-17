@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { flushSync } from "react-dom";
 
-// Form state for every form (Login, Register, Project, later Lore and Profile): the field values
+// Form state for every form (Login, Register, Project, Lore, later Profile): the field values
 // (controlled inputs), the fields the user has left at least once (touched), and whether
 // a submit was tried. `validate(values)` returns an errors object. It runs on every render,
 // so the errors always match the current values and are never stored in state.
@@ -29,6 +29,12 @@ export function useForm(initialValues, validate) {
     setTouched((current) => ({ ...current, [name]: true }));
   }
 
+  // Changes one field from code instead of from an input event, e.g. the Lore form clears
+  // the folder when another project is chosen
+  function setValue(name, value) {
+    setValues((current) => ({ ...current, [name]: value }));
+  }
+
   // Called at the start of a submit. Returns true when every field is valid. Otherwise it shows
   // all the errors and moves focus to the first invalid field (fields in initialValues order).
   function validateBeforeSubmit(form) {
@@ -46,5 +52,5 @@ export function useForm(initialValues, validate) {
     return false;
   }
 
-  return { values, getShownError, handleChange, handleBlur, validateBeforeSubmit };
+  return { values, getShownError, handleChange, handleBlur, setValue, validateBeforeSubmit };
 }

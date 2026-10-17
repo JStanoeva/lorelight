@@ -185,7 +185,7 @@ The main CRUD collection is **Lore Entries** (`lore_entries`). Projects (`projec
 
 ### Create (POST)
 
-Logged-in users open **Create Lore** from the header or with the "Add Lore" button on one of their Projects (which pre-selects that Project). Every entry belongs to a Project, so the form collects the Project (required), title, category, description, tags, an optional image URL and a public/private setting. Users without any Projects see a prompt to create one first. On submit, `loreService.createLore()` inserts the row with the current user as `author_id`, and the user is redirected to the new entry's details page.
+Logged-in users open **Create Lore** from the header, with the "Add Lore" button on one of their Projects (which pre-selects that Project), or with "New lore entry here" in one of its folders (which pre-selects that folder too). Every entry belongs to a Project, so the form collects the Project (required), an optional Folder (only the chosen Project's folders are listed), title, category, description, tags, an optional image URL and a public/private setting. Users without any Projects see a prompt to create one first. On submit, `loreService.createLore()` inserts the row with the current user as `author_id`, and the user is redirected to the new entry's details page.
 
 New Projects and Lore Entries are private until their owner makes them public.
 
@@ -241,7 +241,7 @@ All forms use controlled inputs (`value` + `onChange`) and submit through the `o
 - **Lore category:** required; must be one of the predefined categories.
 - **Lore project:** required; must be one of the user's own Projects.
 - **Lore description** (multiple rules): required; at least 20 characters; at most 5,000 characters.
-- **Tags:** optional; up to 10 tags; each tag up to 30 characters; stored in lowercase; duplicates are removed.
+- **Tags:** optional; up to 10 tags; each tag up to 30 characters; letters, numbers, spaces and hyphens only, with at least one letter or number; stored in lowercase; duplicates are removed. While the user types, the form shows a live preview of the tags exactly as they will be saved, with any problem marked on its tag.
 - **Image / cover URL:** optional; if filled in, must be a valid `http(s)` URL.
 - **Project title:** required; 3–80 characters; leading and trailing spaces are removed. **Project description:** optional; up to 1,000 characters.
 - **Folder name:** required; 1–50 characters; leading and trailing spaces are removed; must be unique within its Project (ignoring upper/lower case).
@@ -269,7 +269,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), and the focus targets of the Project sidebar and its menus
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
-  - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
   - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.
