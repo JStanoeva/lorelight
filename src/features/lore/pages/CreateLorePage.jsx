@@ -7,20 +7,7 @@ import Loader from "../../../shared/components/Loader.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import LoreForm from "../components/LoreForm.jsx";
 import { loreService } from "../services/loreService.js";
-import { EMPTY_LORE_VALUES, FOLDER_GONE_MESSAGE } from "../utils/loreValidation.js";
-
-// Readable messages for the two errors this form can run into, everything else as usual
-function getCreateErrorMessage(error) {
-  // 23503: the chosen folder was deleted after the form loaded it
-  if (error?.code === "23503") {
-    return FOLDER_GONE_MESSAGE;
-  }
-  // 42501: the database only accepts lore in the user's own projects (e.g. one deleted meanwhile)
-  if (error?.code === "42501") {
-    return "You can only add lore to your own projects. Choose one of them and try again.";
-  }
-  return getErrorMessage(error);
-}
+import { EMPTY_LORE_VALUES, getLoreSaveErrorMessage } from "../utils/loreValidation.js";
 
 export default function CreateLorePage() {
   const { user } = useAuth();
@@ -53,7 +40,7 @@ export default function CreateLorePage() {
       const entry = await loreService.createLore(payload, user.id);
       navigate(`/lore/${entry.id}`);
     } catch (createError) {
-      return getCreateErrorMessage(createError);
+      return getLoreSaveErrorMessage(createError);
     }
   }
 

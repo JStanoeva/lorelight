@@ -200,7 +200,7 @@ New Projects and Lore Entries are private until their owner makes them public.
 
 ### Update (PUT/PATCH)
 
-- **How the author edits:** the Edit button on the details page (visible only to the author) opens `/lore/:entryId/edit`. The form is pre-filled with the current values, and `loreService.updateLore()` saves the changes. Changing the Project selector moves the entry to another of the user's Projects.
+- **How the author edits:** the Edit button on the details page (visible only to the author) opens `/lore/:entryId/edit`. The form is pre-filled with the current values, and `loreService.updateLore()` saves the changes. Changing the Project selector moves the entry to another of the user's Projects; the entry leaves its folder unless a folder of the new Project is chosen.
 - **UI update:** after a successful update, the user is redirected to the details page, which loads the updated entry.
 
 ### Delete
