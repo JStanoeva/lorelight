@@ -1,0 +1,51 @@
+/*
+  CreatorLink: a creator's avatar, name and @username, linking to their profile (Project Details,
+  Lore Details).
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+*/
+@layer components {
+  /* The pill radius gives the keyboard focus ring a rounded shape */
+  .creator-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+    border-radius: 999px;
+    text-decoration: none;
+  }
+
+  .creator-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--color-lantern-500), var(--color-lantern-700));
+    color: var(--color-parchment-100);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .creator-name {
+    font-weight: 600;
+    color: var(--color-parchment-100);
+  }
+
+  /* A very long name or username wraps instead of widening the page on phones */
+  .creator-name,
+  .creator-handle {
+    overflow-wrap: anywhere;
+  }
+
+  .creator-handle {
+    color: var(--color-gold-400);
+  }
+
+  .creator-link:hover .creator-name,
+  .creator-link:hover .creator-handle {
+    color: var(--color-gold-300);
+    text-decoration: underline;
+  }
+}

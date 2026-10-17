@@ -10,7 +10,7 @@ import ProjectHeader from "../components/ProjectHeader.jsx";
 import ProjectLoreSection from "../components/ProjectLoreSection.jsx";
 import ProjectWorkspace from "../components/ProjectWorkspace.jsx";
 import { useProject } from "../hooks/useProject.js";
-import { sortFolders } from "../utils/projectContents.js";
+import { withoutFolder, withSavedFolder } from "../utils/projectContents.js";
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams();
@@ -19,21 +19,13 @@ export default function ProjectDetailsPage() {
   const { project, entries, folders, isLoading, error, refetch, updateData } = useProject(projectId);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // A folder was created or renamed: put it in the list (in alphabetical order)
+  // Folder changes made in the sidebar update the loaded data at once, without reloading
   function handleFolderSaved(savedFolder) {
-    updateData((data) => ({
-      ...data,
-      folders: sortFolders([...data.folders.filter((folder) => folder.id !== savedFolder.id), savedFolder]),
-    }));
+    updateData((data) => withSavedFolder(data, savedFolder));
   }
 
-  // A folder was deleted: the database moved its entries to the top level, so do the same here
   function handleFolderDeleted(folderId) {
-    updateData((data) => ({
-      ...data,
-      folders: data.folders.filter((folder) => folder.id !== folderId),
-      entries: data.entries.map((entry) => (entry.folder_id === folderId ? { ...entry, folder_id: null } : entry)),
-    }));
+    updateData((data) => withoutFolder(data, folderId));
   }
 
   if (isLoading) {

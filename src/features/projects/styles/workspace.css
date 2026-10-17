@@ -557,49 +557,6 @@
     color: var(--color-parchment-500);
   }
 
-  .ws-owner {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    min-width: 0;
-    border-radius: 999px;
-    text-decoration: none;
-  }
-
-  .ws-owner-avatar {
-    display: inline-grid;
-    place-items: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--color-lantern-500), var(--color-lantern-700));
-    color: var(--color-parchment-100);
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .ws-owner-name {
-    font-weight: 600;
-    color: var(--color-parchment-100);
-  }
-
-  /* A very long name or username wraps instead of widening the page on phones */
-  .ws-owner-name,
-  .ws-owner-handle {
-    overflow-wrap: anywhere;
-  }
-
-  .ws-owner-handle {
-    color: var(--color-gold-400);
-  }
-
-  .ws-owner:hover .ws-owner-handle,
-  .ws-owner:hover .ws-owner-name {
-    color: var(--color-gold-300);
-    text-decoration: underline;
-  }
-
   .ws-byline-meta {
     display: inline-flex;
     flex-wrap: wrap;

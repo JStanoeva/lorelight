@@ -1,0 +1,159 @@
+/*
+  "Emblem Print" lore placeholder (LorePlaceholder.jsx). Every line is drawn with currentColor,
+  which comes from the category's text colour class on the root.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+*/
+@layer components {
+  .emblem-print {
+    --emblem-print-bg: #0d1226;
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--emblem-print-bg);
+    /* Lets the rules at the bottom react to the placeholder's own size, not the window's */
+    container: emblem-print / size;
+  }
+
+  /* Holds the shared <symbol>s only; it takes no space */
+  .emblem-print-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .emblem-print-layer {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The parts of an emblem. No stroke-width here: each <use> sets its own, and the parts inherit it */
+  .emblem-print-line {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .emblem-print-fill {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  .emblem-print-tint {
+    fill: currentColor;
+    fill-opacity: 0.28;
+    stroke: none;
+  }
+
+  /* The lattice lines between the emblems */
+  .emblem-print-rule {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 0.8px;
+    opacity: 0.2;
+  }
+
+  .emblem-print-rule--dots {
+    stroke-width: 1.6px;
+    stroke-linecap: round;
+    opacity: 0.36;
+  }
+
+  /* A zero-length line with round caps draws a bead */
+  .emblem-print-joint {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3px;
+    stroke-linecap: round;
+    opacity: 0.45;
+  }
+
+  .emblem-print-joint--gold {
+    stroke: var(--color-gold-400);
+    opacity: 0.5;
+  }
+
+  .emblem-print-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* The cartouche: shown on wide banners only (see the container rules below) */
+  .emblem-print-feature {
+    position: absolute;
+    top: 46%;
+    display: none;
+    height: 58%; /* FEATURE_PIXELS in emblemPrint.js assumes this */
+    aspect-ratio: 1;
+    translate: -50% -50%;
+  }
+
+  .emblem-print-feature svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* A dark plate behind the cartouche, so the print stops around it */
+  .emblem-print-feature-halo {
+    fill: var(--emblem-print-bg);
+    fill-opacity: 0.94;
+    stroke: var(--emblem-print-bg);
+    stroke-width: 10px;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .emblem-print-feature-line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2px;
+    stroke-linejoin: round;
+    opacity: 0.6;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .emblem-print-feature-gold {
+    fill: none;
+    stroke: var(--color-gold-400);
+    stroke-width: 1px;
+    stroke-linejoin: round;
+    opacity: 0.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .emblem-print-feature-beads {
+    fill: none;
+    stroke: var(--color-gold-400);
+    stroke-width: 4px;
+    stroke-linecap: round;
+    opacity: 0.75;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Wide, low banners: show the cartouche. Not on taller ones (the 4:3 phone banner, or a desktop
+     banner that a long title made taller): the cartouche's size follows the height, so there it
+     would sit behind the title or grow past the right edge */
+  @container emblem-print (min-width: 520px) and (min-aspect-ratio: 9 / 4) {
+    .emblem-print-feature {
+      display: block;
+    }
+  }
+
+  /* Large banners: a slightly larger print, so it doesn't look too fine */
+  @container emblem-print (min-width: 640px) {
+    .emblem-print-scale {
+      transform: scale(1.22);
+    }
+  }
+}

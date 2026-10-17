@@ -166,6 +166,7 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 
 - **Navigation:** each Lore Card is a `<Link>` to `/lore/:entryId`. After creating or editing an entry, `useNavigate` redirects to its details page.
 - **Route parameter data:** `entryId` is read with `useParams` and passed to the `useLoreEntry(entryId)` hook, which loads the entry together with its author and project. Missing and private entries, and ids that aren't valid, show a "not found" state.
+- **Page content:** the entry is shown inside its Project's workspace: the Project's sidebar (folders and entries, with the open entry highlighted, loaded with `useProject`) and, beside it, a banner with the entry's image (or a generated print of its category's emblem), category, title, author, Project, folder and dates, then the appreciation count, the description and the tags. Moving between entries of the same Project keeps the sidebar in place and only reloads the entry. The author also sees Edit and Delete buttons and a short note on who can see the entry.
 
 ---
 
@@ -192,7 +193,7 @@ New Projects and Lore Entries are private until their owner makes them public.
 ### Read (GET)
 
 - **Catalog:** `useLoreList(filters)` → `loreService.getPublicLore()` loads public entries with the active search, category and sort.
-- **Details:** `useLoreEntry(entryId)` → `loreService.getLoreById()`
+- **Details:** `useLoreEntry(entryId)` → `loreService.getLoreById()`, plus `useProject()` for the Project sidebar
 - **Project Details:** loads the project, its folders and its lore entries.
 - **Profile:** loads a creator's Projects, Lore and Constellation (only public items for visitors; everything for the owner).
 - **My Constellation:** loads the current user's saved entries.
@@ -204,7 +205,7 @@ New Projects and Lore Entries are private until their owner makes them public.
 
 ### Delete
 
-- **How the author deletes:** the Delete button (visible only to the author) opens a confirmation dialog. After confirming, `loreService.deleteLore()` removes the entry. Its appreciations and Constellation saves are deleted automatically by the database.
+- **How the author deletes:** the Delete button on the details page (visible only to the author) opens a confirmation dialog. After confirming, `loreService.deleteLore()` removes the entry. Its appreciations and Constellation saves are deleted automatically by the database.
 - **UI update:** the user is redirected to the details page of the Project the entry belonged to, where the deleted entry no longer appears.
 
 Deleting a **Project** opens a dialog with two choices:
@@ -278,7 +279,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details (owner actions), Lore/Project forms (author id), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), Lore/Project forms (author id), and the appreciation and Constellation buttons.
 
 ### Component Styling
 
@@ -305,6 +306,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - The catalog, projects and Constellation show a friendly empty state with a call to action.
   - Searches without results suggest clearing the filters.
   - Projects without a cover image, or whose image fails to load, show a generated pattern that is unique to each Project instead of a broken image.
+  - Lore Entries without an image, or whose image fails to load, show a generated print of their category's emblem (for example a crown for Politics), also unique to each entry.
   - Missing or private records (including anything inside a private Project) show a "not found" state.
   - If a saved entry becomes private, directly or because its Project becomes private, it is removed from every Constellation automatically, so no one sees a broken card.
   - Unknown URLs show the Not Found page.

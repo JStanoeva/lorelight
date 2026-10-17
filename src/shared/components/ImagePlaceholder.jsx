@@ -2,25 +2,20 @@ import { useId } from "react";
 import { createSigil } from "../utils/sigil.js";
 import "../styles/sigil.css";
 
-// The "Archive Sigil": a seal generated from `seed` (a record id), so every project gets its own,
-// and the same one on every visit. Shown when there is no image or the image fails to load.
-// `tintClassName` is a text colour class (a lore category's starClassName); without it the seal is gold.
+// The "Archive Sigil": a gold seal generated from `seed` (a record id), so every project gets its
+// own, and the same one on every visit. Shown when there is no image or the image fails to load.
 // The parent sets the size and must be `relative overflow-hidden`.
-export default function ImagePlaceholder({ seed, tintClassName = "" }) {
+export default function ImagePlaceholder({ seed }) {
   // Many placeholders share a page, so every gradient and pattern id must be unique.
   const idBase = `sigil-${useId()}`;
   const textureId = `${idBase}-texture`;
   const glowId = `${idBase}-glow`;
 
-  const isTinted = Boolean(tintClassName);
-  const sigil = createSigil(seed, isTinted);
+  const sigil = createSigil(seed);
 
   // Every line below is drawn with currentColor, so this one colour paints the whole seal.
-  const rootClassName = isTinted ? `sigil ${tintClassName}` : "sigil";
-  const rootStyle = isTinted ? undefined : { color: sigil.ink };
-
   return (
-    <div className={rootClassName} style={rootStyle} aria-hidden="true">
+    <div className="sigil" style={{ color: sigil.ink }} aria-hidden="true">
       {/* Layer 1: fine texture in screen pixels, so it stays delicate at every size */}
       <svg className="sigil-layer" focusable="false">
         <defs>

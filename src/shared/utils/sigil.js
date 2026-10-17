@@ -133,8 +133,7 @@ function buildFigure(random, figureType, points, step, rotation) {
 }
 
 // Everything ImagePlaceholder needs to draw one sigil, decided by the seed alone.
-// `isTinted`: the colours come from currentColor (a lore category) instead of the project gold.
-export function createSigil(seed, isTinted) {
+export function createSigil(seed) {
   const random = createRandom(hashString(String(seed)));
 
   const points = 5 + Math.floor(random() * 5);
@@ -193,15 +192,15 @@ export function createSigil(seed, isTinted) {
 
   const frame = pick(random, ["double", "double", "single", "none"]);
   const texture = pick(random, TEXTURES);
-  const projectInk = pick(random, PROJECT_INKS);
-  const projectGlow = pick(random, PROJECT_GLOWS);
+  const ink = pick(random, PROJECT_INKS);
+  const glow = pick(random, PROJECT_GLOWS);
 
   return {
-    ink: isTinted ? null : projectInk,
-    accent: isTinted ? "currentColor" : GOLD_ACCENT,
-    glow: isTinted ? { color: "currentColor", opacity: 0.22 } : projectGlow,
+    ink,
+    accent: GOLD_ACCENT,
+    glow,
     texture,
-    textureOpacity: isTinted ? 0.11 : 0.085,
+    textureOpacity: 0.085,
     frame,
     figure,
     rim,

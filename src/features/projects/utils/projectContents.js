@@ -17,6 +17,24 @@ export function sortFolders(folders) {
   return [...folders].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
 }
 
+// The pages pass these to useProject's updateData, so a folder change from the sidebar shows at once.
+// A folder was created or renamed: put it in the list, in alphabetical order.
+export function withSavedFolder(data, savedFolder) {
+  return {
+    ...data,
+    folders: sortFolders([...data.folders.filter((folder) => folder.id !== savedFolder.id), savedFolder]),
+  };
+}
+
+// A folder was deleted: the database moved its entries to the top level, so do the same here.
+export function withoutFolder(data, folderId) {
+  return {
+    ...data,
+    folders: data.folders.filter((folder) => folder.id !== folderId),
+    entries: data.entries.map((entry) => (entry.folder_id === folderId ? { ...entry, folder_id: null } : entry)),
+  };
+}
+
 export function formatEntryCount(count) {
   if (count === 0) return "No entries";
   if (count === 1) return "1 entry";

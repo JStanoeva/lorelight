@@ -17,6 +17,7 @@ export default function ConfirmDialog({
 }) {
   const dialogRef = useRef(null);
   const titleId = useId();
+  const descriptionId = useId();
 
   // The native <dialog> is opened and closed through its own methods,
   // so the effect keeps it in sync with the isOpen prop.
@@ -54,6 +55,7 @@ export default function ConfirmDialog({
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
+      aria-describedby={descriptionId}
       onCancel={handleEscape}
       onClose={onCancel}
       onKeyDown={handleKeyDown}
@@ -62,7 +64,10 @@ export default function ConfirmDialog({
       <h2 id={titleId} className="text-xl">
         {title}
       </h2>
-      <div className="mt-3 text-parchment-300">{children}</div>
+      {/* aria-describedby makes screen readers read this (e.g. "can't be undone") when the dialog opens */}
+      <div id={descriptionId} className="mt-3 text-parchment-300">
+        {children}
+      </div>
       {error && (
         <p role="alert" className="alert-error mt-4 text-sm">
           {error}

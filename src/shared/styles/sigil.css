@@ -1,6 +1,6 @@
 /*
-  "Archive Sigil" image placeholder (ImagePlaceholder.jsx). Every colour comes from currentColor:
-  a lore category class, or a seeded gold for projects.
+  "Archive Sigil" image placeholder (ImagePlaceholder.jsx). Every line is drawn with currentColor,
+  the seeded gold ink set on the root.
   Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
   Tailwind utility on the same element always wins.
 */

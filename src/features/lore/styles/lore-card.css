@@ -1,27 +1,36 @@
 /*
   LoreCard: a lore entry as a card (Project Details, later the Catalog, profiles and Constellation).
-  The category colour arrives as currentColor through the category's text class.
+  The category colour arrives as currentColor through the category's text class on the body.
   Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
   Tailwind utility on the same element always wins.
 */
 @layer components {
   .lore-card {
-    isolation: isolate;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  /* The picture strip: flush with the card's edges; the card's rounded corners and
+     overflow: hidden clip its top corners. The image or the emblem print fills it. */
+  .lore-card-picture {
+    position: relative;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+    background: var(--color-night-900);
+  }
+
+  /* A thin category-coloured line along the top (right under the picture), fading to the right,
+     and a soft glow of the same colour behind the text. Every text inside sets its own colour. */
+  .lore-card-body {
     display: flex;
     flex: 1;
     flex-direction: column;
     gap: 0.625rem;
-    padding: 1.125rem 1.125rem 1rem;
-  }
-
-  .lore-card-glow {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
+    padding: 1rem 1.125rem;
     background:
       linear-gradient(to right, currentColor, transparent 85%) top left / 100% 2px no-repeat,
-      radial-gradient(130% 90% at 0% 0%, color-mix(in srgb, currentColor 14%, transparent), transparent 62%);
+      radial-gradient(130% 90% at 0% 0%, color-mix(in srgb, currentColor 12%, transparent), transparent 62%);
   }
 
   .lore-card-top {
@@ -47,6 +56,7 @@
   .lore-card-title {
     margin: 0.125rem 0 0;
     font-size: 1.25rem;
+    color: var(--color-parchment-100);
     overflow-wrap: anywhere;
   }
 

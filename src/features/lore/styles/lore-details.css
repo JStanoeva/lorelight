@@ -1,0 +1,303 @@
+/*
+  Lore Details (LoreArticle with LoreHeader and LoreActions): the picture as a banner with the title
+  on it, the action row, then the text as a comfortable reading column and the tags.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+*/
+@layer components {
+  /* ---------- Banner: the picture with the title on it ---------- */
+  /* The text sits in normal flow at the bottom, so a long title makes the banner taller instead of
+     running off its top edge. overflow: clip (not hidden) keeps that working: aspect-ratio only lets
+     a box grow to fit its content when the box isn't a scroll container. */
+  .lore-hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    aspect-ratio: 3 / 1;
+    overflow: clip;
+    border: 1px solid var(--color-night-700);
+    border-radius: 1rem;
+    background: var(--color-night-900);
+    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.8);
+  }
+
+  .lore-hero-picture {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+  }
+
+  /* Darkens the bottom and the left a little, for the mood; the text's own dark background (below)
+     is what keeps it readable */
+  .lore-hero-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        to top,
+        rgb(11 16 32 / 0.96) 0%,
+        rgb(11 16 32 / 0.82) 32%,
+        rgb(11 16 32 / 0.35) 64%,
+        transparent 90%
+      ),
+      linear-gradient(to right, rgb(11 16 32 / 0.6), transparent 70%);
+  }
+
+  .lore-hero-text {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    /* The right padding leaves room for the emblem print's large framed emblem (centred at 64-86 % of
+       the width) */
+    padding: 2.5rem max(1.75rem, 44%) 1.5rem 1.75rem;
+  }
+
+  /* The dark background belongs to the text block, so a long title that makes the banner taller never
+     sits on the bare picture. It fades out before the framed emblem, and the mask fades it in over
+     the top padding, so it has no hard top edge. */
+  .lore-hero-text::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to right, rgb(11 16 32 / 0.75) 0 50%, transparent 72%);
+    mask-image: linear-gradient(to bottom, transparent, #000 2rem);
+  }
+
+  .lore-badge-plate {
+    display: inline-flex;
+    border-radius: 999px;
+    background: rgb(11 16 32 / 0.75);
+    backdrop-filter: blur(6px);
+  }
+
+  .lore-badge-star {
+    margin-right: 0.3125rem;
+  }
+
+  .lore-title {
+    margin: 0;
+    font-size: clamp(1.625rem, 1.15rem + 1.6vw, 2.5rem);
+    line-height: 1.15;
+    text-shadow: 0 2px 18px rgb(0 0 0 / 0.7);
+    overflow-wrap: anywhere;
+  }
+
+  .lore-byline,
+  .lore-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    color: var(--color-parchment-300);
+  }
+
+  .lore-byline {
+    gap: 0.375rem 0.75rem;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  /* A very long project title wraps instead of widening the page on phones */
+  .lore-byline > span {
+    overflow-wrap: anywhere;
+  }
+
+  .lore-project-link {
+    font-weight: 600;
+  }
+
+  /* Folder and dates: one quiet line under the byline */
+  .lore-meta {
+    gap: 0.25rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .lore-meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .lore-meta svg {
+    color: var(--color-lantern-300);
+  }
+
+  /* Each dot sits before an item, so a wrapped line starts with a dot instead of ending with one */
+  .lore-meta > span + span::before {
+    content: "";
+    width: 3px;
+    height: 3px;
+    margin-right: 0.375rem;
+    border-radius: 999px;
+    background: var(--color-parchment-500);
+  }
+
+  /* ---------- Action row ---------- */
+  .lore-toolbar {
+    margin-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-night-700);
+  }
+
+  .lore-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+  }
+
+  /* Gold means appreciation in this theme */
+  .lore-appreciations {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-parchment-100);
+  }
+
+  .lore-appreciations svg {
+    color: var(--color-gold-400);
+  }
+
+  .lore-owner-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .lore-visibility {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    margin: 0.875rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-parchment-300);
+  }
+
+  /* ---------- Reading column ---------- */
+  .lore-reading {
+    max-width: 68ch;
+    margin-top: 2rem;
+  }
+
+  .lore-text {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    color: var(--color-parchment-300);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .lore-text::first-line {
+    color: var(--color-parchment-100);
+  }
+
+  /* A gold drop cap two lines tall, like the first letter of an old codex page */
+  .lore-text.has-drop-cap::first-letter {
+    float: left;
+    margin: 0.3rem 0.625rem 0 0;
+    font-family: var(--font-display);
+    font-size: 3.7em;
+    font-weight: 700;
+    line-height: 0.8;
+    color: var(--color-gold-400);
+  }
+
+  .lore-tags {
+    margin-top: 2rem;
+  }
+
+  .lore-label {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-parchment-500);
+  }
+
+  .lore-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lore-tag {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 999px;
+    background: var(--color-night-900);
+    font-size: 0.8125rem;
+    color: var(--color-parchment-300);
+    overflow-wrap: anywhere;
+  }
+
+  .lore-tag > span {
+    margin-right: 0.0625rem;
+    color: var(--color-parchment-500);
+  }
+
+  /* ---------- Phones ---------- */
+  @media (width < 40rem) {
+    /* Taller than the desktop strip, so the picture still shows above the title */
+    .lore-hero {
+      aspect-ratio: 4 / 3;
+      border-radius: 0.75rem;
+    }
+
+    /* The framed emblem only shows on wide, low banners (lore-placeholder.css), not on this 4:3 one,
+       so the text may use the full width, on a background that darkens it evenly */
+    .lore-hero-text {
+      padding: 2rem 1rem 1rem;
+    }
+
+    .lore-hero-text::before {
+      background: linear-gradient(to top, rgb(11 16 32 / 0.9), rgb(11 16 32 / 0.65));
+    }
+
+    .lore-title {
+      font-size: 1.625rem;
+    }
+
+    /* Edit and Delete share their own row in two equal halves, so they're easy to tap */
+    .lore-owner-tools {
+      width: 100%;
+    }
+
+    .lore-owner-tools > .btn {
+      flex: 1;
+    }
+
+    .lore-reading {
+      margin-top: 1.5rem;
+    }
+
+    .lore-text {
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+  }
+}
