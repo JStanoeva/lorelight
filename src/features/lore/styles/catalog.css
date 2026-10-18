@@ -10,6 +10,7 @@
 @layer components {
   /* ---------- Hero: a short night sky (about 305px tall on desktop, 275px on phones) ---------- */
 
+  /* overflow: hidden also cuts off the strip of the sky that lies under the scrollbar (below) */
   .catalog-hero {
     position: relative;
     isolation: isolate;
@@ -18,30 +19,34 @@
     align-items: center;
     min-height: 18.75rem;
     padding-block: 3rem;
+    background: var(--color-night-950);
+  }
+
+  /* The sky is as wide as the whole window (100vw includes the scrollbar), not the page, like
+     the site-column utility: everything placed in percentages inside it stays in place when a
+     scrollbar appears or disappears, e.g. when "All" brings enough cards to scroll. */
+  .catalog-sky {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 100vw;
+    z-index: -1;
+    pointer-events: none;
     background:
       /* the glow of the horizon, under the search bar */
       radial-gradient(55% 80% at 50% 118%, color-mix(in oklab, var(--color-lantern-700) 60%, transparent), transparent 72%),
       /* violet clouds at both sides */
       radial-gradient(38% 75% at 8% 5%, color-mix(in oklab, var(--color-lantern-900) 90%, transparent), transparent 70%),
-      radial-gradient(34% 70% at 94% 20%, color-mix(in oklab, var(--color-lantern-700) 38%, transparent), transparent 70%),
-      var(--color-night-950);
+      radial-gradient(34% 70% at 94% 20%, color-mix(in oklab, var(--color-lantern-700) 38%, transparent), transparent 70%);
   }
 
   /* The horizon: a hairline that fades out at both ends, so the band has no hard box edge */
-  .catalog-hero::after {
+  .catalog-sky::after {
     content: "";
     position: absolute;
     inset: auto 0 0;
     height: 1px;
     background: linear-gradient(to right, transparent, var(--color-night-500), transparent);
     opacity: 0.7;
-  }
-
-  .catalog-sky {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
   }
 
   .catalog-sky > * {
