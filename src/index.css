@@ -29,6 +29,15 @@
   --font-body: "Inter", system-ui, sans-serif;
 }
 
+/* The site's centered 72rem column (as wide as max-w-6xl) for the header, footer and pages. It's
+   centered on the whole window (100vw includes the scrollbar), not on the space beside the
+   scrollbar, so it stays in place when the user moves between pages with and without a scrollbar.
+   clamp() keeps it inside the page: never past the left edge, never under the scrollbar. */
+@utility site-column {
+  width: min(72rem, 100%);
+  margin-left: clamp(0px, (100vw - 72rem) / 2, 100% - 72rem);
+}
+
 @layer base {
   :root {
     --header-height: 4rem;

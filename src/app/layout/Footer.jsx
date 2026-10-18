@@ -5,7 +5,7 @@ const REPOSITORY_URL = "https://github.com/JStanoeva/lorelight";
 export default function Footer() {
   return (
     <footer className="border-t border-night-700 bg-night-900">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-sm text-parchment-500 sm:flex-row sm:justify-between sm:px-6">
+      <div className="site-column flex flex-col items-center gap-4 px-4 py-8 text-sm text-parchment-500 sm:flex-row sm:justify-between sm:px-6">
         <div className="flex items-center gap-2">
           <img src="/favicon.png" alt="" className="size-6" />
           <span>&copy; 2026 Lorelight · Where your worlds come to light.</span>

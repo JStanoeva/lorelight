@@ -14,7 +14,7 @@
 
   /* relative: content paints above any absolute decorative layer placed before it */
   .home-container {
-    @apply relative mx-auto w-full max-w-6xl px-4 sm:px-6;
+    @apply relative site-column px-4 sm:px-6;
   }
 
   .home-section {

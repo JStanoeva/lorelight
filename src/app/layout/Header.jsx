@@ -84,7 +84,7 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
       onBlur={handleBlur}
       className={`sticky top-0 z-40 h-(--header-height) border-b transition-colors duration-300 motion-reduce:transition-none ${surfaceClasses}`}
     >
-      <div className="relative mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="site-column relative flex h-full items-center justify-between gap-4 px-4 sm:px-6">
         <Link
           to="/"
           onClick={handleBrandClick}
