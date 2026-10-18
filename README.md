@@ -145,7 +145,7 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 
 ### Nested & Parameterized Routes
 
-- **Nested routing:** yes. All routes render inside `MainLayout` (header, `<Outlet />`, footer). `AuthGuard` and `GuestGuard` are layout routes whose child routes render through `<Outlet />`.
+- **Nested routing:** yes. All routes render inside `MainLayout` (header, `<Outlet />`, footer). `AuthGuard` and `GuestGuard` are layout routes whose child routes render through `<Outlet />`. Project Details and Lore Details share the `ProjectWorkspaceLayout` layout route: it loads the Project (and the open Lore Entry) and renders the Project sidebar, which stays mounted while only the page beside it changes. Both pages read its data with `useOutletContext`.
 - **URL parameters:** `/lore/:entryId`, `/lore/:entryId/edit`, `/projects/:projectId`, `/projects/:projectId/edit`, `/profile/:userId`
 - **Search parameters:** the catalog stores search, category and sort in the URL (e.g. `/lore?q=dragon&category=creature&sort=newest`).
 
@@ -165,8 +165,8 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 ### Details Page
 
 - **Navigation:** each Lore Card is a `<Link>` to `/lore/:entryId`. After creating or editing an entry, `useNavigate` redirects to its details page.
-- **Route parameter data:** `entryId` is read with `useParams` and passed to the `useLoreEntry(entryId)` hook, which loads the entry together with its author and project. Missing and private entries, and ids that aren't valid, show a "not found" state.
-- **Page content:** the entry is shown inside its Project's workspace: the Project's sidebar (folders and entries, with the open entry highlighted, loaded with `useProject`) and, beside it, a banner with the entry's image (or a generated print of its category's emblem), category, title, author, Project, folder and dates, then the appreciation count, the description and the tags. Moving between entries of the same Project keeps the sidebar in place and only reloads the entry. The author also sees Edit and Delete buttons and a short note on who can see the entry.
+- **Route parameter data:** `entryId` is read with `useParams` in the workspace layout route and passed to the `useLoreEntry(entryId)` hook, which loads the entry together with its author and project; `LoreDetailsPage` receives it through `useOutletContext`. Missing and private entries, and ids that aren't valid, show a "not found" state.
+- **Page content:** the entry is shown inside its Project's workspace: the Project's sidebar (folders and entries, with the open entry highlighted, loaded with `useProject`) and, beside it, a banner with the entry's image (or a generated print of its category's emblem), category, title, author, Project, folder and dates, then the appreciation count, the description and the tags. Moving between the Project's overview and its entries, or from one entry to another, keeps the sidebar in place (with its filter and open folders) and only loads the entry; the Project itself isn't loaded again. The author also sees Edit and Delete buttons and a short note on who can see the entry.
 
 ---
 
@@ -266,10 +266,10 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useState` — form fields, loading and error states, UI toggles
   - `useEffect` — data fetching, auth subscription, a scroll-spy observer
   - `useContext` — reading `AuthContext` through the `useAuth` hook
-  - `useCallback` — a stable `refetch` function returned by the data hooks (and `updateData` in `useProject`, which applies a just-saved folder change without reloading)
+  - `useCallback` — a stable `refetch` function returned by the data hooks (and `updateData` in `useProject`, which applies a just-saved folder change or a deleted entry without reloading)
   - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), and the focus targets of the Project sidebar and its menus
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
-  - `useParams`, `useNavigate`, `useSearchParams`, `useLocation` — routing
+  - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
   - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
@@ -279,7 +279,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), Lore/Project forms (author id), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), Lore/Project forms (author id), and the appreciation and Constellation buttons.
 
 ### Component Styling
 
@@ -354,10 +354,10 @@ Inside each feature:
 ### Data Flow
 
 ```
-Page → custom hook → service → Supabase → service → hook → page/components
+Page (or its layout route) → custom hook → service → Supabase → service → hook → page/components
 ```
 
-Example: `/lore/:entryId` → `LoreDetailsPage` → `useLoreEntry(entryId)` → `loreService.getLoreById()` → Supabase.
+Example: `/lore/:entryId` → `ProjectWorkspaceLayout` (the layout route around `LoreDetailsPage`) → `useLoreEntry(entryId)` → `loreService.getLoreById()` → Supabase; `LoreDetailsPage` then receives the entry through `useOutletContext()`.
 
 Services contain no React code, and pages contain no Supabase code.
 

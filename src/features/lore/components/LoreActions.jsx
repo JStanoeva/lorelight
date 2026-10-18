@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import Icon from "../../../shared/components/Icon.jsx";
 import { getVisibility } from "../utils/visibility.js";
 import DeleteLoreDialog from "./DeleteLoreDialog.jsx";
@@ -19,9 +19,8 @@ function formatAppreciationCount(count) {
 }
 
 // The row under the banner: the appreciation count for everyone, and for the author the Edit and
-// Delete actions plus a note on who can see the entry.
-export default function LoreActions({ entry, isOwner }) {
-  const navigate = useNavigate();
+// Delete actions plus a note on who can see the entry. `onDeleted` runs after a successful delete.
+export default function LoreActions({ entry, isOwner, onDeleted }) {
   // Kept here (not in the page), so an open dialog closes by itself when another entry starts
   // loading: this row is replaced by the loader, and its state goes with it
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -62,7 +61,7 @@ export default function LoreActions({ entry, isOwner }) {
         <DeleteLoreDialog
           entry={entry}
           onCancel={() => setIsDeleteOpen(false)}
-          onDeleted={() => navigate(`/projects/${entry.project_id}`)}
+          onDeleted={onDeleted}
         />
       )}
     </div>

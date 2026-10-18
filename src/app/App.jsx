@@ -11,6 +11,7 @@ import LoreCatalogPage from "../features/lore/pages/LoreCatalogPage.jsx";
 import LoreDetailsPage from "../features/lore/pages/LoreDetailsPage.jsx";
 import EditProfilePage from "../features/profile/pages/EditProfilePage.jsx";
 import ProfilePage from "../features/profile/pages/ProfilePage.jsx";
+import ProjectWorkspaceLayout from "../features/projects/components/ProjectWorkspaceLayout.jsx";
 import CreateProjectPage from "../features/projects/pages/CreateProjectPage.jsx";
 import EditProjectPage from "../features/projects/pages/EditProjectPage.jsx";
 import MyProjectsPage from "../features/projects/pages/MyProjectsPage.jsx";
@@ -29,8 +30,11 @@ export default function App() {
           {/* Public */}
           <Route index element={<HomePage />} />
           <Route path="lore" element={<LoreCatalogPage />} />
-          <Route path="lore/:entryId" element={<LoreDetailsPage />} />
-          <Route path="projects/:projectId" element={<ProjectDetailsPage />} />
+          {/* One workspace layout for both, so the project sidebar stays mounted between them */}
+          <Route element={<ProjectWorkspaceLayout />}>
+            <Route path="lore/:entryId" element={<LoreDetailsPage />} />
+            <Route path="projects/:projectId" element={<ProjectDetailsPage />} />
+          </Route>
           <Route path="profile/:userId" element={<ProfilePage />} />
 
           {/* Logged-in users only */}

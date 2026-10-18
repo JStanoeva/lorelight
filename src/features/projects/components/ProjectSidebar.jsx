@@ -11,7 +11,8 @@ import SidebarEntry from "./SidebarEntry.jsx";
 import SidebarFolder from "./SidebarFolder.jsx";
 
 // The project's contents: a filter box, the folders with their entries, and the unfiled entries.
-// Shared by Project Details and (from 5.2) Lore Details, where `activeEntryId` marks the open entry.
+// It stays mounted across Project Details and Lore Details (see ProjectWorkspaceLayout), where
+// `activeEntryId` marks the open entry.
 // On wide screens it's a fixed column; below 1024px it's a drawer: `onClose` closes it (close button,
 // Escape), `onNavigate` closes it when a link inside is followed or focus leaves it.
 export default function ProjectSidebar({
@@ -32,7 +33,9 @@ export default function ProjectSidebar({
   const filterId = useId();
   const treeRef = useRef(null);
 
-  const isFiltering = filterText.trim() !== "";
+  // The filter box is hidden without entries (e.g. after the last one is deleted), so then any text
+  // left in it is ignored: otherwise it would hide every folder
+  const isFiltering = entries.length > 0 && filterText.trim() !== "";
   const shownEntries = filterEntries(entries, filterText);
   // While filtering, folders without a match are hidden
   const shownFolders = isFiltering

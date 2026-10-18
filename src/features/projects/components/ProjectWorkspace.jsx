@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { useLocation } from "react-router";
 import Icon from "../../../shared/components/Icon.jsx";
 import ProjectSidebar from "./ProjectSidebar.jsx";
 import "../styles/workspace.css";
 
 // The workspace frame: the contents sidebar on the left and the page's own content (`children`)
 // on the right. Below 1024px a "Contents" bar opens the sidebar as a drawer instead.
+// ProjectWorkspaceLayout renders it, so it stays mounted while the page beside it changes.
 export default function ProjectWorkspace({
   project,
   folders,
@@ -16,25 +18,34 @@ export default function ProjectWorkspace({
   onFolderDeleted,
   children,
 }) {
-  const [isContentsOpen, setIsContentsOpen] = useState(false);
+  const { pathname } = useLocation();
+  // The page the drawer was opened on. It's open only on that page, so it also closes when the
+  // browser's Back or Forward button changes the page beside it.
+  const [openedOnPath, setOpenedOnPath] = useState(null);
+  // Another page took over: forget the old one, so coming back to it doesn't reopen the drawer
+  // (adjusting state during render, so no effect is needed)
+  if (openedOnPath !== null && openedOnPath !== pathname) {
+    setOpenedOnPath(null);
+  }
+  const isContentsOpen = openedOnPath === pathname;
   const contentsButtonRef = useRef(null);
   const closeButtonRef = useRef(null);
 
   function openContents() {
     // flushSync shows the drawer right away, so focus can move into it
-    flushSync(() => setIsContentsOpen(true));
+    flushSync(() => setOpenedOnPath(pathname));
     closeButtonRef.current.focus();
   }
 
   // Closed with the close button, Escape or the backdrop: focus goes back to the Contents button
   function closeContents() {
-    setIsContentsOpen(false);
+    setOpenedOnPath(null);
     contentsButtonRef.current.focus();
   }
 
   // A link inside was followed: just close, the new page takes over
   function handleNavigate() {
-    setIsContentsOpen(false);
+    setOpenedOnPath(null);
   }
 
   return (

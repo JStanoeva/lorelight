@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useOutletContext } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
@@ -8,62 +8,33 @@ import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import DeleteProjectDialog from "../components/DeleteProjectDialog.jsx";
 import ProjectHeader from "../components/ProjectHeader.jsx";
 import ProjectLoreSection from "../components/ProjectLoreSection.jsx";
-import ProjectWorkspace from "../components/ProjectWorkspace.jsx";
-import { useProject } from "../hooks/useProject.js";
-import { withoutFolder, withSavedFolder } from "../utils/projectContents.js";
 
+// The project's overview. ProjectWorkspaceLayout loads the project (useProject with the URL's
+// projectId) and shows its sidebar beside this page.
 export default function ProjectDetailsPage() {
-  const { projectId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { project, entries, folders, isLoading, error, refetch, updateData } = useProject(projectId);
+  const { projectState } = useOutletContext();
+  const { project, entries, folders, isLoading, error, refetch } = projectState;
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // Folder changes made in the sidebar update the loaded data at once, without reloading
-  function handleFolderSaved(savedFolder) {
-    updateData((data) => withSavedFolder(data, savedFolder));
-  }
-
-  function handleFolderDeleted(folderId) {
-    updateData((data) => withoutFolder(data, folderId));
-  }
-
   if (isLoading) {
-    return (
-      <section className="page">
-        <Loader label="Loading the project…" />
-      </section>
-    );
+    return <Loader label="Loading the project…" />;
   }
 
   if (error) {
-    return (
-      <section className="page">
-        <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />
-      </section>
-    );
+    return <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
   }
 
   // Invalid id, a deleted project, or someone else's private project
   if (!project) {
-    return (
-      <section className="page">
-        <NotFoundState title="Project not found" text="This project doesn't exist, or it's private." />
-      </section>
-    );
+    return <NotFoundState title="Project not found" text="This project doesn't exist, or it's private." />;
   }
 
   const isOwner = user?.id === project.owner_id;
 
   return (
-    <ProjectWorkspace
-      project={project}
-      folders={folders}
-      entries={entries}
-      isOwner={isOwner}
-      onFolderSaved={handleFolderSaved}
-      onFolderDeleted={handleFolderDeleted}
-    >
+    <>
       <ProjectHeader
         project={project}
         entryCount={entries.length}
@@ -81,6 +52,6 @@ export default function ProjectDetailsPage() {
           onDeleted={() => navigate("/projects")}
         />
       )}
-    </ProjectWorkspace>
+    </>
   );
 }

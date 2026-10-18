@@ -17,8 +17,8 @@ export function sortFolders(folders) {
   return [...folders].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
 }
 
-// The pages pass these to useProject's updateData, so a folder change from the sidebar shows at once.
-// A folder was created or renamed: put it in the list, in alphabetical order.
+// These go to useProject's updateData, so a change shows at once without reloading the project.
+// A folder was created or renamed in the sidebar: put it in the list, in alphabetical order.
 export function withSavedFolder(data, savedFolder) {
   return {
     ...data,
@@ -32,6 +32,14 @@ export function withoutFolder(data, folderId) {
     ...data,
     folders: data.folders.filter((folder) => folder.id !== folderId),
     entries: data.entries.map((entry) => (entry.folder_id === folderId ? { ...entry, folder_id: null } : entry)),
+  };
+}
+
+// A lore entry was deleted on Lore Details: take it out of the project's entries.
+export function withoutEntry(data, entryId) {
+  return {
+    ...data,
+    entries: data.entries.filter((entry) => entry.id !== entryId),
   };
 }
 
