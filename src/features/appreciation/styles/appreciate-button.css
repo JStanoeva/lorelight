@@ -1,0 +1,190 @@
+/*
+  AppreciateButton: Appreciate and its count joined in one pill ("♡ Appreciate | 7"), the error line
+  under it, and the status error with Try again. Plain CSS (no @apply), so it needs no @reference.
+  The rules sit in the components layer, so a Tailwind utility on the same element always wins.
+*/
+@layer components {
+  /* Takes the space left of the author's Edit and Delete, so an error line under the pill wraps
+     here instead of pushing them onto a new line */
+  .appreciate {
+    flex: 1 1 0;
+  }
+
+  /* As tall as .btn (38px), so the pill lines up with Edit and Delete in the same row */
+  .appreciate-pill {
+    display: inline-flex;
+    align-items: stretch;
+    padding: 0;
+    border: 1px solid var(--color-night-500);
+    border-radius: 999px;
+    background: var(--color-night-900);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    color: var(--color-parchment-100);
+    /* The guest's version is a link */
+    text-decoration: none;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .appreciate-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem 0.5rem 0.875rem;
+    transition: color 150ms ease;
+  }
+
+  .appreciate-glyph {
+    color: var(--color-parchment-300);
+    transition: color 150ms ease;
+  }
+
+  /* The count: its own darker segment behind a divider, like a counter badge. tabular-nums keeps the
+     pill from changing width between 7 and 8. */
+  .appreciate-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    padding: 0 0.875rem 0 0.75rem;
+    border-left: 1px solid var(--color-night-500);
+    border-radius: 0 999px 999px 0;
+    background: var(--color-night-800);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-parchment-300);
+    transition:
+      color 150ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  /* Hover only where a click does something (not while waiting) */
+  .appreciate-pill:not([aria-disabled="true"]):hover {
+    border-color: var(--color-gold-400);
+  }
+
+  .appreciate-pill:not([aria-disabled="true"]):hover .appreciate-action,
+  .appreciate-pill:not([aria-disabled="true"]):hover .appreciate-glyph {
+    color: var(--color-gold-300);
+  }
+
+  /* Pressed: a gold border over a soft gold wash, the filled heart and the number in gold */
+  .appreciate-pill[aria-pressed="true"] {
+    border-color: var(--color-gold-400);
+    background: rgb(232 193 112 / 0.08);
+  }
+
+  .appreciate-pill[aria-pressed="true"] .appreciate-glyph {
+    color: var(--color-gold-400);
+  }
+
+  .appreciate-pill[aria-pressed="true"] .appreciate-count {
+    border-left-color: rgb(232 193 112 / 0.5);
+    background: rgb(232 193 112 / 0.14);
+    color: var(--color-gold-400);
+  }
+
+  /* Waiting (status loading or a request on its way): the click is ignored, so say "busy", not "no" */
+  .appreciate-pill[aria-disabled="true"] {
+    cursor: progress;
+  }
+
+  /* Status unknown: the action half fades, the count (already known) stays readable */
+  .appreciate-pill[data-checking] .appreciate-action {
+    opacity: 0.55;
+  }
+
+  .appreciate-pill[data-pending] .appreciate-count {
+    opacity: 0.65;
+  }
+
+  /* The error under the pill after a failed request was undone */
+  .appreciate-error {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-danger);
+  }
+
+  .appreciate-status-error {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* Phones: the pill fills its row, like Edit and Delete in the row below it */
+  @media (width < 40rem) {
+    .appreciate {
+      flex-basis: 100%;
+    }
+
+    .appreciate-pill {
+      display: flex;
+      width: 100%;
+    }
+
+    .appreciate-action {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  /* Motion only for people who haven't asked for less: a small pop when the heart fills, and the
+     number gently breathing while the request is on its way */
+  @media (prefers-reduced-motion: no-preference) {
+    .appreciate-glyph.is-popping {
+      animation: appreciate-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+    }
+
+    .appreciate-pill[data-pending] .appreciate-count {
+      animation: appreciate-breathe 0.9s ease-in-out infinite alternate;
+    }
+  }
+
+  /* High Contrast mode drops the backgrounds: the filled heart still shows the pressed state, and
+     the system's highlight colour marks it too */
+  @media (forced-colors: active) {
+    .appreciate-pill,
+    .appreciate-count {
+      border-color: ButtonText;
+    }
+
+    .appreciate-pill[aria-pressed="true"],
+    .appreciate-pill[aria-pressed="true"] .appreciate-count {
+      border-color: Highlight;
+    }
+
+    .appreciate-pill[aria-pressed="true"] .appreciate-glyph,
+    .appreciate-pill[aria-pressed="true"] .appreciate-count {
+      color: Highlight;
+    }
+
+    .appreciate-pill[aria-disabled="true"] {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}
+
+@keyframes appreciate-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes appreciate-breathe {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.45;
+  }
+}

@@ -1,6 +1,7 @@
 import { useNavigate, useOutletContext } from "react-router";
+import { changeAppreciationCount } from "../../appreciation/utils/appreciationCount.js";
 import { useAuth } from "../../auth/hooks/useAuth.js";
-import { withoutEntry } from "../../projects/utils/projectContents.js";
+import { withAppreciationChange, withoutEntry } from "../../projects/utils/projectContents.js";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
@@ -13,7 +14,7 @@ export default function LoreDetailsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { entryState, projectState } = useOutletContext();
-  const { entry, isLoading, error, refetch } = entryState;
+  const { entry, isLoading, error, refetch, updateData: updateEntry } = entryState;
   const {
     project,
     folders,
@@ -33,6 +34,16 @@ export default function LoreDetailsPage() {
       refetchProject();
     }
     navigate(`/projects/${entry.project_id}`);
+  }
+
+  // An appreciation was added (1) or removed (-1), or undone after a failed request: the count
+  // changes here at once, and in the project's loaded entries too, so the overview's cards show
+  // the new number without loading the project again
+  function handleAppreciationChange(change) {
+    updateEntry((current) => changeAppreciationCount(current, change));
+    if (project) {
+      updateData((data) => withAppreciationChange(data, entry.id, change));
+    }
   }
 
   if (isLoading) {
@@ -72,6 +83,7 @@ export default function LoreDetailsPage() {
         folderName={folder?.name ?? null}
         isOwner={user?.id === entry.author_id}
         onDeleted={handleDeleted}
+        onAppreciationChange={handleAppreciationChange}
       />
     </>
   );

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import AppreciateButton from "../../appreciation/components/AppreciateButton.jsx";
+import { formatAppreciationCount } from "../../appreciation/utils/appreciationCount.js";
 import Icon from "../../../shared/components/Icon.jsx";
 import { getVisibility } from "../utils/visibility.js";
 import DeleteLoreDialog from "./DeleteLoreDialog.jsx";
@@ -12,28 +14,39 @@ const VISIBILITY_NOTES = {
   hidden: "This entry is public, but its project is private, so only you can see it for now.",
 };
 
-function formatAppreciationCount(count) {
-  if (count === 0) return "No appreciations yet";
-  if (count === 1) return "1 appreciation";
-  return `${count} appreciations`;
-}
+// Why the author sees the count but no Appreciate button: the database only accepts appreciations
+// of lore that others can read (the entry AND its project are public)
+const CLOSED_REASONS = {
+  private: "Appreciations open once the entry is public.",
+  hidden: "Appreciations open once its project is public too.",
+};
 
-// The row under the banner: the appreciation count for everyone, and for the author the Edit and
-// Delete actions plus a note on who can see the entry. `onDeleted` runs after a successful delete.
-export default function LoreActions({ entry, isOwner, onDeleted }) {
+// The row under the banner: the Appreciate button with the count (only the count, with a reason, on
+// the author's entries that others can't see), and for the author the Edit and Delete actions plus
+// a note on who can see the entry. `onDeleted` runs after a successful delete,
+// `onAppreciationChange(change)` when an appreciation is added (1) or removed (-1), and with the
+// opposite change when that request fails.
+export default function LoreActions({ entry, isOwner, onDeleted, onAppreciationChange }) {
   // Kept here (not in the page), so an open dialog closes by itself when another entry starts
   // loading: this row is replaced by the loader, and its state goes with it
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  // The author always sees their own project, so entry.project is there
-  const visibility = isOwner ? getVisibility(entry, entry.project) : null;
+  // The author always sees their own project, so entry.project is there. Everyone else can only
+  // ever open entries that are public in a public project.
+  const visibility = isOwner ? getVisibility(entry, entry.project) : "public";
 
   return (
     <div className="lore-toolbar">
       <div className="lore-actions">
-        <p className="lore-appreciations">
-          <Icon name="heart" />
-          {formatAppreciationCount(entry.appreciation_count)}
-        </p>
+        {visibility === "public" ? (
+          <AppreciateButton entry={entry} onCountChange={onAppreciationChange} />
+        ) : (
+          // Appreciations kept from when the entry was public still count, so its author sees them
+          <p className="lore-appreciations">
+            <Icon name="heart" />
+            {formatAppreciationCount(entry.appreciation_count)}{" "}
+            <span className="lore-appreciations-reason">{CLOSED_REASONS[visibility]}</span>
+          </p>
+        )}
 
         {isOwner && (
           <div className="lore-owner-tools">

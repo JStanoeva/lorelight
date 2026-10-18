@@ -36,6 +36,18 @@ export function useLoreEntry(entryId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
+  // Applies a change to the entry it already has (e.g. the appreciation count: changed at once on a
+  // click, and changed back if the request fails), so the screen updates without reloading.
+  // `updater(entry)` returns the new entry. Only the data of this request key is changed, like
+  // useProject's updateData, and an entry that wasn't found stays not found.
+  const updateData = useCallback(
+    (updater) =>
+      setResult((current) =>
+        current.key === requestKey && current.data ? { ...current, data: updater(current.data) } : current,
+      ),
+    [requestKey],
+  );
+
   // Loading is derived, so the effect never calls setState synchronously.
   const isLoading = !requestKey || result.key !== requestKey;
 
@@ -44,5 +56,6 @@ export function useLoreEntry(entryId) {
     error: isLoading ? null : result.error,
     isLoading,
     refetch,
+    updateData,
   };
 }

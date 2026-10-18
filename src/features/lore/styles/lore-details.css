@@ -157,11 +157,13 @@
     gap: 0.75rem 1rem;
   }
 
-  /* Gold means appreciation in this theme */
+  /* The count as text, on the author's entries that others can't see (elsewhere the Appreciate
+     button shows it). Gold means appreciation in this theme. */
   .lore-appreciations {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem 0.5rem;
     margin: 0;
     font-size: 0.875rem;
     font-weight: 600;
@@ -172,9 +174,25 @@
     color: var(--color-gold-400);
   }
 
+  /* Why there's no Appreciate button yet */
+  .lore-appreciations-reason {
+    font-weight: 400;
+    color: var(--color-parchment-500);
+  }
+
+  /* A visual separator only: the empty alternative text keeps screen readers from reading the dot */
+  .lore-appreciations-reason::before {
+    content: "·";
+    content: "·" / "";
+    margin-right: 0.5rem;
+  }
+
+  /* align-self: Edit and Delete stay level with the Appreciate pill when an error line appears
+     under it */
   .lore-owner-tools {
     display: flex;
     flex-wrap: wrap;
+    align-self: flex-start;
     gap: 0.5rem;
   }
 
@@ -289,6 +307,16 @@
 
     .lore-owner-tools > .btn {
       flex: 1;
+    }
+
+    /* The reason gets its own line under the count (lined up with its text), without the dot */
+    .lore-appreciations-reason {
+      flex-basis: 100%;
+      padding-left: 1.5rem;
+    }
+
+    .lore-appreciations-reason::before {
+      content: none;
     }
 
     .lore-reading {

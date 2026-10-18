@@ -167,7 +167,8 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 
 - **Navigation:** each Lore Card is a `<Link>` to `/lore/:entryId`. After creating or editing an entry, `useNavigate` redirects to its details page.
 - **Route parameter data:** `entryId` is read with `useParams` in the workspace layout route and passed to the `useLoreEntry(entryId)` hook, which loads the entry together with its author and project; `LoreDetailsPage` receives it through `useOutletContext`. Missing and private entries, and ids that aren't valid, show a "not found" state.
-- **Page content:** the entry is shown inside its Project's workspace: the Project's sidebar (folders and entries, with the open entry highlighted, loaded with `useProject`) and, beside it, a banner with the entry's image (or a generated print of its category's emblem), category, title, author, Project, folder and dates, then the appreciation count, the description and the tags. Moving between the Project's overview and its entries, or from one entry to another, keeps the sidebar in place (with its filter and open folders) and only loads the entry; the Project itself isn't loaded again. The author also sees Edit and Delete buttons and a short note on who can see the entry.
+- **Page content:** the entry is shown inside its Project's workspace: the Project's sidebar (folders and entries, with the open entry highlighted, loaded with `useProject`) and, beside it, a banner with the entry's image (or a generated print of its category's emblem), category, title, author, Project, folder and dates, then the Appreciate button with the appreciation count, the description and the tags. Moving between the Project's overview and its entries, or from one entry to another, keeps the sidebar in place (with its filter and open folders) and only loads the entry; the Project itself isn't loaded again. The author also sees Edit and Delete buttons and a short note on who can see the entry.
+- **Appreciate:** logged-in users appreciate an entry, or remove their appreciation, by clicking the Appreciate button, which also shows the count. Authors can appreciate their own public entries too. Guests who click it are taken to the login page and brought back to the entry afterwards. On an author's private entry (or a public entry in a private Project) only the count is shown, with a short note, because only public lore can be appreciated.
 
 ---
 
@@ -220,6 +221,8 @@ Making a **Project private** hides all of its Lore Entries from everyone else, w
 
 **Folders** organize the lore inside a Project (one level). The owner creates, renames and deletes them from the Project's sidebar. Deleting a folder never deletes lore: its entries move back to the top level of the Project.
 
+**Appreciations** are added and removed on Lore Details: `appreciationService.appreciate()` inserts the user's row in `appreciations`, and `appreciationService.removeAppreciation()` deletes it. The button and the count change at once, and the change is undone, with an error message, if the request fails.
+
 ---
 
 ## 8. Forms & Validation
@@ -267,20 +270,20 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useState` — form fields, loading and error states, UI toggles
   - `useEffect` — data fetching, auth subscription, a scroll-spy observer, and keeping the chosen category in view in the Lore Catalog's category row (which scrolls sideways on phones)
   - `useContext` — reading `AuthContext` through the `useAuth` hook
-  - `useCallback` — a stable `refetch` function returned by the data hooks (and `updateData` in `useProject`, which applies a just-saved folder change or a deleted entry without reloading)
-  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), the focus targets of the Project sidebar and its menus, and on the Lore Catalog the category row (scrolled to the chosen or focused category), the search input (focus stays in it after a search) and the result count (focus moves there after a filter is removed or after Try again)
-  - `useId` — unique ids that link form labels, hints and error messages to their inputs
+  - `useCallback` — a stable `refetch` function returned by the data hooks, plus `updateData` in `useProject` and `useLoreEntry` and `setHasAppreciated` in `useAppreciation`, which apply a change without reloading (a saved folder change, a deleted entry, or an appreciation, which shows at once and is undone if its request fails)
+  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), the focus targets of the Project sidebar and its menus, on the Lore Catalog the category row (scrolled to the chosen or focused category), the search input (focus stays in it after a search) and the result count (focus moves there after a filter is removed or after Try again), and in the Appreciate button a flag that ignores a second click until the first request has finished, plus the button itself (focus moves to it after Try again)
+  - `useId` — unique ids that link form labels, hints and error messages to their inputs, and the Appreciate button to its description (the count in words)
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
-  - Custom hooks — `useAuth`, `useViewerKey`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useViewerKey`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useAppreciation`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
-  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted (the previous cards stay on screen, dimmed, until the new ones arrive). `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another. `useLoreEntry`, `useProject` and `useFolders` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't. For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
+  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted (the previous cards stay on screen, dimmed, until the new ones arrive). `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another. `useLoreEntry`, `useProject`, `useFolders` and `useAppreciation` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't (and `useAppreciation` because its answer is the logged-in user's own). For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
   - **Unmount:** `AuthContext` unsubscribes from the auth listener in its effect cleanup. Data hooks mark in-flight requests as stale in their cleanup, so a late response never updates an unmounted component.
 
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), the Lore Catalog's empty-state call to action (Register or Log in for guests, Create Lore for users), Lore/Project forms (author id), `useViewerKey` (used by `useProject`, `useLoreEntry` and `useFolders`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), the Lore Catalog's empty-state call to action (Register or Log in for guests, Create Lore for users), Lore/Project forms (author id), `useViewerKey` (used by `useProject`, `useLoreEntry`, `useFolders` and `useAppreciation`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
 
 ### Component Styling
 
@@ -302,7 +305,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ## 11. Error & Edge Case Handling
 
 - **Authentication errors:** wrong credentials, already registered emails and taken usernames show a readable message on the form. Guests opening private routes are redirected to login, and logged-in users are redirected away from login and register.
-- **Network or data errors:** every data-loading page shows a loading state, and failed requests show an error message with a retry button instead of crashing. Failed mutations show an error and keep the form data, so nothing is lost.
+- **Network or data errors:** every data-loading page shows a loading state, and failed requests show an error message with a retry button instead of crashing. Failed mutations show an error and keep the form data, so nothing is lost. A failed appreciation (or removal) is undone on screen and explained in one line under the button, for example when the entry was made private in the meantime.
 - **Empty or missing data states:**
   - The catalog, projects and Constellation show a friendly empty state with a call to action.
   - Searches without results suggest clearing the filters.
@@ -335,7 +338,7 @@ src/
 │   ├── lore/           # catalog, details, lore forms, lore service
 │   ├── projects/       # project pages, forms, project service
 │   ├── constellation/  # saved lore
-│   ├── appreciation/   # appreciate button and service
+│   ├── appreciation/   # appreciate button, hook and service
 │   └── profile/        # creator profiles
 ├── shared/         # shared UI components, hooks and utilities
 ├── lib/            # Supabase client
@@ -383,7 +386,7 @@ Authorization is enforced in the database with Row Level Security, not only in t
 - Only the owner can create, update or delete their lore and projects, and lore can only be written into the author's own Projects.
 - Only a Project's owner can create, rename or delete its folders, and an entry can only be placed in a folder of its own Project. Other users see a folder only while it contains public lore. Deleting a folder never deletes lore: its entries move back to the top level of the Project.
 - Users can upload images only into their own Storage folder (JPEG, PNG or WebP, up to 2 MB) and delete only their own images. Nobody can list other users' files.
-- Users can only add or remove their own appreciations and Constellation saves, and only for public lore. Constellations are publicly visible on creator profiles; saved lore that becomes private is removed from them automatically.
+- Users can add appreciations and Constellation saves only for public lore, and can add or remove only their own. Constellations are publicly visible on creator profiles; saved lore that becomes private is removed from them automatically.
 - Table privileges add a second layer under RLS: guests can only read, and ids, owners, usernames and timestamps can't be changed through the API.
 - Check constraints mirror the form validation rules (lengths, categories, project genres and formats, tags, username format, folder names), so invalid data is rejected even if the frontend is bypassed.
 

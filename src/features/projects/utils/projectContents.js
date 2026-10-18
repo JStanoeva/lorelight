@@ -1,3 +1,5 @@
+import { changeAppreciationCount } from "../../appreciation/utils/appreciationCount.js";
+
 // Helpers for the project workspace (sidebar and lore grid).
 
 // The entries of one folder, or the unfiled ones when folderId is null.
@@ -40,6 +42,16 @@ export function withoutEntry(data, entryId) {
   return {
     ...data,
     entries: data.entries.filter((entry) => entry.id !== entryId),
+  };
+}
+
+// An entry was appreciated (change 1) or its appreciation removed (change -1) on Lore Details, or
+// that was undone after a failed request (the opposite change): update its count here too, so the
+// overview's cards show the new number.
+export function withAppreciationChange(data, entryId, change) {
+  return {
+    ...data,
+    entries: data.entries.map((entry) => (entry.id === entryId ? changeAppreciationCount(entry, change) : entry)),
   };
 }
 
