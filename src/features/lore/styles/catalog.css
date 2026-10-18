@@ -1,0 +1,677 @@
+/*
+  Lore Catalog ("Star Atlas"): the night-sky hero with the search bar, the category chips, the
+  results toolbar and the notices that replace the cards. The cards themselves are LoreCard's
+  (lore-card.css). Imported by LoreCatalogPage.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer after
+  components.css, so they can adjust .btn and .input, and a Tailwind utility on the same element
+  still wins (the category colour classes rely on that).
+  Nothing here animates; the few hover transitions only run without reduced motion.
+*/
+@layer components {
+  /* ---------- Hero: a short night sky (about 305px tall on desktop, 275px on phones) ---------- */
+
+  .catalog-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    min-height: 18.75rem;
+    padding-block: 3rem;
+    background:
+      /* the glow of the horizon, under the search bar */
+      radial-gradient(55% 80% at 50% 118%, color-mix(in oklab, var(--color-lantern-700) 60%, transparent), transparent 72%),
+      /* violet clouds at both sides */
+      radial-gradient(38% 75% at 8% 5%, color-mix(in oklab, var(--color-lantern-900) 90%, transparent), transparent 70%),
+      radial-gradient(34% 70% at 94% 20%, color-mix(in oklab, var(--color-lantern-700) 38%, transparent), transparent 70%),
+      var(--color-night-950);
+  }
+
+  /* The horizon: a hairline that fades out at both ends, so the band has no hard box edge */
+  .catalog-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-night-500), transparent);
+    opacity: 0.7;
+  }
+
+  .catalog-sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .catalog-sky > * {
+    position: absolute;
+  }
+
+  /* A planisphere: rings and meridians around a pole below the band, fading out upwards */
+  .catalog-sky-chart {
+    inset: 0;
+    background:
+      repeating-radial-gradient(
+        circle at 50% 145%,
+        transparent 0 calc(4.5rem - 1px),
+        rgb(95 108 168 / 0.24) calc(4.5rem - 1px) 4.5rem
+      ),
+      repeating-conic-gradient(
+        from 0deg at 50% 145%,
+        rgb(95 108 168 / 0.14) 0deg 0.18deg,
+        transparent 0.18deg 9deg
+      );
+    -webkit-mask-image: radial-gradient(ellipse 70% 125% at 50% 100%, #000 20%, transparent 78%);
+    mask-image: radial-gradient(ellipse 70% 125% at 50% 100%, #000 20%, transparent 78%);
+  }
+
+  /* The Home page's star field (one dot per layer on coprime tile sizes, so the pattern never
+     visibly repeats), plus three brighter stars with a soft halo. Still.
+     Two masks, and a star shows only where both let it through (intersect): the field fades out
+     towards the bottom, and an ellipse around the eyebrow, title and intro stays clear, so no
+     star ever sits on the text. The ellipse is centred on the intro line, the widest line of the
+     text, and narrows upwards like the text does (title, then the short eyebrow). Its size was
+     measured to clear every line of text (plus 4px) from 360px up; phones get a narrower, taller
+     one, because the intro wraps onto two or three lines there. */
+  .catalog-sky-stars {
+    --star: var(--color-parchment-100);
+    --text-clearing: radial-gradient(26rem 8.75rem at 50% 50%, transparent 90%, #000 100%);
+    inset: 0;
+    opacity: 0.85;
+    background-image:
+      radial-gradient(circle at 50% 50%, var(--star) 0 1.4px, color-mix(in oklab, var(--color-lantern-300) 30%, transparent) 2.2px, transparent 7px),
+      radial-gradient(circle at 50% 50%, var(--star) 0 1.2px, color-mix(in oklab, var(--color-gold-300) 25%, transparent) 2px, transparent 6px),
+      radial-gradient(circle at 50% 50%, var(--star) 0 1.3px, color-mix(in oklab, var(--color-lantern-300) 28%, transparent) 2px, transparent 6px),
+      radial-gradient(circle at 20% 30%, var(--star) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, color-mix(in oklab, var(--star) 70%, transparent) 0 0.7px, transparent 1.2px),
+      radial-gradient(circle at 45% 85%, color-mix(in oklab, var(--color-lantern-300) 90%, transparent) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 85% 15%, color-mix(in oklab, var(--color-parchment-300) 90%, transparent) 0 1.1px, transparent 1.8px),
+      radial-gradient(circle at 10% 70%, color-mix(in oklab, var(--star) 55%, transparent) 0 0.6px, transparent 1.1px),
+      radial-gradient(circle at 55% 40%, var(--star) 0 1.2px, transparent 2px),
+      radial-gradient(circle at 33% 52%, color-mix(in oklab, var(--star) 60%, transparent) 0 0.7px, transparent 1.2px),
+      radial-gradient(circle at 78% 88%, color-mix(in oklab, var(--star) 80%, transparent) 0 0.9px, transparent 1.4px);
+    background-size:
+      14px 14px, 14px 14px, 14px 14px,
+      211px 199px, 257px 241px, 313px 307px, 379px 367px, 163px 157px, 431px 419px, 283px 271px, 347px 331px;
+    background-position:
+      30% 18%, 86% 72%, 62% 10%,
+      0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    background-repeat:
+      no-repeat, no-repeat, no-repeat,
+      repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
+    -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%), var(--text-clearing);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to bottom, #000 45%, transparent 100%), var(--text-clearing);
+    mask-composite: intersect;
+  }
+
+  @media (width < 40rem) {
+    .catalog-sky-stars {
+      --text-clearing: radial-gradient(20rem 9.5rem at 50% 50%, transparent 90%, #000 100%);
+    }
+  }
+
+  /* Two constellations at the sides, only where they stay clear of the centred text */
+  .catalog-constellation {
+    display: none;
+    color: var(--color-lantern-300);
+  }
+
+  .catalog-constellation line {
+    stroke: currentColor;
+    stroke-opacity: 0.32;
+    stroke-width: 1;
+  }
+
+  .catalog-constellation-halo {
+    fill: currentColor;
+    fill-opacity: 0.14;
+  }
+
+  .catalog-constellation-star {
+    fill: var(--color-parchment-100);
+  }
+
+  @media (width >= 75rem) {
+    .catalog-constellation {
+      display: block;
+      width: 11rem;
+    }
+
+    .catalog-constellation-left {
+      top: 2rem;
+      left: max(1.5rem, calc(50% - 35rem));
+    }
+
+    .catalog-constellation-right {
+      top: 3.25rem;
+      right: max(1.5rem, calc(50% - 35rem));
+    }
+  }
+
+  /* relative: paints above the sky layer */
+  .catalog-hero-content {
+    position: relative;
+    padding-inline: 1rem;
+    text-align: center;
+  }
+
+  /* lantern-300 is only used as text on solid night surfaces, where it stays above 7.4:1 */
+  .catalog-eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-lantern-300);
+  }
+
+  .catalog-title {
+    margin: 0.625rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.5rem + 2.4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    color: var(--color-parchment-100);
+    text-shadow: 0 0 28px rgb(122 79 175 / 0.55);
+    text-wrap: balance;
+  }
+
+  .catalog-subtitle {
+    max-width: 46rem;
+    margin: 0.75rem auto 0;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-parchment-300);
+    text-wrap: pretty;
+  }
+
+  /* ---------- Search bar: one rounded pill with the Search button inside ---------- */
+
+  .catalog-search {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: min(100%, 40rem);
+    margin: 1.75rem auto 0;
+    padding: 0.375rem 0.375rem 0.375rem 1.125rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 999px;
+    background: rgb(18 26 51 / 0.92);
+    box-shadow:
+      0 12px 40px rgb(0 0 0 / 0.4),
+      0 0 0 6px rgb(122 79 175 / 0.12);
+  }
+
+  /* The ring goes around the whole pill (the input itself has none), like a focused .input */
+  .catalog-search:has(.catalog-search-input:focus-visible) {
+    border-color: var(--color-gold-400);
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 2px;
+  }
+
+  .catalog-search-icon {
+    color: var(--color-parchment-500);
+  }
+
+  /* 16px text: phones don't zoom into the field */
+  .catalog-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 1rem;
+    color: var(--color-parchment-100);
+  }
+
+  .catalog-search-input::placeholder {
+    color: var(--color-parchment-500);
+    opacity: 1;
+  }
+
+  .catalog-search-input:focus-visible {
+    outline: none;
+  }
+
+  .catalog-search-button {
+    flex: none;
+    height: 2.75rem;
+    padding-inline: 1.375rem;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+  }
+
+  /* ---------- Category chips ---------- */
+
+  .catalog-index {
+    padding: 1.5rem 1rem 0;
+  }
+
+  .catalog-index-label {
+    margin: 0 0 0.625rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-parchment-500);
+  }
+
+  /* relative: the chips' offsetLeft is measured from here (CategoryChips). The block padding
+     leaves room for the focus ring when the row scrolls (a scroll box clips what overflows). */
+  .catalog-chips-scroller {
+    position: relative;
+    padding-block: 0.375rem;
+  }
+
+  /* Wide screens: the chips are laid out like words in a centred paragraph, so text-wrap:
+     balance can share them evenly between the rows (7 + 6 at 1280px instead of 10 + 3). Each
+     chip's 0.25rem margin makes the 0.5rem gaps; the list's negative margin takes it back at
+     the edges. Browsers without balance simply wrap as usual. */
+  .catalog-chips {
+    margin: -0.25rem;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .catalog-chips > li {
+    display: inline-block;
+    margin: 0.25rem;
+    vertical-align: top;
+  }
+
+  /* The button's colour is the category's (a Tailwind text class), so currentColor paints the
+     star, and the border, tint and glow of the pressed chip */
+  .catalog-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    min-height: 2.25rem;
+    padding: 0 0.875rem 0 0.75rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 999px;
+    background: rgb(18 26 51 / 0.6);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .catalog-chip-star {
+    flex: none;
+    width: 0.5625rem;
+    height: 0.8125rem;
+    opacity: 0.8;
+  }
+
+  .catalog-chip-label {
+    color: var(--color-parchment-300);
+  }
+
+  .catalog-chip[aria-pressed="true"] {
+    border-color: color-mix(in srgb, currentColor 75%, transparent);
+    background: color-mix(in srgb, currentColor 16%, var(--color-night-900));
+    box-shadow: 0 0 18px -4px color-mix(in srgb, currentColor 65%, transparent);
+  }
+
+  .catalog-chip[aria-pressed="true"] .catalog-chip-label {
+    color: var(--color-parchment-100);
+  }
+
+  .catalog-chip[aria-pressed="true"] .catalog-chip-star {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+
+  /* Same condition as Tailwind's hover: variant, so a tap never leaves a chip in its hover look */
+  @media (hover: hover) {
+    .catalog-chip:not([aria-pressed="true"]):hover {
+      border-color: color-mix(in srgb, currentColor 55%, transparent);
+    }
+
+    .catalog-chip:hover .catalog-chip-label {
+      color: var(--color-parchment-100);
+    }
+  }
+
+  /* High Contrast mode drops the tint and the glow: a thicker border marks the pressed chip */
+  @media (forced-colors: active) {
+    .catalog-chip[aria-pressed="true"] {
+      border: 3px solid Highlight;
+    }
+  }
+
+  /* ---------- Results ---------- */
+
+  .catalog-results {
+    padding: 1.75rem 1rem 4rem;
+  }
+
+  .catalog-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-night-700);
+  }
+
+  .catalog-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    min-width: 0;
+  }
+
+  /* It takes focus after a filter is removed or after "Try again" (tabIndex -1); the radius
+     rounds its focus ring. One line tall even while empty (loading), so the cards below don't
+     move up and back. */
+  .catalog-count {
+    min-height: 1lh;
+    margin: 0;
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+    color: var(--color-parchment-300);
+    overflow-wrap: anywhere;
+  }
+
+  .catalog-count strong {
+    font-weight: 600;
+    color: var(--color-parchment-100);
+  }
+
+  .catalog-active {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* A removable filter is an action, so its hover turns gold */
+  .catalog-active-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    max-width: 100%;
+    min-height: 2rem;
+    padding: 0 0.5rem 0 0.75rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 999px;
+    background: var(--color-night-900);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-parchment-100);
+  }
+
+  .catalog-active-chip-text {
+    min-width: 0;
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .catalog-active-chip-star {
+    flex: none;
+    width: 0.5rem;
+    height: 0.75rem;
+  }
+
+  .catalog-clear {
+    min-height: 2rem;
+    padding: 0 0.25rem;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-gold-400);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .catalog-active-chip:hover {
+      border-color: var(--color-gold-400);
+      color: var(--color-gold-300);
+    }
+
+    .catalog-clear:hover {
+      color: var(--color-gold-300);
+    }
+  }
+
+  .catalog-sort {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .catalog-sort-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-parchment-300);
+  }
+
+  /* .input is full width; here it only needs to fit "Newest first" */
+  .catalog-sort-select {
+    width: auto;
+    min-width: 10.5rem;
+    min-height: 2.5rem;
+  }
+
+  /* Shown when the catalog returned as many entries as it loads at most */
+  .catalog-limit {
+    margin: -0.5rem 0 1.5rem;
+    font-size: 0.875rem;
+    color: var(--color-parchment-500);
+  }
+
+  /* The previous cards while new filters load: dimmed and not clickable */
+  .catalog-results-pending {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ---------- Empty catalog / no results ---------- */
+
+  .catalog-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    border: 1px dashed var(--color-night-700);
+    border-radius: 1rem;
+    text-align: center;
+    background:
+      radial-gradient(60% 80% at 50% 0%, color-mix(in oklab, var(--color-lantern-900) 75%, transparent), transparent 70%),
+      rgb(18 26 51 / 0.5);
+  }
+
+  .catalog-notice-chart {
+    position: relative;
+    width: 6.5rem;
+    height: 6.5rem;
+    color: var(--color-night-500);
+  }
+
+  .catalog-notice-chart svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .catalog-notice-ring {
+    fill: none;
+    stroke: currentColor;
+    stroke-opacity: 0.7;
+    stroke-dasharray: 2 4;
+  }
+
+  .catalog-notice-axis {
+    stroke: currentColor;
+    stroke-opacity: 0.35;
+  }
+
+  .catalog-notice-dot {
+    fill: var(--color-parchment-300);
+  }
+
+  /* The single star, as tall as the chart (the svg rule above sizes it), in the lantern's violet
+     (never gold: gold means "action"). Moved up a little, so its waist (y 20 of 34) sits on the
+     chart's centre. */
+  .catalog-notice-star {
+    position: absolute;
+    inset: 0;
+    translate: 0 -9%;
+    color: var(--color-lantern-300);
+    filter: drop-shadow(0 0 8px var(--color-lantern-500));
+  }
+
+  .catalog-notice-title {
+    margin: 0.25rem 0 0;
+    font-size: 1.5rem;
+    color: var(--color-parchment-100);
+    text-wrap: balance;
+  }
+
+  .catalog-notice-text {
+    max-width: 34rem;
+    margin: 0;
+    line-height: 1.65;
+    color: var(--color-parchment-300);
+    text-wrap: pretty;
+  }
+
+  .catalog-notice-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  /* ---------- Sizes ---------- */
+
+  @media (width >= 40rem) {
+    .catalog-hero-content,
+    .catalog-index,
+    .catalog-results {
+      padding-inline: 1.5rem;
+    }
+
+    .catalog-results {
+      padding-block: 2rem 5rem;
+    }
+  }
+
+  /* Phones: a shorter hero, 40px touch targets, and the chips in one row that scrolls sideways.
+     The row runs to the screen edges and fades out on the right, which shows that it goes on. */
+  @media (width < 40rem) {
+    .catalog-hero {
+      min-height: 16.25rem;
+      padding-block: 2.25rem;
+    }
+
+    .catalog-title {
+      letter-spacing: 0.02em;
+    }
+
+    .catalog-subtitle {
+      font-size: 1rem;
+    }
+
+    .catalog-search {
+      margin-top: 1.375rem;
+      padding: 0.3125rem 0.3125rem 0.3125rem 0.875rem;
+      gap: 0.5rem;
+    }
+
+    .catalog-search-input,
+    .catalog-search-button {
+      height: 2.5rem;
+    }
+
+    .catalog-search-button {
+      padding-inline: 1rem;
+    }
+
+    .catalog-index-label {
+      text-align: left;
+    }
+
+    .catalog-chips-scroller {
+      margin-inline: -1rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 0.75rem, #000 calc(100% - 3.5rem), transparent);
+      mask-image: linear-gradient(to right, transparent, #000 0.75rem, #000 calc(100% - 3.5rem), transparent);
+    }
+
+    .catalog-chips-scroller::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* One row: a flex line that never wraps (the wide-screen paragraph layout is undone) */
+    .catalog-chips {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0;
+      padding-left: 1rem;
+    }
+
+    /* Room after the last chip, so it can scroll fully out of the fade */
+    .catalog-chips::after {
+      content: "";
+      flex: none;
+      width: 3rem;
+    }
+
+    .catalog-chips > li {
+      flex: none;
+      margin: 0;
+    }
+
+    .catalog-chip,
+    .catalog-active-chip,
+    .catalog-clear {
+      min-height: 2.5rem;
+    }
+
+    .catalog-summary,
+    .catalog-sort {
+      width: 100%;
+    }
+
+    .catalog-sort-select {
+      flex: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .catalog-chip,
+    .catalog-active-chip {
+      transition:
+        border-color 150ms ease-out,
+        background-color 150ms ease-out,
+        box-shadow 150ms ease-out;
+    }
+
+    .catalog-chip-label,
+    .catalog-clear {
+      transition: color 150ms ease-out;
+    }
+  }
+}

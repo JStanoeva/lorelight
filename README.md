@@ -147,7 +147,7 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 
 - **Nested routing:** yes. All routes render inside `MainLayout` (header, `<Outlet />`, footer). `AuthGuard` and `GuestGuard` are layout routes whose child routes render through `<Outlet />`. Project Details and Lore Details share the `ProjectWorkspaceLayout` layout route: it loads the Project (and the open Lore Entry) and renders the Project sidebar, which stays mounted while only the page beside it changes. Both pages read its data with `useOutletContext`.
 - **URL parameters:** `/lore/:entryId`, `/lore/:entryId/edit`, `/projects/:projectId`, `/projects/:projectId/edit`, `/profile/:userId`
-- **Search parameters:** the catalog stores search, category and sort in the URL (e.g. `/lore?q=dragon&category=creature&sort=newest`).
+- **Search parameters:** the catalog stores search, category and sort in the URL (e.g. `/lore?q=dragon&category=creature&sort=oldest`; the default newest-first order is left out of the URL).
 
 ---
 
@@ -155,12 +155,13 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 
 ### Catalog / List Page
 
-- **Data displayed:** a grid of public Lore Entries from public Projects, showing title, category, a short description excerpt, tags, author (display name) and appreciation count.
+- **Data displayed:** a grid of public Lore Entries from public Projects, showing title, category, the world (Project) the entry belongs to, a short description excerpt, tags, author (display name) and appreciation count.
 - **Interaction:**
   - **Search** by title, description, or an exact tag
-  - **Filter** by category
+  - **Filter** by category, chosen with buttons (one category at a time, or all)
   - **Sort** by newest or oldest
   - Filters are kept in the URL, so a filtered view survives refresh and can be shared.
+  - The catalog shows at most 100 entries at a time. When that limit is reached, a note suggests searching or choosing a category to narrow the results down.
 
 ### Details Page
 
@@ -232,7 +233,7 @@ Making a **Project private** hides all of its Lore Entries from everyone else, w
 - Edit Profile
 - Folder name (new folder / rename folder, inline in the Project sidebar)
 - Delete Project dialog (a controlled choice: delete the lore, or move it to another Project; confirmed with its Delete button)
-- Catalog search and filters
+- Catalog search (submitted with Enter or the Search button). The category buttons and the sort select beside it apply immediately, without a submit.
 
 All forms use controlled inputs (`value` + `onChange`) and submit through the `onSubmit` synthetic event. Delete confirmations (such as the Delete Project dialog) are confirmed with a button click in a confirmation dialog.
 
@@ -264,22 +265,22 @@ Invalid fields show a message under the input. The submit button is disabled whi
 
 - **Hooks used:**
   - `useState` — form fields, loading and error states, UI toggles
-  - `useEffect` — data fetching, auth subscription, a scroll-spy observer
+  - `useEffect` — data fetching, auth subscription, a scroll-spy observer, and keeping the chosen category in view in the Lore Catalog's category row (which scrolls sideways on phones)
   - `useContext` — reading `AuthContext` through the `useAuth` hook
   - `useCallback` — a stable `refetch` function returned by the data hooks (and `updateData` in `useProject`, which applies a just-saved folder change or a deleted entry without reloading)
-  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), and the focus targets of the Project sidebar and its menus
+  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), the focus targets of the Project sidebar and its menus, and on the Lore Catalog the category row (scrolled to the chosen or focused category), the search input (focus stays in it after a search) and the result count (focus moves there after a filter is removed or after Try again)
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
   - Custom hooks — `useAuth`, `useViewerKey`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
-  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another. `useLoreEntry`, `useProject` and `useFolders` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't. For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
+  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted (the previous cards stay on screen, dimmed, until the new ones arrive). `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another. `useLoreEntry`, `useProject` and `useFolders` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't. For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
   - **Unmount:** `AuthContext` unsubscribes from the auth listener in its effect cleanup. Data hooks mark in-flight requests as stale in their cleanup, so a late response never updates an unmounted component.
 
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), Lore/Project forms (author id), `useViewerKey` (used by `useProject`, `useLoreEntry` and `useFolders`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), the Lore Catalog's empty-state call to action (Register or Log in for guests, Create Lore for users), Lore/Project forms (author id), `useViewerKey` (used by `useProject`, `useLoreEntry` and `useFolders`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
 
 ### Component Styling
 

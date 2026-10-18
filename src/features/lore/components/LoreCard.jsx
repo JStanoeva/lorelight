@@ -1,18 +1,31 @@
 import { Link } from "react-router";
+import StarGlyph from "../../home/components/StarGlyph.jsx";
 import CoverImage from "../../../shared/components/CoverImage.jsx";
 import Icon from "../../../shared/components/Icon.jsx";
 import LorePlaceholder from "./LorePlaceholder.jsx";
 import { getCategory } from "../utils/getCategory.js";
+import "../../../shared/styles/creator-link.css";
 import "../styles/lore-card.css";
+
+// How many tags the catalog card lists before "+N"
+const VISIBLE_TAGS = 3;
 
 // A lore entry as a card: a picture strip on top (the entry's image, or its emblem print), then the text.
 // The line under the picture and the glow behind the text take the category colour (currentColor).
-// `folderName` is the entry's folder ("Unfiled" when null); `isOwner` shows the Private marker.
-export default function LoreCard({ entry, folderName, isOwner = false }) {
+// variant "project" (Project Details): the folder in the footer. `folderName` is the entry's folder
+// ("Unfiled" when null); `isOwner` shows the Private marker.
+// variant "catalog" (Lore Catalog): the world (project) under the title, up to three tags, and the
+// author in the footer, because the reader may not know whose lore it is.
+export default function LoreCard({ entry, variant = "project", folderName, isOwner = false }) {
   const category = getCategory(entry.category);
+  const isCatalog = variant === "catalog";
+  const authorName = entry.author?.display_name ?? "Unknown creator";
+  const tags = entry.tags ?? [];
+  const shownTags = tags.slice(0, VISIBLE_TAGS);
+  const hiddenTagCount = tags.length - shownTags.length;
 
   return (
-    <article className="card-interactive lore-card">
+    <article className={isCatalog ? "card-interactive lore-card lore-card-catalog" : "card-interactive lore-card"}>
       <div className="lore-card-picture">
         {/* alt="" because the title right below already names the entry */}
         <CoverImage
@@ -43,13 +56,48 @@ export default function LoreCard({ entry, folderName, isOwner = false }) {
           </Link>
         </h3>
 
+        {isCatalog && entry.project && (
+          <p className="lore-card-world">
+            <StarGlyph className="lore-card-world-star" />
+            <span className="sr-only">World: </span>
+            <span className="lore-card-world-name">{entry.project.title}</span>
+          </p>
+        )}
+
         <p className="lore-card-excerpt">{entry.description}</p>
 
+        {isCatalog && shownTags.length > 0 && (
+          <ul aria-label="Tags" className="lore-card-tags">
+            {shownTags.map((tag) => (
+              <li key={tag} className="lore-card-tag">
+                {tag}
+              </li>
+            ))}
+            {hiddenTagCount > 0 && (
+              <li className="lore-card-tag lore-card-tag-more">
+                +{hiddenTagCount}
+                <span className="sr-only"> more</span>
+              </li>
+            )}
+          </ul>
+        )}
+
         <div className="lore-card-foot">
-          <span className="lore-card-folder">
-            <Icon name="folder" size={14} />
-            {folderName ?? "Unfiled"}
-          </span>
+          {isCatalog ? (
+            // Sits above the stretched title link (z-index), so it opens the profile, not the entry
+            <Link to={`/profile/${entry.author_id}`} className="lore-card-author">
+              <span className="creator-avatar" aria-hidden="true">
+                {authorName.charAt(0).toUpperCase()}
+              </span>
+              <span className="sr-only">By </span>
+              <span className="lore-card-author-name">{authorName}</span>
+            </Link>
+          ) : (
+            <span className="lore-card-folder">
+              <Icon name="folder" size={14} />
+              {folderName ?? "Unfiled"}
+            </span>
+          )}
           <span className="lore-card-appreciations">
             <Icon name="heart" size={14} />
             {entry.appreciation_count}

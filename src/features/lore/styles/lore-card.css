@@ -1,5 +1,5 @@
 /*
-  LoreCard: a lore entry as a card (Project Details, later the Catalog, profiles and Constellation).
+  LoreCard: a lore entry as a card (Project Details and the Lore Catalog, later profiles and Constellation).
   The category colour arrives as currentColor through the category's text class on the body.
   Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
   Tailwind utility on the same element always wins.
@@ -92,5 +92,116 @@
     gap: 0.375rem;
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+
+  /* ---------- Catalog variant (variant="catalog"): world, tags and author ---------- */
+
+  .lore-card-world {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    margin: -0.25rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--color-parchment-500);
+  }
+
+  .lore-card-world-star {
+    flex: none;
+    width: 0.5rem;
+    height: 0.6875rem;
+    color: var(--color-lantern-300);
+  }
+
+  .lore-card-world-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* One line of tags on every card width: when they don't fit, the tags shrink and end in "…"
+     (the full tags are on Lore Details), and "+N" keeps its size */
+  .lore-card-tags {
+    display: flex;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+  }
+
+  /* A 22px pill around a 20px line. A flex item is laid out as a block, so the ellipsis works. */
+  .lore-card-tag {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 1.375rem;
+    padding: 0 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--color-night-700);
+    border-radius: 999px;
+    background: rgb(18 26 51 / 0.7);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: var(--color-parchment-300);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lore-card-tag-more {
+    flex: none;
+    border-style: dashed;
+    color: var(--color-parchment-500);
+  }
+
+  /* Above the title's stretched link (.card-link::after covers the whole card), so a click here
+     opens the profile. The pill radius gives its focus ring a rounded shape. */
+  .lore-card-author {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    min-height: 2rem;
+    padding-right: 0.375rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-parchment-100);
+    text-decoration: none;
+  }
+
+  .lore-card-author .creator-avatar {
+    flex: none;
+  }
+
+  .lore-card-author-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lore-card-author:hover {
+    color: var(--color-gold-300);
+  }
+
+  .lore-card-author:hover .lore-card-author-name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Scoped to the catalog card: a long author name shrinks (ellipsis), the count never does.
+     The project card's footer keeps its own balance between folder and count. */
+  .lore-card-catalog .lore-card-appreciations {
+    flex: none;
+  }
+
+  /* Phones: a 40px touch target */
+  @media (width < 40rem) {
+    .lore-card-author {
+      min-height: 2.5rem;
+    }
   }
 }

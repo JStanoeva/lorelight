@@ -1,6 +1,6 @@
 /*
   CreatorLink: a creator's avatar, name and @username, linking to their profile (Project Details,
-  Lore Details).
+  Lore Details). .creator-avatar is also used by LoreCard's catalog footer (Lore Catalog).
   Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
   Tailwind utility on the same element always wins.
 */
