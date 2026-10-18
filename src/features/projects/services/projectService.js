@@ -104,8 +104,10 @@ async function deleteProject(id) {
   return data;
 }
 
-// Two requests, not one transaction: if the delete fails, the lore has already moved
-// and nothing is lost. A database trigger takes the moved entries out of their folders.
+// One database function (migration 006) moves the lore and deletes the project in a single
+// transaction, so an entry added to the project at the same moment can't be deleted with it,
+// and if anything fails nothing changes. Returns null when the project doesn't exist or isn't
+// the user's, like deleteProject.
 async function moveLoreAndDeleteProject(id, targetProjectId) {
   if (!isValidUuid(id) || !isValidUuid(targetProjectId)) {
     return null;
@@ -117,16 +119,16 @@ async function moveLoreAndDeleteProject(id, targetProjectId) {
     throw new Error("Choose a different project to move the lore to.");
   }
 
-  const { error } = await supabase
-    .from("lore_entries")
-    .update({ project_id: targetProjectId })
-    .eq("project_id", id);
+  const { data: isDeleted, error } = await supabase.rpc("move_lore_and_delete_project", {
+    source_project_id: id,
+    target_project_id: targetProjectId,
+  });
 
   if (error) {
     throw error;
   }
 
-  return deleteProject(id);
+  return isDeleted ? { id } : null;
 }
 
 export const projectService = {

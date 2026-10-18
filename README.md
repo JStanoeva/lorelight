@@ -211,7 +211,7 @@ New Projects and Lore Entries are private until their owner makes them public.
 Deleting a **Project** opens a dialog with two choices:
 
 - **Delete with its lore:** the Project is deleted, and the database removes its Lore Entries (and their appreciations and Constellation saves) automatically.
-- **Move lore, then delete:** all entries are first moved to another Project the user chooses, then the empty Project is deleted. This option only appears when the user owns another Project.
+- **Move lore, then delete:** all entries are first moved to another Project the user chooses, then the empty Project is deleted. Both steps run in one database transaction (the `move_lore_and_delete_project` function), so an entry added to the Project at the same moment can't be lost, and nothing changes if a step fails. This option only appears when the user owns another Project.
 
 **Projects** follow the same pattern: after creating or editing a Project, the user lands on its details page; after deleting it, on My Projects.
 
@@ -270,16 +270,16 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), and the focus targets of the Project sidebar and its menus
   - `useId` — unique ids that link form labels, hints and error messages to their inputs
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
-  - Custom hooks — `useAuth`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
+  - Custom hooks — `useAuth`, `useViewerKey`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
-  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another.
+  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted. `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another. `useLoreEntry`, `useProject` and `useFolders` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't. For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
   - **Unmount:** `AuthContext` unsubscribes from the auth listener in its effect cleanup. Data hooks mark in-flight requests as stale in their cleanup, so a late response never updates an unmounted component.
 
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), Lore/Project forms (author id), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), Lore/Project forms (author id), `useViewerKey` (used by `useProject`, `useLoreEntry` and `useFolders`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
 
 ### Component Styling
 

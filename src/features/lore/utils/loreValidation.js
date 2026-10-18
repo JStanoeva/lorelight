@@ -12,17 +12,24 @@ export const LORE_DESCRIPTION_MAX = 5000;
 // Shown when the chosen folder was deleted after the form loaded it (Postgres 23503)
 export const FOLDER_GONE_MESSAGE = 'The chosen folder no longer exists. Choose another folder, or "No folder".';
 
-// Readable messages for the two errors saving an entry (Create and Edit) can run into,
+const PROJECT_GONE_MESSAGE = "The chosen project no longer exists. Choose another project and try again.";
+
+// Readable messages for the errors saving an entry (Create and Edit) can run into,
 // everything else as usual
 export function getLoreSaveErrorMessage(error) {
-  // 23503: the chosen folder was deleted after the form loaded it
+  // 23503 on the project's key: the project was deleted while this save waited for it
+  // (deleting a project after moving its lore locks it until it's gone, migration 006)
+  if (error?.code === "23503" && error.message?.includes("lore_entries_project_id_fkey")) {
+    return PROJECT_GONE_MESSAGE;
+  }
+  // Any other 23503: the chosen folder was deleted after the form loaded it
   if (error?.code === "23503") {
     return FOLDER_GONE_MESSAGE;
   }
   // 42501: the database only accepts lore in the user's own projects, and the form only lists
   // those, so the chosen project was deleted after the form loaded it (e.g. in another tab)
   if (error?.code === "42501") {
-    return "The chosen project no longer exists. Choose another project and try again.";
+    return PROJECT_GONE_MESSAGE;
   }
   return getErrorMessage(error);
 }
