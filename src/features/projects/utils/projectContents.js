@@ -45,9 +45,8 @@ export function withoutEntry(data, entryId) {
   };
 }
 
-// An entry was appreciated (change 1) or its appreciation removed (change -1) on Lore Details, or
-// that was undone after a failed request (the opposite change): update its count here too, so the
-// overview's cards show the new number.
+// An entry was appreciated (change 1) or its appreciation removed (change -1) on Lore Details:
+// update its count here too, so the overview's cards show the new number.
 export function withAppreciationChange(data, entryId, change) {
   return {
     ...data,

@@ -36,9 +36,9 @@ export default function LoreDetailsPage() {
     navigate(`/projects/${entry.project_id}`);
   }
 
-  // An appreciation was added (1) or removed (-1), or undone after a failed request: the count
-  // changes here at once, and in the project's loaded entries too, so the overview's cards show
-  // the new number without loading the project again
+  // The database has accepted a new appreciation (1) or its removal (-1): the count changes here,
+  // and in the project's loaded entries too, so the overview's cards show the new number without
+  // loading the project again
   function handleAppreciationChange(change) {
     updateEntry((current) => changeAppreciationCount(current, change));
     if (project) {

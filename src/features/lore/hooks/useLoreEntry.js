@@ -36,8 +36,8 @@ export function useLoreEntry(entryId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
-  // Applies a change to the entry it already has (e.g. the appreciation count: changed at once on a
-  // click, and changed back if the request fails), so the screen updates without reloading.
+  // Applies a change to the entry it already has (e.g. the appreciation count after the database
+  // accepted a new appreciation), so the screen updates without reloading.
   // `updater(entry)` returns the new entry. Only the data of this request key is changed, like
   // useProject's updateData, and an entry that wasn't found stays not found.
   const updateData = useCallback(

@@ -221,7 +221,7 @@ Making a **Project private** hides all of its Lore Entries from everyone else, w
 
 **Folders** organize the lore inside a Project (one level). The owner creates, renames and deletes them from the Project's sidebar. Deleting a folder never deletes lore: its entries move back to the top level of the Project.
 
-**Appreciations** are added and removed on Lore Details: `appreciationService.appreciate()` inserts the user's row in `appreciations`, and `appreciationService.removeAppreciation()` deletes it. The button and the count change at once, and the change is undone, with an error message, if the request fails.
+**Appreciations** are added and removed on Lore Details: `appreciationService.appreciate()` inserts the user's row in `appreciations`, and `appreciationService.removeAppreciation()` deletes it. While the request is on its way, the button shows that it's being processed; only after the database has accepted the change does the button light up (or go out) and the count change. If the request fails, nothing on the page changes, and a short message explains why.
 
 ---
 
@@ -270,7 +270,8 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useState` — form fields, loading and error states, UI toggles
   - `useEffect` — data fetching, auth subscription, a scroll-spy observer, and keeping the chosen category in view in the Lore Catalog's category row (which scrolls sideways on phones)
   - `useContext` — reading `AuthContext` through the `useAuth` hook
-  - `useCallback` — a stable `refetch` function returned by the data hooks, plus `updateData` in `useProject` and `useLoreEntry` and `setHasAppreciated` in `useAppreciation`, which apply a change without reloading (a saved folder change, a deleted entry, or an appreciation, which shows at once and is undone if its request fails)
+  - `useCallback` — a stable `refetch` function returned by the data hooks, plus `updateData` in `useProject` and `useLoreEntry` and `setHasAppreciated` in `useAppreciation`, which apply a change without reloading (a saved folder change, a deleted entry, or an appreciation the database has accepted)
+  - `useTransition` — the Appreciate button sends its request as an async Action: `isPending` shows that the request is being processed (the count reads "…"), and the button lights up and the count changes only when the database has answered
   - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), the focus targets of the Project sidebar and its menus, on the Lore Catalog the category row (scrolled to the chosen or focused category), the search input (focus stays in it after a search) and the result count (focus moves there after a filter is removed or after Try again), and in the Appreciate button a flag that ignores a second click until the first request has finished, plus the button itself (focus moves to it after Try again)
   - `useId` — unique ids that link form labels, hints and error messages to their inputs, and the Appreciate button to its description (the count in words)
   - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
@@ -305,7 +306,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 ## 11. Error & Edge Case Handling
 
 - **Authentication errors:** wrong credentials, already registered emails and taken usernames show a readable message on the form. Guests opening private routes are redirected to login, and logged-in users are redirected away from login and register.
-- **Network or data errors:** every data-loading page shows a loading state, and failed requests show an error message with a retry button instead of crashing. Failed mutations show an error and keep the form data, so nothing is lost. A failed appreciation (or removal) is undone on screen and explained in one line under the button, for example when the entry was made private in the meantime.
+- **Network or data errors:** every data-loading page shows a loading state, and failed requests show an error message with a retry button instead of crashing. Failed mutations show an error and keep the form data, so nothing is lost. The Appreciate button never shows a change before the database has accepted it, so a failed appreciation (or removal) leaves the button and the count as they were and is explained in one line under the button, for example when the entry was made private in the meantime.
 - **Empty or missing data states:**
   - The catalog, projects and Constellation show a friendly empty state with a call to action.
   - Searches without results suggest clearing the filters.

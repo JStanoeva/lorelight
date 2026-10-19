@@ -42,9 +42,9 @@ export function useAppreciation(loreId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
-  // For the button: shows a click at once (and undoes it if the request fails) without asking the
-  // database again. Only the answer of this request key is changed: a click that finishes after
-  // the entry or the viewer changed (e.g. a logout in another tab) can't leak into the new answer.
+  // For the button: applies the answer of a request the database has just accepted, without asking
+  // again. Only the answer of this request key is changed: a click that finishes after the entry or
+  // the viewer changed (e.g. a logout in another tab) can't leak into the new answer.
   const setHasAppreciated = useCallback(
     (value) => setResult((current) => (current.key === requestKey ? { ...current, data: value } : current)),
     [requestKey],

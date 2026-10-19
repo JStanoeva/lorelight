@@ -24,8 +24,8 @@ const CLOSED_REASONS = {
 // The row under the banner: the Appreciate button with the count (only the count, with a reason, on
 // the author's entries that others can't see), and for the author the Edit and Delete actions plus
 // a note on who can see the entry. `onDeleted` runs after a successful delete,
-// `onAppreciationChange(change)` when an appreciation is added (1) or removed (-1), and with the
-// opposite change when that request fails.
+// `onAppreciationChange(change)` once the database has accepted a new appreciation (1) or its
+// removal (-1).
 export default function LoreActions({ entry, isOwner, onDeleted, onAppreciationChange }) {
   // Kept here (not in the page), so an open dialog closes by itself when another entry starts
   // loading: this row is replaced by the loader, and its state goes with it

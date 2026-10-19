@@ -43,11 +43,11 @@
   }
 
   /* The count: its own darker segment behind a divider, like a counter badge. tabular-nums keeps the
-     pill from changing width between 7 and 8. */
+     pill from changing width between 7 and 8. A grid, so the number and the pending "…" can share
+     one cell (see below). */
   .appreciate-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-grid;
+    place-items: center;
     min-width: 2.75rem;
     padding: 0 0.875rem 0 0.75rem;
     border-left: 1px solid var(--color-night-500);
@@ -97,11 +97,28 @@
     opacity: 0.55;
   }
 
-  .appreciate-pill[data-pending] .appreciate-count {
-    opacity: 0.65;
+  /* Processing (the request is on its way): the pill keeps its current state, the border turns a soft
+     gold and the count segment shows "…". It lights up (or goes out) only when the answer is there. */
+  .appreciate-pill[data-pending] {
+    border-color: rgb(232 193 112 / 0.55);
   }
 
-  /* The error under the pill after a failed request was undone */
+  .appreciate-pill[data-pending] .appreciate-glyph {
+    color: var(--color-gold-300);
+  }
+
+  /* The number and the "…" sit in the same grid cell. While pending, the number is invisible but
+     still takes its space, so a long count ("1,204") doesn't make the pill shrink under "…". */
+  .appreciate-count-number,
+  .appreciate-count-pending {
+    grid-area: 1 / 1;
+  }
+
+  .appreciate-pill[data-pending] .appreciate-count-number {
+    visibility: hidden;
+  }
+
+  /* The error under the pill after a failed request (nothing on screen was changed) */
   .appreciate-error {
     margin: 0.75rem 0 0;
     font-size: 0.875rem;
@@ -131,14 +148,14 @@
     }
   }
 
-  /* Motion only for people who haven't asked for less: a small pop when the heart fills, and the
-     number gently breathing while the request is on its way */
+  /* Motion only for people who haven't asked for less: the heart gently breathing while the request
+     is on its way, and a small pop when it fills after the database has accepted the appreciation */
   @media (prefers-reduced-motion: no-preference) {
     .appreciate-glyph.is-popping {
       animation: appreciate-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
     }
 
-    .appreciate-pill[data-pending] .appreciate-count {
+    .appreciate-pill[data-pending] .appreciate-glyph {
       animation: appreciate-breathe 0.9s ease-in-out infinite alternate;
     }
   }
