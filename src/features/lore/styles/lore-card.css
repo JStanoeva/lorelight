@@ -1,5 +1,5 @@
 /*
-  LoreCard: a lore entry as a card (Project Details and the Lore Catalog, later profiles and Constellation).
+  LoreCard: a lore entry as a card (Project Details, the Lore Catalog and Creator Profiles).
   The category colour arrives as currentColor through the category's text class on the body.
   Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
   Tailwind utility on the same element always wins.
@@ -51,6 +51,12 @@
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--color-parchment-300);
+  }
+
+  /* "Hidden" (a public entry in a private project): VisibilityBadge's lantern tone, so it reads
+     differently from "Private". lantern-300 stays above 7.4:1 on the card. */
+  .lore-card-hidden {
+    color: var(--color-lantern-300);
   }
 
   .lore-card-title {
@@ -196,6 +202,11 @@
      The project card's footer keeps its own balance between folder and count. */
   .lore-card-catalog .lore-card-appreciations {
     flex: none;
+  }
+
+  /* Without the author (showAuthor false) the count keeps its place on the right */
+  .lore-card-catalog .lore-card-appreciations:only-child {
+    margin-left: auto;
   }
 
   /* Phones: a 40px touch target */

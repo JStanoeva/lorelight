@@ -183,7 +183,8 @@
     margin-top: 0.25rem;
   }
 
-  /* The Save pill's note that Constellations are public: always the last line, under any error */
+  /* The note that appreciations and saves show on the public profile: always the last line, under
+     any error */
   .lore-reactions .pill-button-note {
     flex-basis: 100%;
     order: 2;

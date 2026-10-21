@@ -10,7 +10,9 @@ function formatLoreCount(count) {
 }
 
 // `showVisibility` is for the owner's own lists: visitors only ever see public projects.
-export default function ProjectCard({ project, showVisibility = false }) {
+// `headingLevel` keeps the page outline right: 2 on its own page, 3 under a section heading.
+export default function ProjectCard({ project, showVisibility = false, headingLevel = 2 }) {
+  const Title = headingLevel === 3 ? "h3" : "h2";
   const formatLabel = getFormatLabel(project.format);
   const genreLabel = getGenreLabel(project.genre);
   const details = [formatLabel, genreLabel].filter(Boolean).join(" · ");
@@ -24,12 +26,12 @@ export default function ProjectCard({ project, showVisibility = false }) {
       <div className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-start justify-between gap-3">
           {/* min-w-0 + wrap-anywhere: a very long word wraps instead of pushing the badge off the card */}
-          <h2 className="min-w-0 text-xl wrap-anywhere">
+          <Title className="min-w-0 text-xl wrap-anywhere">
             {/* The link stretches over the whole card (see .card-link), so the card is one big target. */}
             <Link to={`/projects/${project.id}`} className="card-link">
               {project.title}
             </Link>
-          </h2>
+          </Title>
           {showVisibility && <VisibilityBadge visibility={project.is_public ? "public" : "private"} />}
         </div>
 

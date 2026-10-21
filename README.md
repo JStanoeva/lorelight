@@ -78,8 +78,8 @@ Lorelight gives writers, game masters and worldbuilders one place to keep the lo
 
 ### Guest (Not Authenticated)
 
-- **Available pages / routes:** Home (`/`), Lore Catalog (`/lore`), Lore Details (`/lore/:entryId`), Project Details (`/projects/:projectId`), Creator Profile (`/profile/:userId`), Login (`/login`), Register (`/register`)
-- **Public data shown:** public Lore Entries in public Projects (title, category, description, tags, author, project, appreciation count), public Projects with their public lore, creator profiles (display name, `@username`, bio, public Projects and lore, and the creator's Constellation of saved inspiration)
+- **Available pages / routes:** Home (`/`), Lore Catalog (`/lore`), Lore Details (`/lore/:entryId`), Project Details (`/projects/:projectId`), Creator Profile (`/profile/:userId`), Creator's Collection (`/profile/:userId/:collection`), Login (`/login`), Register (`/register`)
+- **Public data shown:** public Lore Entries in public Projects (title, category, description, tags, author, project, appreciation count), public Projects with their public lore, creator profiles (avatar, display name, `@username`, bio, creator title and figures, public Projects and lore, the creator's Constellation of saved inspiration and the public lore they appreciated)
 - Guests can see appreciation counts, but the Appreciate and Save buttons prompt them to log in.
 
 ### Authenticated User
@@ -121,33 +121,34 @@ Lorelight gives writers, game masters and worldbuilders one place to keep the lo
 
 ### Main Routes
 
-| Route                       | Page             | Access        |
-| --------------------------- | ---------------- | ------------- |
-| `/`                         | Home             | Public        |
-| `/lore`                     | Lore Catalog     | Public        |
-| `/lore/:entryId`            | Lore Details     | Public        |
-| `/projects/:projectId`      | Project Details  | Public        |
-| `/profile/:userId`          | Creator Profile  | Public        |
-| `/lore/create`              | Create Lore      | Authenticated |
-| `/lore/:entryId/edit`       | Edit Lore        | Author only   |
-| `/projects`                 | My Projects      | Authenticated |
-| `/projects/create`          | Create Project   | Authenticated |
-| `/projects/:projectId/edit` | Edit Project     | Author only   |
-| `/constellation`            | My Constellation | Authenticated |
-| `/profile/edit`             | Edit Profile     | Authenticated |
-| `/login`                    | Login            | Guest only    |
-| `/register`                 | Register         | Guest only    |
-| `*`                         | Not Found        | Public        |
+| Route                          | Page                 | Access        |
+| ------------------------------ | -------------------- | ------------- |
+| `/`                            | Home                 | Public        |
+| `/lore`                        | Lore Catalog         | Public        |
+| `/lore/:entryId`               | Lore Details         | Public        |
+| `/projects/:projectId`         | Project Details      | Public        |
+| `/profile/:userId`             | Creator Profile      | Public        |
+| `/profile/:userId/:collection` | Creator's Collection | Public        |
+| `/lore/create`                 | Create Lore          | Authenticated |
+| `/lore/:entryId/edit`          | Edit Lore            | Author only   |
+| `/projects`                    | My Projects          | Authenticated |
+| `/projects/create`             | Create Project       | Authenticated |
+| `/projects/:projectId/edit`    | Edit Project         | Author only   |
+| `/constellation`               | My Constellation     | Authenticated |
+| `/profile/edit`                | Edit Profile         | Authenticated |
+| `/login`                       | Login                | Guest only    |
+| `/register`                    | Register             | Guest only    |
+| `*`                            | Not Found            | Public        |
 
-That is 15 routes: 5 public pages, 7 pages for logged-in users (2 of them author-only), 2 guest-only pages and a Not Found fallback. The dynamic pages (loading data from the backend) are the Lore Catalog, Lore Details, Project Details, Creator Profile, My Projects and My Constellation.
+That is 16 routes: 6 public pages, 7 pages for logged-in users (2 of them author-only), 2 guest-only pages and a Not Found fallback. The dynamic pages (loading data from the backend) are the Lore Catalog, Lore Details, Project Details, Creator Profile, Creator's Collection, My Projects and My Constellation. A Creator's Collection page (`:collection` is `projects`, `lore`, `constellation` or `appreciated`) lists everything in one of the profile's tabs; any other value shows the Not Found page.
 
 The Home page (`/`) is a static introduction that loads no data: a hero with sign-up and login actions for guests (create and explore actions for logged-in users), three expandable previews (Create, Share, Explore), every lore category with a link to the filtered catalog, a short FAQ and a closing call to action. On Home, the header also links to the About, Categories and FAQ sections and highlights the one in view (for logged-in users, these links appear in the menu on small screens and in the header bar on screens at least 1280 px wide).
 
 ### Nested & Parameterized Routes
 
 - **Nested routing:** yes. All routes render inside `MainLayout` (header, `<Outlet />`, footer). `AuthGuard` and `GuestGuard` are layout routes whose child routes render through `<Outlet />`. Project Details and Lore Details share the `ProjectWorkspaceLayout` layout route: it loads the Project (and the open Lore Entry) and renders the Project sidebar, which stays mounted while only the page beside it changes. Both pages read its data with `useOutletContext`.
-- **URL parameters:** `/lore/:entryId`, `/lore/:entryId/edit`, `/projects/:projectId`, `/projects/:projectId/edit`, `/profile/:userId`
-- **Search parameters:** the catalog stores search, category and sort in the URL (e.g. `/lore?q=dragon&category=creature&sort=oldest`; the default newest-first order is left out of the URL). My Constellation stores its category filter the same way (e.g. `/constellation?category=location`).
+- **URL parameters:** `/lore/:entryId`, `/lore/:entryId/edit`, `/projects/:projectId`, `/projects/:projectId/edit`, `/profile/:userId`, `/profile/:userId/:collection`
+- **Search parameters:** the catalog stores search, category and sort in the URL (e.g. `/lore?q=dragon&category=creature&sort=oldest`; the default newest-first order is left out of the URL). My Constellation stores its category filter the same way (e.g. `/constellation?category=location`), and so does a creator's full Constellation page. A Creator Profile keeps the open tab in the URL (e.g. `/profile/:userId?tab=lore`), so it survives a refresh and can be shared.
 
 ---
 
@@ -169,7 +170,7 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 - **Route parameter data:** `entryId` is read with `useParams` in the workspace layout route and passed to the `useLoreEntry(entryId)` hook, which loads the entry together with its author and project; `LoreDetailsPage` receives it through `useOutletContext`. Missing and private entries, and ids that aren't valid, show a "not found" state.
 - **Page content:** the entry is shown inside its Project's workspace: the Project's sidebar (folders and entries, with the open entry highlighted, loaded with `useProject`) and, beside it, a banner with the entry's image (or a generated print of its category's emblem), category, title, author, Project, folder and dates, then the Appreciate button with the appreciation count, the description and the tags. Moving between the Project's overview and its entries, or from one entry to another, keeps the sidebar in place (with its filter and open folders) and only loads the entry; the Project itself isn't loaded again. The author also sees Edit and Delete buttons and a short note on who can see the entry.
 - **Appreciate:** logged-in users appreciate an entry, or remove their appreciation, by clicking the Appreciate button, which also shows the count. Authors can appreciate their own public entries too. Guests who click it are taken to the login page and brought back to the entry afterwards. On an author's private entry (or a public entry in a private Project) only the count is shown, with a short note, because only public lore can be appreciated.
-- **Save:** next to it, the Save button adds the entry to the user's Constellation or removes it again; its star fills once the entry is saved. Like Appreciate, it waits for the database before it changes, it works for the author's own public entries too, and guests are taken to the login page. A short note under the buttons tells logged-in users before they click that their Constellation is public, so anyone can see the entries they save.
+- **Save:** next to it, the Save button adds the entry to the user's Constellation or removes it again; its star fills once the entry is saved. Like Appreciate, it waits for the database before it changes, it works for the author's own public entries too, and guests are taken to the login page. A short note under the buttons tells logged-in users before they click that their profile is public, so anyone can see the entries they appreciate or save (in their profile's Appreciated and Constellation tabs).
 
 ### My Constellation
 
@@ -177,6 +178,15 @@ The Home page (`/`) is a static introduction that loads no data: a hero with sig
 - **Star-threads:** each card hangs on a star-pin in its category's colour, and dotted threads of stardust join the saved entries of the same category, so every category forms its own constellation. Each thread runs from one pin to the next in a gentle curve behind the cards, so it shows in the gaps between them. The threads are faint at first; hovering or focusing a card lights up its category's threads, while the pins of the other categories fade. On narrow screens (one column of cards) a straight dotted thread joins the cards once a category is chosen.
 - **Filter:** category buttons above the board (All, plus every category the user has saved, each with its number of entries) show one category at a time and light up its whole constellation. The choice is kept in the URL, so it survives a refresh and Back/Forward step through it. Filtering happens in the browser, because all saved entries are already loaded.
 - **Remove:** each card has a Remove button. The card shows that it's being removed and leaves the board only after the database has confirmed it; a confirmation line then names the removed entry, and keyboard focus moves to the next card. If a category's last entry is removed, the board offers "Show all" and a link to that category in the Lore Catalog. A Constellation without any saves shows an invitation to explore the catalog.
+
+### Creator Profile
+
+- **Navigation:** author names on cards and details pages, and the `@username` link in the header (for the user's own profile), open `/profile/:userId`. The id is read with `useParams` and passed to the `useProfile(userId)` hook.
+- **Header:** a framed card in front of a night sky that is generated for each creator. It shows the creator's avatar inside a star-shaped frame (the picture from the profile's avatar link, or a generated nebula that is unique to the creator when there is no link or the picture fails to load), the display name, `@username`, "Member since" (month and year) and the bio. Each profile has a star colour (one of six), which tints the sky, the avatar frame, the creator title and small accents; the name, bio and other text keep fixed colours, so their contrast never depends on it.
+- **Figures:** the number of Projects, Lore Entries, appreciations received (the sum over the creator's lore that the viewer can see) and Constellation saves, plus "Currently worldbuilding" with a link to the creator's most recently updated public Project.
+- **Creator title:** a title from the lore category the creator has published the most public lore in (for example "Keeper of Locations"; in a tie, the tied category with the newest public entry wins). Only public lore counts, also when the owner looks at their own profile, so everyone sees the same title. Creators without public lore have no title.
+- **Tabs:** Projects, Lore, Constellation and Appreciated (the public lore the creator has appreciated), each with its number of items. A tab shows its three most recent items as cards (Projects by last update, Lore by creation, saves and appreciations by when they were made) and, when there are more, an "All …" link to `/profile/:userId/:collection`, which lists every item, newest first. The full Constellation page shows the same pin board as My Constellation, with its category filter, but without Remove buttons; the owner gets a link to My Constellation to manage it. The tabs follow the WAI-ARIA tabs pattern (arrow keys, Home and End move between them).
+- **Owner and visitors:** visitors see only public items; the owner sees everything, with private entries, private Projects and public entries inside a private Project marked on their cards. The owner also sees an Edit profile button and, with the tabs, one sentence on who can see the open tab (for example "Everyone can see the public lore you appreciate."; the owner's own appreciated entries that are no longer public stay in their list, marked, but visitors don't see them). Each empty tab explains itself: the owner gets a next step (such as "Create a project"), a visitor a short sentence.
 
 ---
 
@@ -205,7 +215,7 @@ New Projects and Lore Entries are private until their owner makes them public.
 - **Catalog:** `useLoreList(filters)` → `loreService.getPublicLore()` loads public entries with the active search, category and sort.
 - **Details:** `useLoreEntry(entryId)` → `loreService.getLoreById()`, plus `useProject()` for the Project sidebar
 - **Project Details:** loads the project, its folders and its lore entries.
-- **Profile:** loads a creator's Projects, Lore and Constellation (only public items for visitors; everything for the owner).
+- **Profile:** `useProfile(userId)` loads the creator's profile, Projects, Lore Entries, Constellation saves and appreciated lore at the same time (`profileService.getProfileById()`, `projectService.getProjectsByOwner()`, `loreService.getLoreByAuthor()`, `constellationService.getConstellation()`, `appreciationService.getAppreciatedLore()`); visitors get only public items, the owner everything. The figures, the creator title and the three most recent items per tab are worked out from these lists, and the Creator's Collection pages reuse the same hook.
 - **My Constellation:** `useConstellation(userId)` → `constellationService.getConstellation()` loads the current user's saved entries with their Project and author, most recently saved first.
 
 ### Update (PUT/PATCH)
@@ -278,24 +288,24 @@ Invalid fields show a message under the input. The submit button is disabled whi
 
 - **Hooks used:**
   - `useState` — form fields, loading and error states, UI toggles
-  - `useEffect` — data fetching, auth subscription, a scroll-spy observer, keeping the chosen category in view in the category row (which scrolls sideways on phones), and on My Constellation a `ResizeObserver` that measures where the cards' star-pins ended up, so the threads can be drawn between them (it measures again when the board changes size or the cards change, and is disconnected in the effect's cleanup)
+  - `useEffect` — data fetching, auth subscription, a scroll-spy observer, keeping the chosen category in view in the category row (which scrolls sideways on phones), and on My Constellation a `ResizeObserver` that measures where the cards' star-pins ended up, so the threads can be drawn between them (it measures again when the board changes size or the cards change, and is disconnected in the effect's cleanup), and on a Creator Profile moving keyboard focus to the page's heading after Try again (`useRetryFocus`)
   - `useContext` — reading `AuthContext` through the `useAuth` hook
-  - `useCallback` — a stable `refetch` function returned by the data hooks, plus `updateData` in `useProject` and `useLoreEntry`, `setHasAppreciated` in `useAppreciation`, `setIsSaved` in `useSaveStatus` and `removeEntry` in `useConstellation`, which apply a change without reloading (a saved folder change, a deleted entry, or an appreciation, save or removal the database has accepted)
-  - `useMemo` — on My Constellation, the category counts, the entries of the chosen category, the star-threads (built again only when the cards or their measured positions change, not on every hover) and the board's seeded star field
+  - `useCallback` — a stable `refetch` function returned by the data hooks, plus `updateData` in `useProject` and `useLoreEntry`, `setHasAppreciated` in `useAppreciation`, `setIsSaved` in `useSaveStatus` and `removeEntry` in `useConstellation`, which apply a change without reloading (a saved folder change, a deleted entry, or an appreciation, save or removal the database has accepted), and `retry` in `useRetryFocus`
+  - `useMemo` — on My Constellation, the category counts, the entries of the chosen category, the star-threads (built again only when the cards or their measured positions change, not on every hover) and the board's seeded star field; on a Creator Profile, the creator's seeded sky and the shape of the avatar's star frame
   - `useTransition` — the Appreciate and Save buttons and My Constellation's Remove buttons send their requests as async Actions: `isPending` shows that the request is being processed (Appreciate's count reads "…", Save reads "Save…", a removed card shows "Removing…"), and the page changes only when the database has answered
-  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), the focus targets of the Project sidebar and its menus, on the Lore Catalog the category row (scrolled to the chosen or focused category), the search input (focus stays in it after a search) and the result count (focus moves there after a filter is removed or after Try again), in the Appreciate and Save buttons a flag that ignores a second click until the first request has finished, plus the button itself (focus moves to it after Try again), on each Constellation card the same flag for its Remove button, and on My Constellation the board and card list (measured for the threads), the cards' title links (focus moves to the next card after a removal) and the count line (focus moves there after the last card of a view is removed, after "Show all" and after Try again)
-  - `useId` — unique ids that link form labels, hints and error messages to their inputs, the Appreciate button to its description (the count in words), the Save button to its notes (including that the Constellation is public), and the category buttons to their group label
-  - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useSearchParams` keeps the catalog's filters and My Constellation's category in the URL; `useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
-  - Custom hooks — `useAuth`, `useViewerKey`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useAppreciation`, `useSaveStatus`, `useConstellation`, `usePinPositions`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
+  - `useRef` — the confirmation dialog element, the password input (keeping the cursor in place when the password is shown or hidden), the focus targets of the Project sidebar and its menus, on the Lore Catalog the category row (scrolled to the chosen or focused category), the search input (focus stays in it after a search) and the result count (focus moves there after a filter is removed or after Try again), in the Appreciate and Save buttons a flag that ignores a second click until the first request has finished, plus the button itself (focus moves to it after Try again), on each Constellation card the same flag for its Remove button, and on My Constellation the board and card list (measured for the threads), the cards' title links (focus moves to the next card after a removal) and the count line (focus moves there after the last card of a view is removed, after "Show all" and after Try again), and on a Creator Profile the tab buttons (the arrow keys move focus between them), the page's heading (focus moves there after Try again) and a flag that remembers that Try again was pressed
+  - `useId` — unique ids that link form labels, hints and error messages to their inputs, the Appreciate button to its description (the count in words), the Save button to its notes, both buttons to the note that the user's profile is public, the category buttons to their group label, and a Creator Profile's tabs to their panels
+  - `useParams`, `useNavigate`, `useSearchParams`, `useLocation`, `useOutletContext` — routing (`useSearchParams` keeps the catalog's filters, My Constellation's category and a Creator Profile's open tab in the URL; `useOutletContext` passes the workspace layout's data to Project Details and Lore Details)
+  - Custom hooks — `useAuth`, `useViewerKey`, `useForm`, `useLoreList`, `useLoreEntry`, `useProjects`, `useProject`, `useFolders`, `useAppreciation`, `useSaveStatus`, `useConstellation`, `usePinPositions`, `useProfile`, `useRetryFocus`, `useOutsideClick`, `useActiveSection`, `useIsBelowHeader`
 - **Mount / update / unmount example:**
   - **Mount:** `AuthContext` subscribes to `onAuthStateChange`; the first event delivers the stored session.
-  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted (the previous cards stay on screen, dimmed, until the new ones arrive). `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another. `useLoreEntry`, `useProject`, `useFolders`, `useAppreciation`, `useSaveStatus` and `useConstellation` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't (and `useAppreciation` and `useSaveStatus` because their answer is the logged-in user's own). For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
+  - **Update:** `useLoreList` refetches whenever the search, category or sort parameters in the URL change, while the Catalog page stays mounted (the previous cards stay on screen, dimmed, until the new ones arrive). `useLoreEntry(entryId)` likewise refetches when `entryId` changes, e.g. when the browser's Back button returns from one entry's details page to another, and `useProfile(userId)` when a creator's name on one profile opens another creator's profile. `useLoreEntry`, `useProject`, `useFolders`, `useAppreciation`, `useSaveStatus`, `useConstellation` and `useProfile` also reload when the logged-in user changes: their request key includes `useViewerKey()`, because owners see private rows that others don't (and `useAppreciation` and `useSaveStatus` because their answer is the logged-in user's own). For example, after a logout in another tab, an open private Lore Details page reloads as a guest and shows "not found".
   - **Unmount:** `AuthContext` unsubscribes from the auth listener in its effect cleanup. Data hooks mark in-flight requests as stale in their cleanup, so a late response never updates an unmounted component. On My Constellation, `usePinPositions` disconnects its `ResizeObserver` in its cleanup, both when the page closes and before it measures a new set of cards.
 
 ### Context API
 
 - **`AuthContext`** shares the current user, `isAuthLoading`, and the `login`, `register` and `logout` actions.
-- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), the Lore Catalog's empty-state call to action (Register or Log in for guests, Create Lore for users), Lore/Project forms (author id), My Constellation (the user's own saves and their removal), `useViewerKey` (used by `useProject`, `useLoreEntry`, `useFolders`, `useAppreciation`, `useSaveStatus` and `useConstellation`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
+- **Consumers:** `MainLayout` (logout), Header (navigation), the Home page (call-to-action buttons), `AuthGuard`, `GuestGuard`, `OwnerGuard`, Login and Register pages, My Projects (the user's own Projects), Project Details and Lore Details (owner actions), the Project workspace layout (the sidebar's owner tools), the Lore Catalog's empty-state call to action (Register or Log in for guests, Create Lore for users), Lore/Project forms (author id), My Constellation (the user's own saves and their removal), the Creator Profile and its collection pages (whether the profile is the user's own: Edit profile, the notes on who can see each tab, the private items' markers), `useViewerKey` (used by `useProject`, `useLoreEntry`, `useFolders`, `useAppreciation`, `useSaveStatus`, `useConstellation` and `useProfile`, so their data reloads when the logged-in user changes), and the appreciation and Constellation buttons.
 
 ### Component Styling
 
@@ -319,11 +329,12 @@ Invalid fields show a message under the input. The submit button is disabled whi
 - **Authentication errors:** wrong credentials, already registered emails and taken usernames show a readable message on the form. Guests opening private routes are redirected to login, and logged-in users are redirected away from login and register.
 - **Network or data errors:** every data-loading page shows a loading state, and failed requests show an error message with a retry button instead of crashing. Failed mutations show an error and keep the form data, so nothing is lost. The Appreciate button never shows a change before the database has accepted it, so a failed appreciation (or removal) leaves the button and the count as they were and is explained in one line under the button, for example when the entry was made private in the meantime. The Save button and My Constellation's Remove buttons follow the same rule: a failed save or removal changes nothing and says why.
 - **Empty or missing data states:**
-  - The catalog, projects and Constellation show a friendly empty state with a call to action.
+  - The catalog, projects and Constellation show a friendly empty state with a call to action. Each empty tab on a Creator Profile explains itself: the owner gets a next step, a visitor one sentence.
   - Searches without results suggest clearing the filters. On My Constellation, a category with no saved entries left (for example after removing its last one) offers "Show all" and a link to that category in the catalog.
   - Projects without a cover image, or whose image fails to load, show a generated pattern that is unique to each Project instead of a broken image.
   - Lore Entries without an image, or whose image fails to load, show a generated print of their category's emblem (for example a crown for Politics), also unique to each entry.
-  - Missing or private records (including anything inside a private Project) show a "not found" state.
+  - Profiles without an avatar link, or whose picture fails to load, show a generated nebula in the profile's star colour, unique to each creator.
+  - Missing or private records (including anything inside a private Project) show a "not found" state, and so do creator profiles that don't exist ("Creator not found").
   - If a saved entry becomes private, directly or because its Project becomes private, it is removed from every Constellation automatically, so no one sees a broken card.
   - Unknown URLs show the Not Found page.
 
@@ -375,13 +386,15 @@ Page (or its layout route) → custom hook → service → Supabase → service 
 
 Example: `/lore/:entryId` → `ProjectWorkspaceLayout` (the layout route around `LoreDetailsPage`) → `useLoreEntry(entryId)` → `loreService.getLoreById()` → Supabase; `LoreDetailsPage` then receives the entry through `useOutletContext()`.
 
+Another: `/profile/:userId` → `ProfilePage` → `useProfile(userId)` → `profileService.getProfileById()`, `projectService.getProjectsByOwner()`, `loreService.getLoreByAuthor()`, `constellationService.getConstellation()` and `appreciationService.getAppreciatedLore()`, all at once → Supabase.
+
 Services contain no React code, and pages contain no Supabase code.
 
 ### Data Model
 
 | Table                 | Purpose                                                                   |
 | --------------------- | ------------------------------------------------------------------------- |
-| `profiles`            | Public user info (unique username, display name, bio), created on sign-up |
+| `profiles`            | Public user info (unique username, display name, bio, avatar link, star colour), created on sign-up |
 | `projects`            | Collections of lore owned by a user, each with a format and an optional genre |
 | `lore_folders`        | Optional folders that organize the lore inside one project (one level)    |
 | `lore_entries`        | Main content; every entry belongs to exactly one project, and optionally to one of its folders |
@@ -398,7 +411,7 @@ Authorization is enforced in the database with Row Level Security, not only in t
 - Only the owner can create, update or delete their lore and projects, and lore can only be written into the author's own Projects.
 - Only a Project's owner can create, rename or delete its folders, and an entry can only be placed in a folder of its own Project. Other users see a folder only while it contains public lore. Deleting a folder never deletes lore: its entries move back to the top level of the Project.
 - Users can upload images only into their own Storage folder (JPEG, PNG or WebP, up to 2 MB) and delete only their own images. Nobody can list other users' files.
-- Users can add appreciations and Constellation saves only for public lore, and can add or remove only their own. Constellations are publicly visible on creator profiles; saved lore that becomes private is removed from them automatically.
+- Users can add appreciations and Constellation saves only for public lore, and can add or remove only their own. Constellations and appreciations of public lore are publicly visible on creator profiles; saved lore that becomes private is removed from them automatically, and appreciated lore that becomes private disappears from the profile for everyone except its author.
 - Table privileges add a second layer under RLS: guests can only read, and ids, owners, usernames and timestamps can't be changed through the API.
 - Check constraints mirror the form validation rules (lengths, categories, project genres and formats, tags, username format, folder names), so invalid data is rejected even if the frontend is bypassed.
 

@@ -15,13 +15,13 @@ import "../../../shared/styles/pill-button.css";
 // whether the entry is saved. Only for entries others can see (the database accepts saves of public
 // lore only), the author's own included. Nothing claims success before the database has accepted
 // it: while the request is on its way the pill shows that it's being processed, and only then does
-// the star fill (or empty). Logged-in users also see a short note that Constellations are public.
-export default function SaveToConstellationButton({ loreId }) {
+// the star fill (or empty). `publicNoteId` is the id of the note under both pills that says saves
+// show on the user's public profile; the pill points to it with aria-describedby.
+export default function SaveToConstellationButton({ loreId, publicNoteId }) {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();
   const { isSaved, isLoading, error: statusError, refetch, setIsSaved } = useSaveStatus(loreId);
   const descriptionId = useId();
-  const publicNoteId = useId();
   // isPending is true from the click until the request (the async function given to
   // startTransition) has finished and its result is on screen
   const [isPending, startTransition] = useTransition();
@@ -128,7 +128,7 @@ export default function SaveToConstellationButton({ loreId }) {
         className="pill-button"
         aria-pressed={isStatusKnown ? isSaved : undefined}
         aria-disabled={isWaiting || undefined}
-        aria-describedby={user ? `${descriptionId} ${publicNoteId}` : descriptionId}
+        aria-describedby={publicNoteId ? `${descriptionId} ${publicNoteId}` : descriptionId}
         data-checking={!isStatusKnown || undefined}
         data-pending={isPending || undefined}
         onClick={handleClick}
@@ -156,14 +156,6 @@ export default function SaveToConstellationButton({ loreId }) {
       {requestError && (
         <p key={failedAttempts} className="pill-button-error" role="alert">
           {requestError}
-        </p>
-      )}
-
-      {/* Said before the click, so saving never surprises anyone: Constellations are public */}
-      {user && (
-        <p id={publicNoteId} className="pill-button-note">
-          <Icon name="eye" size={14} />
-          Your Constellation is public, so anyone can see the entries you save.
         </p>
       )}
 

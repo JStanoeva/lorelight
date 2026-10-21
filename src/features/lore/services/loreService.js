@@ -78,7 +78,9 @@ async function getLoreByProject(projectId) {
   return data.map(withAppreciationCount);
 }
 
-// A creator's lore, newest first. Row Level Security decides what comes back, as above.
+// A creator's lore for their profile, newest first, each with its project and author. Row Level
+// Security decides what comes back, as above. The project's is_public lets the owner's cards tell
+// "private" from "hidden" (a public entry in a private project).
 async function getLoreByAuthor(authorId) {
   if (!isValidUuid(authorId)) {
     return [];
@@ -86,9 +88,17 @@ async function getLoreByAuthor(authorId) {
 
   const { data, error } = await supabase
     .from("lore_entries")
-    .select(`${LORE_COLUMNS}, appreciations(count)`)
+    .select(
+      `${LORE_COLUMNS},
+      project:projects!lore_entries_project_id_fkey(id, title, is_public),
+      author:profiles!lore_entries_author_id_fkey(id, username, display_name),
+      appreciations(count)`,
+    )
     .eq("author_id", authorId)
-    .order("created_at", { ascending: false });
+    // Entries saved in one statement (e.g. by a script) share the same created_at; ordering by id
+    // after it keeps them in the same order on every request.
+    .order("created_at", { ascending: false })
+    .order("id");
 
   if (error) {
     throw error;

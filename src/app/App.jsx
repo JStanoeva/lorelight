@@ -10,6 +10,7 @@ import EditLorePage from "../features/lore/pages/EditLorePage.jsx";
 import LoreCatalogPage from "../features/lore/pages/LoreCatalogPage.jsx";
 import LoreDetailsPage from "../features/lore/pages/LoreDetailsPage.jsx";
 import EditProfilePage from "../features/profile/pages/EditProfilePage.jsx";
+import ProfileCollectionPage from "../features/profile/pages/ProfileCollectionPage.jsx";
 import ProfilePage from "../features/profile/pages/ProfilePage.jsx";
 import ProjectWorkspaceLayout from "../features/projects/components/ProjectWorkspaceLayout.jsx";
 import CreateProjectPage from "../features/projects/pages/CreateProjectPage.jsx";
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="projects/:projectId" element={<ProjectDetailsPage />} />
           </Route>
           <Route path="profile/:userId" element={<ProfilePage />} />
+          <Route path="profile/:userId/:collection" element={<ProfileCollectionPage />} />
 
           {/* Logged-in users only */}
           <Route element={<AuthGuard />}>

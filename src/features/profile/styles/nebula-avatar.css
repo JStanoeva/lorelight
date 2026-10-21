@@ -1,0 +1,35 @@
+/* The profile avatar: the picture from its link or the generated "Nebula Wash". Both fill their
+   positioned parent, which sets the size and the shape (border-radius, clip-path). */
+
+.nebula-avatar {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b1020;
+}
+
+.nebula-avatar-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nebula-avatar-grain {
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.profile-avatar-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #121a33;
+}
