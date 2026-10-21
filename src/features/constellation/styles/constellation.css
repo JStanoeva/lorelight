@@ -1,0 +1,1248 @@
+/*
+  My Constellation ("Star-Thread Pin Board"): the night-sky hero, the count line, the framed board
+  with its star chart, the tilted cards on star-pins, the star-threads between the cards of one
+  category, and the notices that replace the cards. The category chips are CategoryChips'
+  (category-chips.css). Imported by ConstellationHero and ConstellationBoard.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element still wins (the category colour classes rely on that).
+  Motion (the card's swing, the pending wobble, the loading glow) only runs without reduced motion.
+  Layout: one column of cards on phones and small tablets, two from 768px, three from 1024px.
+*/
+@layer components {
+  /* ---------- Page and its night sky ---------- */
+
+  /* overflow: hidden also cuts off the strip of the sky layers that lies under the scrollbar */
+  .constellation-page {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    flex: 1;
+    background: var(--color-night-950);
+  }
+
+  /* Violet clouds behind the top of the page, fading out over the board. As wide as the whole
+     window (100vw includes the scrollbar), like .catalog-sky in lore/styles/catalog.css:
+     everything placed in percentages stays put when a scrollbar appears. */
+  .constellation-sky {
+    position: absolute;
+    inset: 0 auto auto 0;
+    z-index: -1;
+    width: 100vw;
+    height: 46rem;
+    pointer-events: none;
+    background:
+      radial-gradient(38% 50% at 10% 0%, color-mix(in oklab, var(--color-lantern-700) 55%, transparent), transparent 72%),
+      radial-gradient(34% 46% at 90% 6%, color-mix(in oklab, var(--color-lantern-900) 95%, transparent), transparent 70%),
+      radial-gradient(50% 36% at 62% 34%, rgb(27 36 71 / 0.55), transparent 72%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
+    mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  }
+
+  /* ---------- Hero: eyebrow, title, intro and the public note, centred ---------- */
+
+  .constellation-hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: 2.5rem 0.5rem;
+  }
+
+  /* A still star field (one dot per layer on coprime tile sizes, so it never visibly repeats).
+     Two masks, and a star shows only where both let it through (intersect): the field fades out
+     towards the bottom, and an ellipse around the text stays clear, so no star sits on a letter.
+     The ellipse was measured to clear every line of text (plus a few pixels) from 360px up;
+     phones get a narrower, taller one, because the intro wraps onto more lines there. */
+  .constellation-hero-stars {
+    --star: var(--color-parchment-100);
+    --text-clearing: radial-gradient(25rem 8.25rem at 50% calc(50% + 1rem), transparent 90%, #000 100%);
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: -1;
+    width: 100vw;
+    pointer-events: none;
+    opacity: 0.8;
+    background-image:
+      radial-gradient(circle at 50% 50%, var(--star) 0 1.4px, color-mix(in oklab, var(--color-lantern-300) 30%, transparent) 2.2px, transparent 7px),
+      radial-gradient(circle at 50% 50%, var(--star) 0 1.2px, color-mix(in oklab, var(--color-gold-300) 25%, transparent) 2px, transparent 6px),
+      radial-gradient(circle at 20% 30%, var(--star) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, color-mix(in oklab, var(--star) 70%, transparent) 0 0.7px, transparent 1.2px),
+      radial-gradient(circle at 45% 85%, color-mix(in oklab, var(--color-lantern-300) 90%, transparent) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 85% 15%, color-mix(in oklab, var(--color-parchment-300) 90%, transparent) 0 1.1px, transparent 1.8px),
+      radial-gradient(circle at 10% 70%, color-mix(in oklab, var(--star) 55%, transparent) 0 0.6px, transparent 1.1px),
+      radial-gradient(circle at 55% 40%, var(--star) 0 1.2px, transparent 2px);
+    background-size:
+      14px 14px, 14px 14px,
+      211px 199px, 257px 241px, 313px 307px, 379px 367px, 163px 157px, 431px 419px;
+    background-position:
+      18% 30%, 84% 62%,
+      0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    background-repeat:
+      no-repeat, no-repeat,
+      repeat, repeat, repeat, repeat, repeat, repeat;
+    -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 100%), var(--text-clearing);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to bottom, #000 50%, transparent 100%), var(--text-clearing);
+    mask-composite: intersect;
+  }
+
+  .constellation-hero-content {
+    padding-inline: 1rem;
+    text-align: center;
+  }
+
+  /* lantern-300 is only used as text on solid night surfaces, where it stays above 7.4:1 */
+  .constellation-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-lantern-300);
+  }
+
+  .constellation-eyebrow-star {
+    flex: none;
+    width: 0.625rem;
+    height: 0.875rem;
+    color: var(--color-gold-300);
+  }
+
+  .constellation-title {
+    margin: 0.625rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.6rem + 2.2vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.03em;
+    color: var(--color-parchment-100);
+    text-shadow: 0 0 28px rgb(122 79 175 / 0.55);
+    text-wrap: balance;
+  }
+
+  .constellation-intro {
+    max-width: 40rem;
+    margin: 0.75rem auto 0;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-parchment-300);
+    text-wrap: pretty;
+  }
+
+  /* "Anyone can see your Constellation…": a small pill, so it reads as a fact about the page */
+  .constellation-public-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.875rem 0 0;
+    padding: 0.375rem 0.875rem 0.375rem 0.75rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 999px;
+    background: rgb(18 26 51 / 0.85);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-parchment-300);
+  }
+
+  .constellation-public-note svg {
+    color: var(--color-lantern-300);
+  }
+
+  /* ---------- The chips, the board's column and the count line ---------- */
+
+  /* The chips row sits closer to the hero here than in the catalog (no search bar above it) */
+  .constellation-page .catalog-index {
+    padding-top: 1rem;
+  }
+
+  /* While the saves load, a few faint chip outlines hold the chips row's place (one row) */
+  .board-chip-ghosts {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-block: 0.375rem;
+  }
+
+  .board-chip-ghosts > span {
+    width: 6rem;
+    height: 2.25rem;
+    border: 1px dashed rgb(95 108 168 / 0.6);
+    border-radius: 999px;
+    background: rgb(18 26 51 / 0.6);
+  }
+
+  .constellation-board {
+    padding: 0 1rem 4.5rem;
+  }
+
+  .board-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.25rem;
+    margin-top: 1rem;
+  }
+
+  /* It takes focus after the last card is removed, after "Show all" and after "Try again"
+     (tabIndex -1); the radius rounds its focus ring. One line tall even while empty (loading),
+     so the board below doesn't move down and back. */
+  .board-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 1lh;
+    margin: 0;
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-parchment-100);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .board-count-star {
+    color: var(--color-lantern-300);
+  }
+
+  /* Takes no space while it's empty, but stays in the page for screen readers */
+  .board-removed {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-success);
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- The framed board ---------- */
+
+  /* The dark mat around the surface, with a double rule like the border of a star chart */
+  .pin-frame {
+    position: relative;
+    margin-top: 2rem;
+    padding: 0.5rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 1.125rem;
+    background: linear-gradient(165deg, #19214a, #0f1532 55%, var(--color-night-950));
+    box-shadow:
+      0 40px 90px -30px rgb(0 0 0 / 0.75),
+      inset 0 1px 0 rgb(243 234 215 / 0.06);
+  }
+
+  /* Tick marks along the top and bottom of the mat, like the scale on a chart's border */
+  .pin-frame::before,
+  .pin-frame::after {
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 0.1875rem;
+    background: repeating-linear-gradient(
+      90deg,
+      rgb(165 154 128 / 0.45) 0 1px,
+      transparent 1px 0.75rem,
+      rgb(165 154 128 / 0.2) 0.75rem calc(0.75rem + 1px),
+      transparent calc(0.75rem + 1px) 1.5rem
+    );
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .pin-frame::before {
+    top: 0.1875rem;
+  }
+
+  .pin-frame::after {
+    bottom: 0.1875rem;
+  }
+
+  /* The plaque on the top edge ("Pinned by you") */
+  .pin-frame-plaque {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 2;
+    max-width: calc(100% - 4rem);
+    margin: 0;
+    padding: 0.3125rem 0.75rem;
+    overflow: hidden;
+    translate: -50% -50%;
+    border: 1px solid var(--color-night-500);
+    border-radius: 999px;
+    background: var(--color-night-950);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-lantern-300);
+  }
+
+  /* A small star in each corner of the mat (wider screens) */
+  .pin-frame-corner {
+    position: absolute;
+    display: none;
+    width: 0.75rem;
+    height: 0.75rem;
+    fill: var(--color-parchment-500);
+    opacity: 0.7;
+  }
+
+  .pin-frame-corner-top-left {
+    top: 0.375rem;
+    left: 0.375rem;
+  }
+
+  .pin-frame-corner-top-right {
+    top: 0.375rem;
+    right: 0.375rem;
+  }
+
+  .pin-frame-corner-bottom-right {
+    bottom: 0.375rem;
+    right: 0.375rem;
+  }
+
+  .pin-frame-corner-bottom-left {
+    bottom: 0.375rem;
+    left: 0.375rem;
+  }
+
+  /* The surface: nebula glows over a fine chart grid (every fourth line a little brighter). It
+     grows with its cards (no fixed height). No border (the ring is an inset shadow), so the
+     measured pin positions match the threads' SVG exactly. */
+  .pin-surface {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 2.25rem 0.875rem 2.5rem;
+    border-radius: 0.75rem;
+    background:
+      radial-gradient(60% 34% at 14% 0%, rgb(122 79 175 / 0.24), transparent 72%),
+      radial-gradient(46% 30% at 92% 34%, rgb(57 39 129 / 0.32), transparent 72%),
+      radial-gradient(60% 26% at 30% 78%, rgb(57 39 129 / 0.22), transparent 72%),
+      radial-gradient(70% 30% at 50% 100%, rgb(122 79 175 / 0.16), transparent 72%),
+      linear-gradient(rgb(95 108 168 / 0.11) 1px, transparent 1px) 0 0 / 12rem 12rem,
+      linear-gradient(90deg, rgb(95 108 168 / 0.11) 1px, transparent 1px) 0 0 / 12rem 12rem,
+      linear-gradient(rgb(95 108 168 / 0.055) 1px, transparent 1px) 0 0 / 3rem 3rem,
+      linear-gradient(90deg, rgb(95 108 168 / 0.055) 1px, transparent 1px) 0 0 / 3rem 3rem,
+      #0c1227;
+    box-shadow:
+      inset 0 0 0 1px rgb(95 108 168 / 0.32),
+      inset 0 0 70px rgb(0 0 0 / 0.5);
+  }
+
+  /* Planisphere rings in two corners, fading out towards the middle */
+  .pin-surface::before,
+  .pin-surface::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 34rem;
+    height: 34rem;
+    pointer-events: none;
+    background: repeating-radial-gradient(
+      circle at center,
+      transparent 0 calc(4rem - 1px),
+      rgb(95 108 168 / 0.2) calc(4rem - 1px) 4rem
+    );
+    -webkit-mask-image: radial-gradient(circle at center, #000 0, transparent 70%);
+    mask-image: radial-gradient(circle at center, #000 0, transparent 70%);
+  }
+
+  .pin-surface::before {
+    top: -17rem;
+    right: -17rem;
+  }
+
+  .pin-surface::after {
+    bottom: -17rem;
+    left: -17rem;
+  }
+
+  /* ---------- Stars on the surface (BoardStars) ---------- */
+
+  .pin-stars {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* Around a notice (loading, error, empty) the stars stay clear of the text */
+  .pin-frame-compact .pin-stars {
+    -webkit-mask-image: radial-gradient(ellipse 24rem 14rem at 50% 50%, transparent 75%, #000 100%);
+    mask-image: radial-gradient(ellipse 24rem 14rem at 50% 50%, transparent 75%, #000 100%);
+  }
+
+  .pin-stars-dust {
+    fill: var(--color-parchment-100);
+  }
+
+  .pin-stars-spark {
+    fill: var(--color-lantern-300);
+  }
+
+  /* ---------- Threads (BoardThreads): pin to pin, behind the cards ---------- */
+
+  /* The SVG lies under the card list (z-index 1), so a thread shows in the gaps and passes under
+     the cards; the star-pins sit on top of the cards and hold its ends. The category's colour
+     class paints it (currentColor). Faint on "All"; the constellation of the card under the
+     mouse or focus (or of the chosen category) glows, the others fade.
+     Phones and small tablets don't draw them (one column: see .pin-drop below). */
+  .pin-threads {
+    position: absolute;
+    inset: 0;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .pin-thread {
+    opacity: 0.6;
+  }
+
+  .pin-thread-glow,
+  .pin-thread-dots {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+  }
+
+  /* A very faint soft line under the dots */
+  .pin-thread-glow {
+    stroke-width: 6;
+    opacity: 0.07;
+  }
+
+  /* The stardust: a dash of length 0 with a round cap is a dot as wide as the line, so "0 6 0 9…"
+     draws round dots at uneven distances (the pattern repeats every 28px) */
+  .pin-thread-dots {
+    stroke-width: 2;
+    stroke-dasharray: 0 6 0 9 0 5 0 8;
+    opacity: 0.85;
+  }
+
+  .pin-thread[data-state="lit"] {
+    opacity: 1;
+  }
+
+  .pin-thread[data-state="lit"] .pin-thread-glow {
+    stroke-width: 12;
+    opacity: 0.06;
+  }
+
+  /* Lit: bigger dots, each with its own small glow */
+  .pin-thread[data-state="lit"] .pin-thread-dots {
+    stroke-width: 2.75;
+    opacity: 1;
+    filter: drop-shadow(0 0 2.5px currentColor);
+  }
+
+  .pin-thread[data-state="dimmed"] {
+    opacity: 0.14;
+  }
+
+  /* ---------- The cards' arrangement ---------- */
+
+  /* A grid underneath (newest first, row by row), loosened by each card's own drop and tilt. The
+     gaps leave room for the pins and the threads. --pin-row-gap is also the phone thread's length. */
+  .pin-list {
+    --pin-row-gap: 2.75rem;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 26rem);
+    justify-content: center;
+    align-items: start;
+    gap: var(--pin-row-gap) 2.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The cell: the drop is padding (not margin), so the cell still starts on the row line and the
+     space above a lowered card belongs to it (pointing there lights up its constellation too) */
+  .pin-item {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    padding-top: 0;
+  }
+
+  /* The card hangs from its pin: it tilts (and straightens) around the pin's centre, the middle
+     of its top edge, so the pin never moves and the threads stay attached */
+  .pin-card {
+    --tilt-scale: 0.4;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    rotate: calc(var(--tilt, 0deg) * var(--tilt-scale));
+    transform-origin: 50% 0;
+  }
+
+  .pin-card:hover,
+  .pin-card:focus-within {
+    z-index: 2;
+    rotate: 0deg;
+    scale: 1.02;
+  }
+
+  /* One column, a category chosen: a straight thread from each card down to the next card's pin.
+     A small SVG (a lit .pin-thread), so its dots and glow are the board threads' own. */
+  .pin-drop {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    display: none;
+    width: 0.75rem;
+    height: var(--pin-row-gap);
+    overflow: visible;
+    translate: -50% 0;
+    pointer-events: none;
+  }
+
+  .pin-list[data-category] .pin-item:not(:last-child) .pin-drop {
+    display: block;
+  }
+
+  /* ---------- One pinned card (PinCard) ---------- */
+
+  /* The card itself: .card-interactive gives the border, the rounded corners and the gold focus
+     ring; this adds a "polaroid" sheen and a deeper shadow, as if it lay on the board */
+  .pin-card-paper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background: linear-gradient(180deg, #212b56, var(--color-night-800) 45%);
+    box-shadow:
+      0 18px 30px -14px rgb(0 0 0 / 0.75),
+      0 2px 0 rgb(0 0 0 / 0.3);
+  }
+
+  .pin-card:hover .pin-card-paper {
+    box-shadow:
+      0 26px 44px -16px rgb(0 0 0 / 0.85),
+      0 0 0 1px rgb(95 108 168 / 0.5);
+  }
+
+  /* The picture, inset like a photo on a card. CoverImage needs relative + overflow: hidden. */
+  .pin-card-picture {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 2 / 1;
+    margin: 0.5rem 0.5rem 0;
+    border-radius: 0.625rem;
+    background: var(--color-night-900);
+  }
+
+  /* A thin light edge over the picture */
+  .pin-card-picture::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgb(243 234 215 / 0.1);
+    pointer-events: none;
+  }
+
+  /* The category colour arrives as currentColor (its text class): a soft glow behind the text.
+     Every text inside sets its own colour. */
+  .pin-card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.8125rem 1rem 0.875rem;
+    background: radial-gradient(130% 80% at 0% 0%, color-mix(in srgb, currentColor 10%, transparent), transparent 60%);
+  }
+
+  .pin-card-badge-star {
+    margin-right: 0.3125rem;
+  }
+
+  .pin-card-title {
+    margin: 0.125rem 0 0;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    color: var(--color-parchment-100);
+    overflow-wrap: anywhere;
+  }
+
+  .pin-card-world {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--color-parchment-300);
+  }
+
+  .pin-card-world-star {
+    flex: none;
+    width: 0.5rem;
+    height: 0.6875rem;
+    color: var(--color-lantern-300);
+  }
+
+  .pin-card-world-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Two tidy lines: the author across the whole card, then the date with the Remove button on
+     the right. The author gets the full width, so a name is cut short ("…") only when it's long. */
+  .pin-card-foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    align-self: stretch;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgb(44 55 105 / 0.8);
+  }
+
+  .pin-card-foot .pin-card-author {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  /* Above the title's stretched link (.card-link::after covers the whole card), so a click here
+     opens the profile. The pill radius gives its focus ring a rounded shape. 40px tall for
+     touch in one column, like the Remove button (both get smaller from two columns). */
+  .pin-card-author {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    max-width: 100%;
+    min-height: 2.5rem;
+    padding-right: 0.375rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-parchment-100);
+    text-decoration: none;
+  }
+
+  .pin-card-author .creator-avatar {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.6875rem;
+  }
+
+  .pin-card-author-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pin-card-author:hover {
+    color: var(--color-gold-300);
+  }
+
+  .pin-card-author:hover .pin-card-author-name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pin-card-date {
+    min-width: 0;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    color: var(--color-parchment-500);
+  }
+
+  /* Above the stretched link too */
+  .pin-card-remove {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.5rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.625rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 999px;
+    background: rgb(11 16 32 / 0.6);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-parchment-100);
+  }
+
+  .pin-card-remove:not([aria-disabled="true"]):hover {
+    border-color: var(--color-gold-400);
+    color: var(--color-gold-300);
+  }
+
+  /* Waiting for the database: a click does nothing (aria-disabled keeps the focus in place) */
+  .pin-card-remove[aria-disabled="true"] {
+    cursor: progress;
+    border-style: dashed;
+    border-color: rgb(232 193 112 / 0.7);
+    color: var(--color-parchment-300);
+  }
+
+  /* A small ring; it turns when motion is allowed (below) */
+  .pin-card-spinner {
+    flex: none;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 2px solid var(--color-gold-400);
+    border-top-color: transparent;
+    border-radius: 999px;
+  }
+
+  /* While the removal is on its way the card stays fully opaque (nothing shows through it): a gold
+     dashed line runs around it (an outline: 2px, where a thin border can render as 0.67px), its
+     picture darkens under a "Removing…" stamp, and its pin loosens. It only leaves the board once
+     the database has confirmed it. */
+  .pin-card[data-pending] .pin-card-paper {
+    outline: 2px dashed rgb(232 193 112 / 0.75);
+    outline-offset: 3px;
+  }
+
+  .pin-card[data-pending] .pin-card-picture > :not(.pin-card-stamp) {
+    filter: grayscale(0.8) brightness(0.45);
+  }
+
+  .pin-card[data-pending] .star-pin {
+    opacity: 0.6;
+  }
+
+  .pin-card-stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.75rem;
+    translate: -50% -50%;
+    rotate: -3deg;
+    border: 1px dashed var(--color-gold-400);
+    border-radius: 0.375rem;
+    background: rgb(11 16 32 / 0.92);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-gold-300);
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.5);
+    pointer-events: none;
+  }
+
+  /* Above the stretched link, so the message can be selected and read */
+  .pin-card-error {
+    position: relative;
+    z-index: 1;
+    align-self: stretch;
+    margin: 0.125rem 0 0;
+    padding: 0.5rem 0.625rem;
+    border: 1px solid rgb(244 163 163 / 0.4);
+    border-radius: 0.5rem;
+    background: rgb(244 163 163 / 0.1);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--color-danger);
+  }
+
+  /* ---------- The star-pin ---------- */
+
+  /* Centred on the middle of the card's top edge, half above the card. Its colour class paints it. */
+  .star-pin {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 3;
+    width: 1.75rem;
+    height: 1.75rem;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  .star-pin-glyph {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 2px 2px rgb(0 0 0 / 0.65));
+  }
+
+  .star-pin-halo {
+    fill: currentColor;
+    opacity: 0.18;
+  }
+
+  .star-pin-star {
+    fill: currentColor;
+  }
+
+  .star-pin-core {
+    fill: var(--color-parchment-100);
+  }
+
+  .pin-card:hover .star-pin-halo,
+  .pin-card:focus-within .star-pin-halo,
+  .pin-card[data-highlighted] .star-pin-halo {
+    opacity: 0.5;
+  }
+
+  /* While a constellation glows, the pins of the other categories fade: a lit thread that passes
+     under one of those cards then reads as passing by, and only the bright pins hold its ends */
+  .pin-list[data-lit] .pin-card:not([data-highlighted]) .star-pin {
+    opacity: 0.4;
+  }
+
+  /* ---------- Board hint, notices, loading ---------- */
+
+  /* On its own dark backing, so no star of the board sits behind the words */
+  .pin-board-hint {
+    position: relative;
+    z-index: 1;
+    width: fit-content;
+    max-width: min(100%, 30rem);
+    margin: 2.25rem auto 0;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgb(44 55 105 / 0.8);
+    border-radius: 1rem;
+    background: rgb(12 18 39 / 0.92);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    text-align: center;
+    color: var(--color-parchment-300);
+    text-wrap: pretty;
+  }
+
+  /* Without a chosen category, one column draws no threads, so it says nothing about them */
+  .pin-board-hint-all {
+    display: none;
+  }
+
+  .pin-frame-compact .pin-surface {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 20rem;
+  }
+
+  /* The art takes the notice's colour: lantern violet, or the chosen category's (a text class) */
+  .pin-notice {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 30rem;
+    text-align: center;
+    color: var(--color-lantern-300);
+  }
+
+  .pin-notice-wide {
+    max-width: 38rem;
+  }
+
+  .pin-notice-art {
+    width: min(100%, 12rem);
+    overflow: visible;
+  }
+
+  .pin-notice-art-small {
+    width: min(100%, 11rem);
+  }
+
+  .pin-notice-thread {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1 5.5;
+    opacity: 0.8;
+  }
+
+  .pin-notice-card {
+    fill: rgb(27 36 71 / 0.55);
+    stroke: rgb(95 108 168 / 0.7);
+    stroke-width: 1.2;
+    stroke-dasharray: 5 5;
+  }
+
+  .pin-notice-halo {
+    fill: currentColor;
+    opacity: 0.2;
+  }
+
+  .pin-notice-pin {
+    fill: currentColor;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+
+  .pin-notice-title {
+    margin: 0.25rem 0 0;
+    font-size: 1.5rem;
+    color: var(--color-parchment-100);
+    text-wrap: balance;
+  }
+
+  .pin-notice-text {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--color-parchment-300);
+    text-wrap: pretty;
+  }
+
+  .pin-notice-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .pin-notice-error {
+    width: 100%;
+    text-align: left;
+  }
+
+  .pin-ghosts {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .pin-ghost {
+    position: relative;
+    width: 5.5rem;
+    height: 7.25rem;
+    rotate: var(--tilt, 0deg);
+    transform-origin: 50% 0;
+    border: 1px dashed rgb(95 108 168 / 0.6);
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, rgb(33 43 86 / 0.6), rgb(27 36 71 / 0.35));
+  }
+
+  .pin-ghost:nth-child(3) {
+    display: none;
+  }
+
+  /* Its pin */
+  .pin-ghost::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0.625rem;
+    height: 0.625rem;
+    translate: -50% -50%;
+    border-radius: 999px;
+    background: var(--color-lantern-300);
+    box-shadow: 0 0 10px var(--color-lantern-300);
+    opacity: 0.7;
+  }
+
+  /* ---------- Sizes ---------- */
+
+  /* Phones: a narrower, taller clearing around the text, which wraps onto more lines */
+  @media (width < 40rem) {
+    .constellation-hero {
+      padding-block: 2rem 0.25rem;
+    }
+
+    .constellation-hero-stars {
+      --text-clearing: radial-gradient(19rem 10.5rem at 50% calc(50% + 0.75rem), transparent 90%, #000 100%);
+    }
+
+    /* One line for the title (Cinzel is wide) and for the note, so the first card comes sooner */
+    .constellation-title {
+      font-size: 1.875rem;
+      letter-spacing: 0.02em;
+    }
+
+    .constellation-intro {
+      font-size: 1rem;
+    }
+
+    /* Too long for one line here: plain centred text with the eye at its start, not a pill */
+    .constellation-public-note {
+      display: block;
+      padding: 0;
+      border: 0;
+      background: none;
+      font-size: 0.875rem;
+      text-wrap: balance;
+    }
+
+    .constellation-public-note svg {
+      display: inline;
+      margin-right: 0.375rem;
+      vertical-align: -0.1875rem;
+    }
+
+    /* Like the chips row on phones: from the left, 40px tall */
+    .board-chip-ghosts {
+      justify-content: flex-start;
+    }
+
+    .board-chip-ghosts > span {
+      height: 2.5rem;
+    }
+  }
+
+  @media (width >= 40rem) {
+    .constellation-hero-content,
+    .constellation-board {
+      padding-inline: 1.5rem;
+    }
+
+    .constellation-board {
+      padding-bottom: 5rem;
+    }
+
+    .pin-frame {
+      margin-top: 2rem;
+      padding: 0.75rem;
+      border-radius: 1.5rem;
+    }
+
+    .pin-frame::before,
+    .pin-frame::after {
+      left: 2.5rem;
+      right: 2.5rem;
+      height: 0.3125rem;
+    }
+
+    .pin-frame-corner {
+      display: block;
+    }
+
+    .pin-frame-plaque {
+      padding-inline: 1rem;
+      letter-spacing: 0.2em;
+    }
+
+    .pin-surface {
+      padding: 3.25rem clamp(1rem, 3vw, 2.75rem) 3.5rem;
+      border-radius: 1rem;
+    }
+
+    .pin-frame-compact .pin-surface {
+      min-height: 24rem;
+    }
+
+    .pin-ghost {
+      width: 6.5rem;
+      height: 8.5rem;
+    }
+
+    .pin-ghost:nth-child(3) {
+      display: block;
+    }
+  }
+
+  /* Two columns and more: the board draws its threads, the cards hang loosely (a drop and the
+     full tilt), and the author link and the remove button can be a little smaller */
+  @media (width >= 48rem) {
+    .pin-list {
+      --pin-row-gap: 4rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* One or two cards: as many columns as cards, at most 19rem wide, in the middle */
+    .pin-list-few {
+      grid-template-columns: repeat(var(--pin-count), minmax(0, 19rem));
+    }
+
+    .pin-item {
+      padding-top: var(--drop, 0rem);
+    }
+
+    .pin-card {
+      --tilt-scale: 1;
+    }
+
+    .pin-threads {
+      display: block;
+    }
+
+    .pin-list[data-category] .pin-item:not(:last-child) .pin-drop {
+      display: none;
+    }
+
+    .pin-board-hint-all {
+      display: block;
+    }
+
+    .pin-card-author,
+    .pin-card-remove {
+      min-height: 2rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .pin-list:not(.pin-list-few) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ---------- Motion (only without reduced motion) ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* A little swing as a card straightens, like paper settling on its pin */
+    .pin-card {
+      transition:
+        rotate 560ms cubic-bezier(0.3, 1.7, 0.5, 1),
+        scale 260ms ease-out;
+    }
+
+    .pin-card-paper,
+    .star-pin,
+    .star-pin-halo {
+      transition:
+        opacity 200ms ease-out,
+        box-shadow 200ms ease-out;
+    }
+
+    .pin-thread,
+    .pin-thread-glow,
+    .pin-thread-dots {
+      transition:
+        opacity 220ms ease-out,
+        stroke-width 220ms ease-out;
+    }
+
+    /* When a constellation lights up, its stardust drifts along the threads for a moment and
+       settles (once, so nothing keeps moving next to the text) */
+    .pin-thread[data-state="lit"] .pin-thread-dots {
+      animation: pin-thread-drift 2.4s ease-out;
+    }
+
+    .pin-card-remove {
+      transition:
+        border-color 150ms ease-out,
+        color 150ms ease-out;
+    }
+
+    .pin-card-spinner {
+      animation: pin-spin 0.9s linear infinite;
+    }
+
+    /* The pin loosens while the card is being removed */
+    .pin-card[data-pending] .star-pin {
+      animation: pin-loosen 0.8s ease-in-out infinite alternate;
+    }
+
+    .pin-ghost {
+      animation: pin-ghost-glow 1.6s ease-in-out infinite alternate;
+    }
+
+    .pin-ghost:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    .pin-ghost:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+  }
+
+  /* One whole dash pattern (28px), so the dots end where they rest without the animation */
+  @keyframes pin-thread-drift {
+    from {
+      stroke-dashoffset: 28;
+    }
+
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes pin-spin {
+    to {
+      rotate: 1turn;
+    }
+  }
+
+  @keyframes pin-loosen {
+    from {
+      rotate: -14deg;
+    }
+
+    to {
+      rotate: 14deg;
+    }
+  }
+
+  @keyframes pin-ghost-glow {
+    from {
+      opacity: 0.45;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ---------- Windows High Contrast: threads and pins keep a visible outline ---------- */
+
+  /* Threads: plain dots in the text colour, the lit constellation in the highlight colour */
+  @media (forced-colors: active) {
+    .pin-thread {
+      opacity: 1;
+    }
+
+    .pin-thread-glow {
+      display: none;
+    }
+
+    .pin-thread-dots {
+      stroke: CanvasText;
+    }
+
+    .pin-thread[data-state="lit"] .pin-thread-dots {
+      stroke: Highlight;
+      filter: none;
+    }
+
+    .pin-thread[data-state="dimmed"] {
+      opacity: 0.5;
+    }
+
+    /* The card's gradient is dropped in this mode, so it gets a solid background again: the
+       threads pass under the cards and must not run across their text */
+    .pin-card-paper {
+      background: Canvas;
+    }
+
+    .star-pin-star {
+      fill: CanvasText;
+    }
+
+    .pin-card[data-pending] .pin-card-paper {
+      outline-color: Highlight;
+    }
+  }
+}

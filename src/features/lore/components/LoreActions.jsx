@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import AppreciateButton from "../../appreciation/components/AppreciateButton.jsx";
 import { formatAppreciationCount } from "../../appreciation/utils/appreciationCount.js";
+import SaveToConstellationButton from "../../constellation/components/SaveToConstellationButton.jsx";
 import Icon from "../../../shared/components/Icon.jsx";
 import { getVisibility } from "../utils/visibility.js";
 import DeleteLoreDialog from "./DeleteLoreDialog.jsx";
@@ -14,16 +15,16 @@ const VISIBILITY_NOTES = {
   hidden: "This entry is public, but its project is private, so only you can see it for now.",
 };
 
-// Why the author sees the count but no Appreciate button: the database only accepts appreciations
-// of lore that others can read (the entry AND its project are public)
+// Why the author sees the count but no Appreciate or Save button: the database only accepts
+// appreciations and saves of lore that others can read (the entry AND its project are public)
 const CLOSED_REASONS = {
-  private: "Appreciations open once the entry is public.",
-  hidden: "Appreciations open once its project is public too.",
+  private: "Appreciations and saves open once the entry is public.",
+  hidden: "Appreciations and saves open once its project is public too.",
 };
 
-// The row under the banner: the Appreciate button with the count (only the count, with a reason, on
-// the author's entries that others can't see), and for the author the Edit and Delete actions plus
-// a note on who can see the entry. `onDeleted` runs after a successful delete,
+// The row under the banner: the Appreciate button with the count and the Save button (only the
+// count, with a reason, on the author's entries that others can't see), and for the author the Edit
+// and Delete actions plus a note on who can see the entry. `onDeleted` runs after a successful delete,
 // `onAppreciationChange(change)` once the database has accepted a new appreciation (1) or its
 // removal (-1).
 export default function LoreActions({ entry, isOwner, onDeleted, onAppreciationChange }) {
@@ -38,7 +39,10 @@ export default function LoreActions({ entry, isOwner, onDeleted, onAppreciationC
     <div className="lore-toolbar">
       <div className="lore-actions">
         {visibility === "public" ? (
-          <AppreciateButton entry={entry} onCountChange={onAppreciationChange} />
+          <div className="lore-reactions">
+            <AppreciateButton entry={entry} onCountChange={onAppreciationChange} />
+            <SaveToConstellationButton loreId={entry.id} />
+          </div>
         ) : (
           // Appreciations kept from when the entry was public still count, so its author sees them
           <p className="lore-appreciations">

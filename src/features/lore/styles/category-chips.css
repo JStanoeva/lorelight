@@ -1,0 +1,181 @@
+/*
+  CategoryChips: the row of category toggle chips ("All" + the categories), used by the Lore
+  Catalog and My Constellation (which adds a count to each chip). Imported by the component.
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element still wins (the category colour classes rely on that).
+  Nothing here animates; the few hover transitions only run without reduced motion.
+*/
+@layer components {
+  .catalog-index {
+    padding: 1.5rem 1rem 0;
+  }
+
+  .catalog-index-label {
+    margin: 0 0 0.625rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-parchment-500);
+  }
+
+  /* relative: the chips' offsetLeft is measured from here (CategoryChips). The block padding
+     leaves room for the focus ring when the row scrolls (a scroll box clips what overflows). */
+  .catalog-chips-scroller {
+    position: relative;
+    padding-block: 0.375rem;
+  }
+
+  /* Wide screens: the chips are laid out like words in a centred paragraph, so text-wrap:
+     balance can share them evenly between the rows (7 + 6 at 1280px instead of 10 + 3). Each
+     chip's 0.25rem margin makes the 0.5rem gaps; the list's negative margin takes it back at
+     the edges. Browsers without balance simply wrap as usual. */
+  .catalog-chips {
+    margin: -0.25rem;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .catalog-chips > li {
+    display: inline-block;
+    margin: 0.25rem;
+    vertical-align: top;
+  }
+
+  /* The button's colour is the category's (a Tailwind text class), so currentColor paints the
+     star, and the border, tint and glow of the pressed chip */
+  .catalog-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    min-height: 2.25rem;
+    padding: 0 0.875rem 0 0.75rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 999px;
+    background: rgb(18 26 51 / 0.6);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .catalog-chip-star {
+    flex: none;
+    width: 0.5625rem;
+    height: 0.8125rem;
+    opacity: 0.8;
+  }
+
+  .catalog-chip-label {
+    color: var(--color-parchment-300);
+  }
+
+  /* The number of entries (My Constellation only): muted, with figures of equal width */
+  .catalog-chip-count {
+    margin-left: 0.0625rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-parchment-500);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .catalog-chip[aria-pressed="true"] {
+    border-color: color-mix(in srgb, currentColor 75%, transparent);
+    background: color-mix(in srgb, currentColor 16%, var(--color-night-900));
+    box-shadow: 0 0 18px -4px color-mix(in srgb, currentColor 65%, transparent);
+  }
+
+  .catalog-chip[aria-pressed="true"] .catalog-chip-label,
+  .catalog-chip[aria-pressed="true"] .catalog-chip-count {
+    color: var(--color-parchment-100);
+  }
+
+  .catalog-chip[aria-pressed="true"] .catalog-chip-star {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px currentColor);
+  }
+
+  /* Same condition as Tailwind's hover: variant, so a tap never leaves a chip in its hover look */
+  @media (hover: hover) {
+    .catalog-chip:not([aria-pressed="true"]):hover {
+      border-color: color-mix(in srgb, currentColor 55%, transparent);
+    }
+
+    .catalog-chip:hover .catalog-chip-label {
+      color: var(--color-parchment-100);
+    }
+  }
+
+  /* High Contrast mode drops the tint and the glow: a thicker border marks the pressed chip */
+  @media (forced-colors: active) {
+    .catalog-chip[aria-pressed="true"] {
+      border: 3px solid Highlight;
+    }
+  }
+
+  @media (width >= 40rem) {
+    .catalog-index {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  /* Phones: 40px touch targets, and the chips in one row that scrolls sideways. The row runs to
+     the screen edges and fades out on the right, which shows that it goes on. */
+  @media (width < 40rem) {
+    .catalog-index-label {
+      text-align: left;
+    }
+
+    .catalog-chips-scroller {
+      margin-inline: -1rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 0.75rem, #000 calc(100% - 3.5rem), transparent);
+      mask-image: linear-gradient(to right, transparent, #000 0.75rem, #000 calc(100% - 3.5rem), transparent);
+    }
+
+    .catalog-chips-scroller::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* One row: a flex line that never wraps (the wide-screen paragraph layout is undone) */
+    .catalog-chips {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0;
+      padding-left: 1rem;
+    }
+
+    /* Room after the last chip, so it can scroll fully out of the fade */
+    .catalog-chips::after {
+      content: "";
+      flex: none;
+      width: 3rem;
+    }
+
+    .catalog-chips > li {
+      flex: none;
+      margin: 0;
+    }
+
+    .catalog-chip {
+      min-height: 2.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .catalog-chip {
+      transition:
+        border-color 150ms ease-out,
+        background-color 150ms ease-out,
+        box-shadow 150ms ease-out;
+    }
+
+    .catalog-chip-label {
+      transition: color 150ms ease-out;
+    }
+  }
+}

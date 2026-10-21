@@ -1,0 +1,165 @@
+/*
+  The pill-shaped toggle buttons on Lore Details: Appreciate ("♡ Appreciate | 7") and Save
+  ("☆ Save"). This file holds the look they share, the way .btn does for buttons: the pill, its
+  action half with the glyph, the pressed / checking / pending states, the error lines under it,
+  phones, motion and High Contrast mode. A button adds its own class only for what's special about
+  it (appreciate-button.css: the count segment and the heart's pop).
+  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
+  Tailwind utility on the same element always wins.
+*/
+@layer components {
+  /* As tall as .btn (38px), so the pill lines up with Edit and Delete in the same row */
+  .pill-button {
+    display: inline-flex;
+    align-items: stretch;
+    padding: 0;
+    border: 1px solid var(--color-night-500);
+    border-radius: 999px;
+    background: var(--color-night-900);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    color: var(--color-parchment-100);
+    /* A guest's pill is a link */
+    text-decoration: none;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .pill-button-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem 0.5rem 0.875rem;
+    transition: color 150ms ease;
+  }
+
+  /* A pill without a second segment (Save has no count): its only segment is padded evenly */
+  .pill-button-action:only-child {
+    padding-right: 0.9375rem;
+  }
+
+  .pill-button-glyph {
+    color: var(--color-parchment-300);
+    transition: color 150ms ease;
+  }
+
+  /* Hover only where a click does something (not while waiting) */
+  .pill-button:not([aria-disabled="true"]):hover {
+    border-color: var(--color-gold-400);
+  }
+
+  .pill-button:not([aria-disabled="true"]):hover .pill-button-action,
+  .pill-button:not([aria-disabled="true"]):hover .pill-button-glyph {
+    color: var(--color-gold-300);
+  }
+
+  /* Pressed: a gold border over a soft gold wash, and the filled glyph in gold */
+  .pill-button[aria-pressed="true"] {
+    border-color: var(--color-gold-400);
+    background: rgb(232 193 112 / 0.08);
+  }
+
+  .pill-button[aria-pressed="true"] .pill-button-glyph {
+    color: var(--color-gold-400);
+  }
+
+  /* Waiting (status loading or a request on its way): the click is ignored, so say "busy", not "no" */
+  .pill-button[aria-disabled="true"] {
+    cursor: progress;
+  }
+
+  /* Status unknown: the action half fades (Appreciate's count, already known, stays readable) */
+  .pill-button[data-checking] .pill-button-action {
+    opacity: 0.55;
+  }
+
+  /* Processing (the request is on its way): the pill keeps its current state, the border and the
+     glyph turn a soft gold, and each button adds a "…". It lights up (or goes out) only when the
+     answer is there. */
+  .pill-button[data-pending] {
+    border-color: rgb(232 193 112 / 0.55);
+  }
+
+  .pill-button[data-pending] .pill-button-glyph {
+    color: var(--color-gold-300);
+  }
+
+  /* The error under the pill after a failed request (nothing on screen was changed) */
+  .pill-button-error {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-danger);
+  }
+
+  .pill-button-status-error {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* A short muted note about the pill, e.g. that a Constellation is public (the pill points to it
+     with aria-describedby) */
+  .pill-button-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.375rem;
+    margin: 0.625rem 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--color-parchment-500);
+  }
+
+  /* Level with the first line when the note wraps */
+  .pill-button-note svg {
+    margin-top: 0.15rem;
+    color: var(--color-lantern-300);
+  }
+
+  /* Phones: the row around the pill stretches it, and its content stays centred */
+  @media (width < 40rem) {
+    .pill-button-action {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  /* Motion only for people who haven't asked for less: the glyph gently breathing while the request
+     is on its way */
+  @media (prefers-reduced-motion: no-preference) {
+    .pill-button[data-pending] .pill-button-glyph {
+      animation: pill-button-breathe 0.9s ease-in-out infinite alternate;
+    }
+  }
+
+  /* High Contrast mode drops the backgrounds: the filled glyph still shows the pressed state, and
+     the system's highlight colour marks it too */
+  @media (forced-colors: active) {
+    .pill-button {
+      border-color: ButtonText;
+    }
+
+    .pill-button[aria-pressed="true"] {
+      border-color: Highlight;
+    }
+
+    .pill-button[aria-pressed="true"] .pill-button-glyph {
+      color: Highlight;
+    }
+
+    .pill-button[aria-disabled="true"] {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}
+
+@keyframes pill-button-breathe {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.45;
+  }
+}

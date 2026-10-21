@@ -2,15 +2,8 @@ import { supabase } from "../../../lib/supabase.js";
 import { isValidUuid } from "../../../shared/utils/isValidUuid.js";
 import { LORE_CATEGORIES } from "../constants/categories.js";
 import { DEFAULT_SORT } from "../constants/sortOptions.js";
+import { LORE_COLUMNS, withAppreciationCount } from "../utils/loreRows.js";
 import { toSearchTerm } from "../utils/searchTerm.js";
-
-const LORE_COLUMNS =
-  "id, author_id, project_id, folder_id, title, category, description, tags, image_url, is_public, created_at, updated_at";
-
-// Supabase returns the embedded count as appreciations: [{ count: 3 }]; cards need appreciation_count: 3.
-function withAppreciationCount({ appreciations, ...entry }) {
-  return { ...entry, appreciation_count: appreciations?.[0]?.count ?? 0 };
-}
 
 // The Lore Catalog: public entries of public projects, each with its project, author and
 // appreciation count. Row Level Security would also return the user's own private entries,

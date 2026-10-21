@@ -8,6 +8,7 @@ import { useAppreciation } from "../hooks/useAppreciation.js";
 import { appreciationService } from "../services/appreciationService.js";
 import { formatAppreciationCount, formatPillCount } from "../utils/appreciationCount.js";
 import { getAppreciationErrorMessage } from "../utils/appreciationErrors.js";
+import "../../../shared/styles/pill-button.css";
 import "../styles/appreciate-button.css";
 
 // The Appreciate button on Lore Details: one pill that holds the action and the count
@@ -43,9 +44,9 @@ export default function AppreciateButton({ entry, onCountChange }) {
   if (!isAuthLoading && !user) {
     return (
       <div className="appreciate">
-        <Link to="/login" state={{ from: location }} className="appreciate-pill" aria-describedby={descriptionId}>
-          <span className="appreciate-action">
-            <Icon name="heart" className="appreciate-glyph" />
+        <Link to="/login" state={{ from: location }} className="pill-button appreciate-pill" aria-describedby={descriptionId}>
+          <span className="pill-button-action">
+            <Icon name="heart" className="pill-button-glyph" />
             Appreciate
           </span>
           <span className="appreciate-count" aria-hidden="true">
@@ -139,7 +140,7 @@ export default function AppreciateButton({ entry, onCountChange }) {
       <button
         ref={pillRef}
         type="button"
-        className="appreciate-pill"
+        className="pill-button appreciate-pill"
         aria-pressed={isStatusKnown ? hasAppreciated : undefined}
         aria-disabled={isWaiting || undefined}
         aria-describedby={descriptionId}
@@ -147,11 +148,11 @@ export default function AppreciateButton({ entry, onCountChange }) {
         data-pending={isPending || undefined}
         onClick={handleClick}
       >
-        <span className="appreciate-action">
+        <span className="pill-button-action">
           <Icon
             key={popCount}
             name={isPressed ? "heartFilled" : "heart"}
-            className={isPressed && popCount > 0 ? "appreciate-glyph is-popping" : "appreciate-glyph"}
+            className={isPressed && popCount > 0 ? "pill-button-glyph is-popping" : "pill-button-glyph"}
           />
           Appreciate
         </span>
@@ -174,13 +175,13 @@ export default function AppreciateButton({ entry, onCountChange }) {
       </span>
 
       {saveError && (
-        <p key={failedAttempts} className="appreciate-error" role="alert">
+        <p key={failedAttempts} className="pill-button-error" role="alert">
           {saveError}
         </p>
       )}
 
       {statusError && (
-        <div className="appreciate-status-error">
+        <div className="pill-button-status-error">
           <ErrorMessage
             message={`We couldn't check whether you've appreciated this entry. ${getErrorMessage(statusError)}`}
             onRetry={handleRetry}

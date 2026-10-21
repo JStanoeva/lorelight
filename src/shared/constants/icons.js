@@ -1,5 +1,6 @@
 // Small line icons on a 24×24 grid, drawn with currentColor. `filled` icons are painted instead of stroked.
 const HEART_PATH = "M12 19.5s-7-4.3-7-9.6A3.9 3.9 0 0 1 12 7.6a3.9 3.9 0 0 1 7 2.3c0 5.3-7 9.6-7 9.6z";
+const STAR_PATH = "M12 2.5l2.1 7.4 7.4 2.1-7.4 2.1-2.1 7.4-2.1-7.4L2.5 12l7.4-2.1z";
 
 export const ICONS = {
   chevronRight: { path: "M9 6l6 6-6 6" },
@@ -19,5 +20,9 @@ export const ICONS = {
   heart: { path: HEART_PATH },
   // The same heart, painted: the pressed Appreciate button
   heartFilled: { path: HEART_PATH, filled: true },
-  star: { path: "M12 2.5l2.1 7.4 7.4 2.1-7.4 2.1-2.1 7.4-2.1-7.4L2.5 12l7.4-2.1z", filled: true },
+  star: { path: STAR_PATH, filled: true },
+  // The same star as an outline: the Save button before the entry is saved (painted when it is)
+  starOutline: { path: STAR_PATH },
+  // "Others can see this": the notes that a Constellation is public
+  eye: { path: "M2.5 12S6 5.75 12 5.75 21.5 12 21.5 12 18 18.25 12 18.25 2.5 12 2.5 12z M12 14.75a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5z" },
 };
