@@ -11,6 +11,10 @@ import "../styles/my-projects.css";
 export default function MyProjectsPage() {
   const { user } = useAuth();
   const { projects, isLoading, error, refetch } = useProjects(user.id);
+  // The empty state has its own "Create your first project" button, so the hero leaves its New
+  // Project button out then. While the list loads it stays, so nothing moves for a user who has
+  // projects.
+  const hasNoProjects = !isLoading && !error && projects.length === 0;
 
   let content;
 
@@ -18,7 +22,7 @@ export default function MyProjectsPage() {
     content = <Loader label="Loading your projects…" />;
   } else if (error) {
     content = <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
-  } else if (projects.length === 0) {
+  } else if (hasNoProjects) {
     content = (
       <EmptyState
         title="You don't have any projects yet"
@@ -53,9 +57,11 @@ export default function MyProjectsPage() {
           <h1 id="my-projects-title" className="page-hero-title">
             My Projects
           </h1>
-          <Link to="/projects/create" className="btn btn-primary my-projects-new">
-            New Project
-          </Link>
+          {!hasNoProjects && (
+            <Link to="/projects/create" className="btn btn-primary my-projects-new">
+              New Project
+            </Link>
+          )}
         </div>
       </section>
 

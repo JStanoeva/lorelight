@@ -6,11 +6,9 @@ export function formatSavedCount(count) {
 }
 
 // The line above the board: "18 saved entries", or with a category chosen
-// "Location · 3 of 18 saved entries". `categoryLabel` is "" for all categories.
+// "Location · 3 of 18 saved entries". `categoryLabel` is "" for all categories. Only for a
+// Constellation with saved entries (an empty one says so in its notice).
 export function getBoardCountText(shownCount, totalCount, categoryLabel) {
-  if (totalCount === 0) {
-    return "Nothing pinned yet";
-  }
   if (!categoryLabel) {
     return formatSavedCount(totalCount);
   }

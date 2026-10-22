@@ -118,13 +118,19 @@ export default function ConstellationBoard({
       <div className="constellation-board site-column">
         <div className="board-summary">
           {/* Stays mounted (empty while loading), so screen readers hear every new count.
-              tabIndex -1: it can take focus from code, but isn't a Tab stop. */}
-          <p ref={countRef} tabIndex={-1} role="status" className="board-count">
-            {isLoaded && (
+              tabIndex -1: it can take focus from code, but isn't a Tab stop. An empty Constellation
+              says so in its notice below, so "Nothing pinned yet" is hidden (screen readers still
+              read it), except while the line has keyboard focus (after the last card is removed):
+              then it shows, so the focus ring surrounds words instead of nothing. */}
+          <p ref={countRef} tabIndex={-1} role="status" className="board-count group">
+            {isLoaded && entries.length > 0 && (
               <>
                 <Icon name="star" size={12} className="board-count-star" />
                 {getBoardCountText(shownEntries.length, entries.length, chosenCategory?.label ?? "")}
               </>
+            )}
+            {isLoaded && entries.length === 0 && (
+              <span className="sr-only group-focus-visible:not-sr-only">Nothing pinned yet</span>
             )}
           </p>
 
