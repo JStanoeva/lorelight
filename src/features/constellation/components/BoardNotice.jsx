@@ -5,8 +5,9 @@ import { fourPointStarPath } from "../utils/pinLayout.js";
 // Three ghost cards while the board loads (tilts in degrees)
 const GHOST_TILTS = [-2, 1.5, -1];
 
-// What the board shows instead of cards while it loads (ghost cards + the shared Loader) or after
-// a failed load (a snapped thread + the error with Try again). `kind` is "loading" or "error".
+// What the board shows instead of cards while it loads (the glowing ghost cards + the shared Loader,
+// on their own, without the frame) or after a failed load (a snapped thread + the error with Try
+// again, in the frame). `kind` is "loading" or "error".
 export default function BoardNotice({ kind, isOwner, errorMessage, onRetry }) {
   if (kind === "loading") {
     return (

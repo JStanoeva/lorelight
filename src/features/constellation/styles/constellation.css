@@ -98,22 +98,6 @@
     padding-top: 1rem;
   }
 
-  /* While the saves load, a few faint chip outlines hold the chips row's place (one row) */
-  .board-chip-ghosts {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    padding-block: 0.375rem;
-  }
-
-  .board-chip-ghosts > span {
-    width: 6rem;
-    height: 2.25rem;
-    border: 1px dashed rgb(95 108 168 / 0.6);
-    border-radius: 999px;
-    background: rgb(18 26 51 / 0.6);
-  }
-
   .constellation-board {
     padding: 0 1rem 4.5rem;
   }
@@ -318,7 +302,7 @@
     pointer-events: none;
   }
 
-  /* Around a notice (loading, error, empty) the stars stay clear of the text */
+  /* Around a notice (error, empty) the stars stay clear of the text */
   .pin-frame-compact .pin-stars {
     -webkit-mask-image: radial-gradient(ellipse 24rem 14rem at 50% 50%, transparent 75%, #000 100%);
     mask-image: radial-gradient(ellipse 24rem 14rem at 50% 50%, transparent 75%, #000 100%);
@@ -870,6 +854,15 @@
     text-align: left;
   }
 
+  /* While the saves load: the glowing ghost cards and the Loader on their own, without the frame.
+     An empty Constellation's frame sits higher than a full one's (it has no chips above it), so a
+     frame shown while loading would have to jump; the frame appears once, in its final place. */
+  .board-loading {
+    display: flex;
+    justify-content: center;
+    padding-top: 2.5rem;
+  }
+
   .pin-ghosts {
     display: flex;
     justify-content: center;
@@ -923,15 +916,6 @@
        comes sooner */
     .constellation-hero .page-hero-title {
       font-size: 1.875rem;
-    }
-
-    /* Like the chips row on phones: from the left, 40px tall */
-    .board-chip-ghosts {
-      justify-content: flex-start;
-    }
-
-    .board-chip-ghosts > span {
-      height: 2.5rem;
     }
   }
 

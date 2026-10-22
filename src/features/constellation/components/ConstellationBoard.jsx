@@ -15,8 +15,9 @@ import "../styles/constellation.css";
 const CHIPS_LABEL = "Filter by category";
 
 // A Constellation as a pin board: the category chips (the threads' key and the filter), the count
-// line, and the framed board with the cards (or a loading, error or empty notice). Everything comes
-// in as props, so a creator's profile can show the same board read-only (isOwner false).
+// line, and the framed board with the cards (or an error or empty notice; while loading, the ghost
+// cards on their own). Everything comes in as props, so a creator's profile can show the same board
+// read-only (isOwner false).
 //   entries                 the saves, newest first; isLoading / error / onRetry: the load's state
 //   isOwner                 the viewer's own Constellation: Remove buttons
 //   ownerId, ownerName      whose Constellation it is (the id seeds the board's stars)
@@ -80,37 +81,50 @@ export default function ConstellationBoard({
     onRemoved(entry.id);
   }
 
-  let content;
+  let board;
   if (isLoading) {
-    content = <BoardNotice kind="loading" isOwner={isOwner} />;
+    // The loading animation on its own: the glowing ghost cards and the Loader, but no frame and no
+    // placeholder chips. An empty Constellation has no chips (and its frame sits higher), so those
+    // would appear and then vanish or jump. The chips, the frame and the cards appear once known.
+    board = (
+      <div className="board-loading">
+        <BoardNotice kind="loading" isOwner={isOwner} />
+      </div>
+    );
   } else if (error) {
-    content = <BoardNotice kind="error" errorMessage={getErrorMessage(error)} onRetry={handleRetry} />;
+    board = (
+      <BoardFrame seed={ownerId} plaque={plaque} isCompact>
+        <BoardNotice kind="error" errorMessage={getErrorMessage(error)} onRetry={handleRetry} />
+      </BoardFrame>
+    );
   } else if (shownEntries.length === 0) {
-    content = (
-      <EmptyBoardNotice
-        category={entries.length > 0 ? chosenCategory : null}
+    board = (
+      <BoardFrame seed={ownerId} plaque={plaque} isCompact>
+        <EmptyBoardNotice
+          category={entries.length > 0 ? chosenCategory : null}
+          isOwner={isOwner}
+          ownerName={ownerName}
+          onShowAll={handleShowAll}
+        />
+      </BoardFrame>
+    );
+  } else {
+    board = (
+      <PinBoard
+        entries={shownEntries}
+        selectedCategory={category}
         isOwner={isOwner}
-        ownerName={ownerName}
-        onShowAll={handleShowAll}
+        seed={ownerId}
+        plaque={plaque}
+        fallbackFocusRef={countRef}
+        onRemove={onRemove}
+        onRemoved={handleRemoved}
       />
     );
   }
 
   return (
     <>
-      {isLoading && (
-        // Holds the chips' place while the saves load, so the board doesn't move down when they
-        // appear (one row: how many the chips need is only known once they're loaded)
-        <div className="catalog-index site-column" aria-hidden="true">
-          <p className="catalog-index-label">{CHIPS_LABEL}</p>
-          <div className="board-chip-ghosts">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
-      )}
-
       {isLoaded && entries.length > 0 && (
         <CategoryChips value={category} onChange={handleCategoryChange} counts={counts} label={CHIPS_LABEL} />
       )}
@@ -147,22 +161,7 @@ export default function ConstellationBoard({
           </p>
         </div>
 
-        {content ? (
-          <BoardFrame seed={ownerId} plaque={plaque} isCompact>
-            {content}
-          </BoardFrame>
-        ) : (
-          <PinBoard
-            entries={shownEntries}
-            selectedCategory={category}
-            isOwner={isOwner}
-            seed={ownerId}
-            plaque={plaque}
-            fallbackFocusRef={countRef}
-            onRemove={onRemove}
-            onRemoved={handleRemoved}
-          />
-        )}
+        {board}
       </div>
     </>
   );
