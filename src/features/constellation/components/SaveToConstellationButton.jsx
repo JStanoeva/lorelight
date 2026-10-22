@@ -133,12 +133,11 @@ export default function SaveToConstellationButton({ loreId }) {
         onClick={handleClick}
       >
         <span className="pill-button-action">
+          {/* While the request is on its way, the star breathes (or, without motion, dims: see
+              pill-button.css); the word stays the same, so the pill never changes width */}
           <Icon name={isPressed ? "star" : "starOutline"} className="pill-button-glyph" />
-          {/* One span, so the "…" sits right after the word (the action's gap would push it away) */}
           <span>
             Save<span className="sr-only"> to Constellation</span>
-            {/* While the request is on its way: a cue that doesn't rely on colour or motion */}
-            {isPending && <span aria-hidden="true">…</span>}
           </span>
         </span>
       </button>

@@ -76,8 +76,9 @@
   }
 
   /* Processing (the request is on its way): the pill keeps its current state, the border and the
-     glyph turn a soft gold, and each button adds a "…". It lights up (or goes out) only when the
-     answer is there. */
+     glyph turn a soft gold, and the glyph breathes (below). Nothing changes width, so the pill
+     doesn't jitter under the pointer (Appreciate's "…" takes the count's place). It lights up (or
+     goes out) only when the answer is there. */
   .pill-button[data-pending] {
     border-color: rgb(232 193 112 / 0.55);
   }
@@ -112,6 +113,14 @@
   @media (prefers-reduced-motion: no-preference) {
     .pill-button[data-pending] .pill-button-glyph {
       animation: pill-button-breathe 0.9s ease-in-out infinite alternate;
+    }
+  }
+
+  /* Without motion, the glyph holds still at its faded breath instead, so the pending state still
+     shows by more than the gold tint */
+  @media (prefers-reduced-motion: reduce) {
+    .pill-button[data-pending] .pill-button-glyph {
+      opacity: 0.45;
     }
   }
 
