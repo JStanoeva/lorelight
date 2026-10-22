@@ -10,13 +10,14 @@
 @layer components {
   /* ---------- Hero: a short night sky (about 305px tall on desktop, 275px on phones) ---------- */
 
-  /* overflow: hidden also cuts off the strip of the sky that lies under the scrollbar (below) */
+  /* overflow: hidden also cuts off the strip of the sky that lies under the scrollbar (below).
+     The text starts right at the top padding (the min-height only adds room under the search
+     bar), like .constellation-hero's, so the eyebrow and the title stay in place at every width
+     when switching between the two pages. */
   .catalog-hero {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    display: flex;
-    align-items: center;
     min-height: 18.75rem;
     padding-block: 3rem;
     background: var(--color-night-950);
