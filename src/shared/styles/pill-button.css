@@ -99,24 +99,6 @@
     font-size: 0.875rem;
   }
 
-  /* A short muted note about the pill, e.g. that a Constellation is public (the pill points to it
-     with aria-describedby) */
-  .pill-button-note {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.375rem;
-    margin: 0.625rem 0 0;
-    font-size: 0.8125rem;
-    line-height: 1.45;
-    color: var(--color-parchment-500);
-  }
-
-  /* Level with the first line when the note wraps */
-  .pill-button-note svg {
-    margin-top: 0.15rem;
-    color: var(--color-lantern-300);
-  }
-
   /* Phones: the row around the pill stretches it, and its content stays centred */
   @media (width < 40rem) {
     .pill-button-action {

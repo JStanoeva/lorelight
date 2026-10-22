@@ -19,9 +19,7 @@ import "../styles/appreciate-button.css";
 // Nothing claims success before the database has accepted it: while the request is on its way the
 // pill shows that it's being processed, and only then does it light up (or go out) and the count
 // change. `onCountChange(change)` updates the count on the page: 1 for an appreciation, -1 for a removal.
-// `publicNoteId` is the id of the note under both pills that says appreciations show on the user's
-// public profile; the pill points to it with aria-describedby.
-export default function AppreciateButton({ entry, onCountChange, publicNoteId }) {
+export default function AppreciateButton({ entry, onCountChange }) {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();
   const { hasAppreciated, isLoading, error: statusError, refetch, setHasAppreciated } = useAppreciation(entry.id);
@@ -145,7 +143,7 @@ export default function AppreciateButton({ entry, onCountChange, publicNoteId })
         className="pill-button appreciate-pill"
         aria-pressed={isStatusKnown ? hasAppreciated : undefined}
         aria-disabled={isWaiting || undefined}
-        aria-describedby={publicNoteId ? `${descriptionId} ${publicNoteId}` : descriptionId}
+        aria-describedby={descriptionId}
         data-checking={!isStatusKnown || undefined}
         data-pending={isPending || undefined}
         onClick={handleClick}

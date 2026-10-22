@@ -183,14 +183,6 @@
     margin-top: 0.25rem;
   }
 
-  /* The note that appreciations and saves show on the public profile: always the last line, under
-     any error */
-  .lore-reactions .pill-button-note {
-    flex-basis: 100%;
-    order: 2;
-    margin-top: 0.125rem;
-  }
-
   /* The count as text, on the author's entries that others can't see (elsewhere the Appreciate
      button shows it). Gold means appreciation in this theme. */
   .lore-appreciations {

@@ -15,9 +15,8 @@ import "../../../shared/styles/pill-button.css";
 // whether the entry is saved. Only for entries others can see (the database accepts saves of public
 // lore only), the author's own included. Nothing claims success before the database has accepted
 // it: while the request is on its way the pill shows that it's being processed, and only then does
-// the star fill (or empty). `publicNoteId` is the id of the note under both pills that says saves
-// show on the user's public profile; the pill points to it with aria-describedby.
-export default function SaveToConstellationButton({ loreId, publicNoteId }) {
+// the star fill (or empty).
+export default function SaveToConstellationButton({ loreId }) {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();
   const { isSaved, isLoading, error: statusError, refetch, setIsSaved } = useSaveStatus(loreId);
@@ -128,7 +127,7 @@ export default function SaveToConstellationButton({ loreId, publicNoteId }) {
         className="pill-button"
         aria-pressed={isStatusKnown ? isSaved : undefined}
         aria-disabled={isWaiting || undefined}
-        aria-describedby={publicNoteId ? `${descriptionId} ${publicNoteId}` : descriptionId}
+        aria-describedby={descriptionId}
         data-checking={!isStatusKnown || undefined}
         data-pending={isPending || undefined}
         onClick={handleClick}

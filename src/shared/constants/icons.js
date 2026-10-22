@@ -23,6 +23,6 @@ export const ICONS = {
   star: { path: STAR_PATH, filled: true },
   // The same star as an outline: the Save button before the entry is saved (painted when it is)
   starOutline: { path: STAR_PATH },
-  // "Others can see this": the notes that a Constellation is public
+  // "Others can see this": the profile owner's notes on who can see each tab
   eye: { path: "M2.5 12S6 5.75 12 5.75 21.5 12 21.5 12 18 18.25 12 18.25 2.5 12 2.5 12z M12 14.75a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5z" },
 };

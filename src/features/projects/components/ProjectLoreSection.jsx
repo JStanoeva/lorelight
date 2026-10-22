@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import LoreCard from "../../lore/components/LoreCard.jsx";
 import Icon from "../../../shared/components/Icon.jsx";
-import { formatEntryCount, getNewEntryPath } from "../utils/projectContents.js";
+import { getNewEntryPath } from "../utils/projectContents.js";
 
 // The project's lore as a grid of cards, or an empty state (different for the owner and visitors).
 export default function ProjectLoreSection({ projectId, entries, folders, isOwner }) {
@@ -13,7 +13,6 @@ export default function ProjectLoreSection({ projectId, entries, folders, isOwne
         <h2 id="ws-lore-heading" className="ws-lore-title">
           Lore
         </h2>
-        <span className="ws-lore-count">{formatEntryCount(entries.length)}</span>
         {isOwner && entries.length > 0 && (
           <Link to={getNewEntryPath(projectId)} className="btn btn-primary ws-lore-new">
             <Icon name="plus" />

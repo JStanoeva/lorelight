@@ -1,8 +1,7 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import AppreciateButton from "../../appreciation/components/AppreciateButton.jsx";
 import { formatAppreciationCount } from "../../appreciation/utils/appreciationCount.js";
-import { useAuth } from "../../auth/hooks/useAuth.js";
 import SaveToConstellationButton from "../../constellation/components/SaveToConstellationButton.jsx";
 import Icon from "../../../shared/components/Icon.jsx";
 import { getVisibility } from "../utils/visibility.js";
@@ -29,8 +28,6 @@ const CLOSED_REASONS = {
 // `onAppreciationChange(change)` once the database has accepted a new appreciation (1) or its
 // removal (-1).
 export default function LoreActions({ entry, isOwner, onDeleted, onAppreciationChange }) {
-  const { user } = useAuth();
-  const publicNoteId = useId();
   // Kept here (not in the page), so an open dialog closes by itself when another entry starts
   // loading: this row is replaced by the loader, and its state goes with it
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -43,19 +40,8 @@ export default function LoreActions({ entry, isOwner, onDeleted, onAppreciationC
       <div className="lore-actions">
         {visibility === "public" ? (
           <div className="lore-reactions">
-            <AppreciateButton
-              entry={entry}
-              onCountChange={onAppreciationChange}
-              publicNoteId={user ? publicNoteId : undefined}
-            />
-            <SaveToConstellationButton loreId={entry.id} publicNoteId={user ? publicNoteId : undefined} />
-            {/* Said before the click, so nobody is surprised: both show on the user's public profile */}
-            {user && (
-              <p id={publicNoteId} className="pill-button-note">
-                <Icon name="eye" size={14} />
-                Your profile is public, so anyone can see the entries you appreciate or save.
-              </p>
-            )}
+            <AppreciateButton entry={entry} onCountChange={onAppreciationChange} />
+            <SaveToConstellationButton loreId={entry.id} />
           </div>
         ) : (
           // Appreciations kept from when the entry was public still count, so its author sees them
