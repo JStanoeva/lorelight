@@ -14,9 +14,6 @@ export default function ConstellationPage() {
   const { entries, isLoading, error, refetch, removeEntry } = useConstellation(user.id);
   const [searchParams, setSearchParams] = useSearchParams();
   const category = getCategoryFilter(searchParams);
-  // The category chips are there (or their place is held while loading): not on an empty
-  // Constellation or after a failed load
-  const hasCategoryChips = isLoading || (!error && entries.length > 0);
 
   // Every change is a new history entry; the same category again would only add a duplicate
   function handleCategoryChange(nextCategory) {
@@ -43,7 +40,7 @@ export default function ConstellationPage() {
   return (
     <div className="constellation-page">
       <div className="constellation-sky" aria-hidden="true" />
-      <ConstellationHero showCategoryHint={hasCategoryChips} />
+      <ConstellationHero />
       <ConstellationBoard
         entries={entries}
         isLoading={isLoading}

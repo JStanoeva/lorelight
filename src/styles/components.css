@@ -8,6 +8,47 @@
     @apply text-3xl text-parchment-100 sm:text-4xl;
   }
 
+  /* The top of the Lore Catalog, My Projects and My Constellation: a small purple eyebrow over a
+     large centred title, with the page's own tool under it (the search bar, the New Project button,
+     the category chips). The three share these rules, so their titles sit at exactly the same height
+     and nothing jumps when switching between them in the header. Each page adds its own class for
+     its sky and the space under its tool. */
+  .page-hero {
+    padding-top: 3rem;
+    text-align: center;
+  }
+
+  /* lantern-300 is only used as text on solid night surfaces, where it stays above 7.4:1 */
+  .page-hero-eyebrow {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-lantern-300);
+  }
+
+  .page-hero-title {
+    margin: 0.625rem 0 0;
+    font-size: clamp(2.25rem, 1.5rem + 2.4vw, 3.25rem);
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    color: var(--color-parchment-100);
+    text-shadow: 0 0 28px rgb(122 79 175 / 0.55);
+    text-wrap: balance;
+  }
+
+  /* Phones: a little less room above, and the wide Cinzel letters a little closer together */
+  @media (width < 40rem) {
+    .page-hero {
+      padding-top: 2.25rem;
+    }
+
+    .page-hero-title {
+      letter-spacing: 0.02em;
+    }
+  }
+
   /* Buttons */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-colors disabled:opacity-60;

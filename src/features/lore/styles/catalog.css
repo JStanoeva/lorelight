@@ -8,18 +8,16 @@
   Nothing here animates; the few hover transitions only run without reduced motion.
 */
 @layer components {
-  /* ---------- Hero: a short night sky (about 305px tall on desktop, 275px on phones) ---------- */
+  /* ---------- Hero: a short night sky (about 267px tall on desktop, 214px on phones) ---------- */
 
-  /* overflow: hidden also cuts off the strip of the sky that lies under the scrollbar (below).
-     The text starts right at the top padding (the min-height only adds room under the search
-     bar), like .constellation-hero's, so the eyebrow and the title stay in place at every width
-     when switching between the two pages. */
+  /* The top padding, the eyebrow and the title come from .page-hero (styles/components.css), shared
+     with My Projects and My Constellation. overflow: hidden also cuts off the strip of the sky that
+     lies under the scrollbar (below). */
   .catalog-hero {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    min-height: 18.75rem;
-    padding-block: 3rem;
+    padding-bottom: 3rem;
     background: var(--color-night-950);
   }
 
@@ -75,11 +73,10 @@
   /* The Home page's star field (one dot per layer on coprime tile sizes, so the pattern never
      visibly repeats), plus three brighter stars with a soft halo. Still.
      Two masks, and a star shows only where both let it through (intersect): the field fades out
-     towards the bottom, and an ellipse around the eyebrow, title and intro stays clear, so no
-     star ever sits on the text. The ellipse is centred on the intro line, the widest line of the
-     text, and narrows upwards like the text does (title, then the short eyebrow). Its size was
-     measured to clear every line of text (plus 4px) from 360px up; phones get a narrower, taller
-     one, because the intro wraps onto two or three lines there. */
+     towards the bottom, and an ellipse around the eyebrow, the title and the search bar stays
+     clear, so no star ever sits on the text. The ellipse is centred on the hero, which is the
+     middle of that block. Its size was measured to keep the eyebrow and the title well inside the
+     clear part from 320px up; phones get a narrower one. */
   .catalog-sky-stars {
     --star: var(--color-parchment-100);
     --text-clearing: radial-gradient(26rem 8.75rem at 50% 50%, transparent 90%, #000 100%);
@@ -160,38 +157,6 @@
   .catalog-hero-content {
     position: relative;
     padding-inline: 1rem;
-    text-align: center;
-  }
-
-  /* lantern-300 is only used as text on solid night surfaces, where it stays above 7.4:1 */
-  .catalog-eyebrow {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--color-lantern-300);
-  }
-
-  .catalog-title {
-    margin: 0.625rem 0 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 1.5rem + 2.4vw, 3.25rem);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: 0.04em;
-    color: var(--color-parchment-100);
-    text-shadow: 0 0 28px rgb(122 79 175 / 0.55);
-    text-wrap: balance;
-  }
-
-  .catalog-subtitle {
-    max-width: 46rem;
-    margin: 0.75rem auto 0;
-    font-size: 1.0625rem;
-    line-height: 1.6;
-    color: var(--color-parchment-300);
-    text-wrap: pretty;
   }
 
   /* ---------- Search bar: one rounded pill with the Search button inside ---------- */
@@ -483,16 +448,7 @@
   /* Phones: a shorter hero and 40px touch targets (the chips row: category-chips.css) */
   @media (width < 40rem) {
     .catalog-hero {
-      min-height: 16.25rem;
-      padding-block: 2.25rem;
-    }
-
-    .catalog-title {
-      letter-spacing: 0.02em;
-    }
-
-    .catalog-subtitle {
-      font-size: 1rem;
+      padding-bottom: 2.25rem;
     }
 
     .catalog-search {

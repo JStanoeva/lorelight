@@ -6,6 +6,7 @@ import Loader from "../../../shared/components/Loader.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import ProjectCard from "../components/ProjectCard.jsx";
 import { useProjects } from "../hooks/useProjects.js";
+import "../styles/my-projects.css";
 
 export default function MyProjectsPage() {
   const { user } = useAuth();
@@ -40,16 +41,25 @@ export default function MyProjectsPage() {
     );
   }
 
+  // The top matches the Lore Catalog's and My Constellation's (.page-hero), so the title stays in
+  // place when switching between the three pages in the header
   return (
-    <section className="page">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="page-title">My Projects</h1>
-        <Link to="/projects/create" className="btn btn-primary">
-          New Project
-        </Link>
-      </div>
+    <div className="my-projects-page">
+      <div className="my-projects-sky" aria-hidden="true" />
 
-      <div className="mt-8">{content}</div>
-    </section>
+      <section className="page-hero" aria-labelledby="my-projects-title">
+        <div className="my-projects-hero-content site-column">
+          <p className="page-hero-eyebrow">The worlds you&apos;re building</p>
+          <h1 id="my-projects-title" className="page-hero-title">
+            My Projects
+          </h1>
+          <Link to="/projects/create" className="btn btn-primary my-projects-new">
+            New Project
+          </Link>
+        </div>
+      </section>
+
+      <div className="my-projects-list site-column">{content}</div>
+    </div>
   );
 }
