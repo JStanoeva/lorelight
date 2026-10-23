@@ -22,4 +22,26 @@ async function getProfileById(userId) {
   return data;
 }
 
-export const profileService = { getProfileById };
+// `payload` may only contain the columns the database lets users update
+// (display_name, bio, avatar_url, star_color): build it with toProfilePayload.
+// Returns null when no row was updated: the profile doesn't exist or isn't the user's.
+async function updateProfile(userId, payload) {
+  if (!isValidUuid(userId)) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(payload)
+    .eq("id", userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export const profileService = { getProfileById, updateProfile };

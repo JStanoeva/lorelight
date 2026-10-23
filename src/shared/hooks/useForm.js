@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { flushSync } from "react-dom";
 
-// Form state for every form (Login, Register, Project, Lore, later Profile): the field values
+// Form state for every form (Login, Register, Project, Lore, Profile): the field values
 // (controlled inputs), the fields the user has left at least once (touched), and whether
 // a submit was tried. `validate(values)` returns an errors object. It runs on every render,
 // so the errors always match the current values and are never stored in state.
@@ -48,7 +48,16 @@ export function useForm(initialValues, validate) {
     // flushSync renders the error messages right away, so the field already has its error
     // when it gets focus, and a screen reader reads both together
     flushSync(() => setHasSubmitted(true));
-    form.elements.namedItem(firstInvalidField).focus();
+    const field = form.elements.namedItem(firstInvalidField);
+    // A radio group comes back as a RadioNodeList, which has no focus(): focus its first radio
+    const target = field instanceof RadioNodeList ? field[0] : field;
+    // The submit button keeps focus in the last field, and focus() does nothing (not even scroll
+    // to it) on a field that already has focus. Blurring it first makes focus() work as usual: the
+    // page scrolls to the field, and a screen reader reads it again with its error.
+    if (target === document.activeElement) {
+      target.blur();
+    }
+    target.focus();
     return false;
   }
 

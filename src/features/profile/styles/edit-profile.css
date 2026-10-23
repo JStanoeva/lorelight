@@ -1,0 +1,235 @@
+/*
+  Edit Profile: the same card as Edit Project and Edit Lore, plus a live avatar preview row at the
+  top and a grid of star colour tiles. The star colour (--star, set on .edit-avatar) only tints the
+  crest; every text keeps the app's own colours.
+  Plain CSS (no @apply), in the components layer like profile.css, so Tailwind utilities still win.
+*/
+@layer components {
+  /* ---------- Avatar row: crest (+ "Use my nebula") | link field ---------- */
+
+  .edit-avatar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-night-700);
+  }
+
+  .edit-avatar-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* The small crest (no tick ring, one orbit), a little bigger than on the "All …" pages */
+  .edit-avatar .profile-crest.profile-crest-small {
+    width: 7rem;
+  }
+
+  /* Reserved, so the row keeps its height whether the button shows or not */
+  .edit-avatar-clear {
+    display: flex;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+
+  .edit-avatar-clear .btn {
+    min-height: 2.75rem;
+  }
+
+  .edit-avatar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    min-width: 0;
+  }
+
+  /* Room for two lines, so the warning doesn't push the fields below down when it appears */
+  .edit-avatar-status {
+    min-height: 2.5rem;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-parchment-500);
+  }
+
+  /* Below 360px the warning wraps to three lines, so the line keeps room for three. Before the
+     collapsed rule, so that one still wins while the field shows an error */
+  @media (width < 22.5rem) {
+    .edit-avatar-status {
+      min-height: 3.75rem;
+    }
+  }
+
+  .edit-avatar-status-collapsed {
+    min-height: 0;
+  }
+
+  .edit-avatar-status-warning {
+    color: var(--color-gold-300);
+  }
+
+  /* "Checking the link…" stays invisible for its first 400 ms, so a quick check doesn't flash it */
+  .edit-avatar-status-checking {
+    animation: edit-avatar-hold-hidden 400ms;
+  }
+
+  @keyframes edit-avatar-hold-hidden {
+    from,
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* From 640px: crest | field. A fixed first column (as wide as the button), so the field doesn't
+     move sideways when the button comes or goes */
+  @media (width >= 40rem) {
+    .edit-avatar {
+      grid-template-columns: 8.75rem minmax(0, 1fr);
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .edit-avatar .profile-crest.profile-crest-small {
+      width: 8rem;
+    }
+
+    .edit-avatar-clear {
+      min-height: 2.5rem;
+    }
+
+    .edit-avatar-clear .btn {
+      min-height: 0;
+    }
+  }
+
+  /* ---------- Star colour tiles ---------- */
+
+  /* min-width 0: a fieldset is min-content wide by default and could push the card wider */
+  .star-color-field {
+    min-width: 0;
+  }
+
+  .star-colors {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+  }
+
+  /* The native radio lies invisibly over the whole tile, so a click anywhere chooses it and the
+     arrow keys work as usual; the tile shows its state and its focus ring */
+  .star-color {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.5rem 0.625rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 0.625rem;
+    background: var(--color-night-900);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--color-parchment-300);
+    cursor: pointer;
+  }
+
+  .star-color:hover {
+    border-color: var(--color-parchment-500);
+    color: var(--color-parchment-100);
+  }
+
+  /* The chosen tile: a 2px light border (1px less padding, so nothing moves) and the check mark */
+  .star-color:has(.star-color-input:checked) {
+    padding: calc(0.5rem - 1px) calc(0.625rem - 1px);
+    border: 2px solid var(--color-parchment-100);
+    background: var(--color-night-800);
+    color: var(--color-parchment-100);
+  }
+
+  .star-color:has(.star-color-input:focus-visible) {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 2px;
+  }
+
+  .star-color-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .star-color-swatch {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--swatch);
+    box-shadow:
+      inset 0 0 0 1px rgb(11 16 32 / 0.25),
+      0 0 10px color-mix(in srgb, var(--swatch) 35%, transparent);
+    color: var(--color-night-950);
+  }
+
+  .star-color-check {
+    opacity: 0;
+    stroke-width: 3;
+  }
+
+  .star-color-input:checked + .star-color-swatch .star-color-check {
+    opacity: 1;
+  }
+
+  .star-color-name {
+    min-width: 0;
+  }
+
+  /* From 640px: three per row, with a little more room in each tile */
+  @media (width >= 40rem) {
+    .star-colors {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .star-color {
+      gap: 0.625rem;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .star-color:has(.star-color-input:checked) {
+      padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+    }
+
+    .star-color-swatch {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  /* ---------- Motion (only without reduced motion) ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .star-color {
+      transition:
+        border-color 150ms ease-out,
+        color 150ms ease-out,
+        background-color 150ms ease-out;
+    }
+  }
+
+  /* ---------- Forced colours (Windows High Contrast) ---------- */
+
+  /* The swatch colour is dropped there: keep the check mark and the thicker border as the signal */
+  @media (forced-colors: active) {
+    .star-color:has(.star-color-input:checked) {
+      border-color: Highlight;
+    }
+  }
+}
