@@ -1,9 +1,13 @@
+import { LORE_CATEGORIES } from "../../lore/constants/categories.js";
 import { SECTION_IDS } from "../constants/homeSections.js";
 import CategoryList from "./CategoryList.jsx";
+import CategoryOrrery from "./CategoryOrrery.jsx";
 import SectionHeading from "./SectionHeading.jsx";
 import "../styles/categories.css";
 
 // The intro names no number of categories, so it stays true when one is added.
+// From lg the orrery shows the categories (every star is a button, and its lens holds the same
+// description, examples and link as the list); below lg the list does.
 export default function CategoriesSection() {
   return (
     <section
@@ -25,7 +29,11 @@ export default function CategoriesSection() {
           Catalog. Pick one to browse its public lore.
         </SectionHeading>
 
-        <CategoryList />
+        <CategoryOrrery categories={LORE_CATEGORIES} />
+
+        <div className="lg:hidden">
+          <CategoryList />
+        </div>
       </div>
     </section>
   );

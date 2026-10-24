@@ -3,15 +3,36 @@
 /*
   About section: the three cards and the panel they open.
   Violet marks the selected card; gold stays reserved for the hint and the focus ring.
+  The previews inside the panels live in showcases.css.
 */
+
+/* Registered, so the card glow can glide from one position to the next */
+@property --glow-x {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+@property --glow-y {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+
+@property --glow-strength {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 16%;
+}
+
 @layer components {
   /* isolate: the glow layer below (z-index -1) paints over the card's background but under its text */
   .about-card {
     @apply relative isolate flex h-full w-full flex-col gap-3 rounded-2xl border border-night-700 bg-night-900/70 p-6 text-left hover:border-lantern-500/60 motion-safe:hover:-translate-y-0.5;
   }
 
-  /* A soft violet glow at the top of each card. --glow-x / --glow-y are left free so a later
-     pointer effect can move it without touching this rule. */
+  /* A soft violet glow, resting at the top of each card. AboutCard moves it after the pointer
+     through --glow-x / --glow-y; it brightens on hover. */
   .about-card::before {
     content: "";
     position: absolute;
@@ -20,10 +41,16 @@
     border-radius: inherit;
     pointer-events: none;
     background-image: radial-gradient(
-      240px circle at var(--glow-x, 50%) var(--glow-y, 0%),
-      color-mix(in oklab, var(--color-lantern-500) 16%, transparent),
+      260px circle at var(--glow-x) var(--glow-y),
+      color-mix(in oklab, var(--color-lantern-500) var(--glow-strength), transparent),
       transparent 70%
     );
+  }
+
+  @media (hover: hover) {
+    .about-card:hover {
+      --glow-strength: 30%;
+    }
   }
 
   .about-card[aria-expanded="true"] {
@@ -84,9 +111,10 @@
     rotate: 180deg;
   }
 
-  /* The panel shell, with a violet hairline over the middle of its top border */
+  /* The panel shell, with a violet hairline over the middle of its top border.
+     A little less padding on phones leaves the previews room to breathe. */
   .about-panel {
-    @apply relative min-w-0 rounded-2xl border border-night-700 bg-night-900/85 p-6 sm:p-8 lg:p-10;
+    @apply relative min-w-0 rounded-2xl border border-night-700 bg-night-900/85 p-4 sm:p-8 lg:p-10;
   }
 
   .about-panel::before {
@@ -136,11 +164,13 @@
     @apply inline-flex min-h-11 items-center gap-1 font-semibold underline-offset-4 hover:underline;
   }
 
-  /* Motion is opt-in: with reduced motion the cards, chevrons and panels change without moving */
+  /* Motion is opt-in: with reduced motion the cards, chevrons and panels change without moving,
+     and the icons are simply drawn */
   @media (prefers-reduced-motion: no-preference) {
+    /* The glow glides after the pointer and brightens on hover */
     .about-card {
-      transition-property: border-color, background-color, box-shadow, translate;
-      transition-duration: 200ms;
+      transition-property: border-color, background-color, box-shadow, translate, --glow-x, --glow-y, --glow-strength;
+      transition-duration: 200ms, 200ms, 200ms, 200ms, 280ms, 280ms, 400ms;
       transition-timing-function: ease-out;
     }
 
@@ -150,6 +180,46 @@
 
     .about-panel {
       animation: panel-in 240ms ease-out;
+    }
+
+    /* Card icons: their lines wait hidden until their card is first seen (data-icons on the
+       card's heading, set by AboutSection), then each is traced in once, line after line (--i).
+       The stars light up when their lines are drawn. */
+    [data-icons="waiting"] .about-icon-line {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    [data-icons="waiting"] .about-icon-star {
+      opacity: 0;
+    }
+
+    /* Stacked cards (phones) each start when they scroll into view; side by side, the three
+       come into view together and trace card after card (--card) */
+    [data-icons="tracing"] {
+      --icon-stagger: 0ms;
+    }
+
+    @media (width >= 48rem) {
+      [data-icons="tracing"] {
+        --icon-stagger: calc(var(--card, 0) * 260ms);
+      }
+    }
+
+    [data-icons="tracing"] .about-icon-line {
+      stroke-dasharray: 1;
+      animation: about-icon-trace 1100ms cubic-bezier(0.45, 0.05, 0.3, 1) both;
+      animation-delay: calc(var(--icon-stagger) + var(--i, 0) * 170ms + 120ms);
+    }
+
+    [data-icons="tracing"] .about-icon-star {
+      animation: about-icon-ignite 900ms ease-out both;
+      animation-delay: calc(var(--icon-stagger) + 950ms);
+    }
+
+    [data-icons="tracing"] .about-icon {
+      animation: about-icon-glow 2200ms ease-out both;
+      animation-delay: var(--icon-stagger);
     }
   }
 }
@@ -164,5 +234,41 @@
   to {
     opacity: 1;
     translate: 0 0;
+  }
+}
+
+@keyframes about-icon-trace {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* A missing "to" keyframe means: end on the element's own look */
+@keyframes about-icon-ignite {
+  from {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px var(--color-lantern-300));
+  }
+}
+
+@keyframes about-icon-glow {
+  0% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+
+  45% {
+    filter: drop-shadow(0 0 5px color-mix(in oklab, var(--color-lantern-300) 80%, transparent));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
   }
 }

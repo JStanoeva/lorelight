@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { ABOUT_ITEMS } from "../constants/aboutItems.js";
 import { SECTION_IDS } from "../constants/homeSections.js";
+import { useHomeMotion } from "../hooks/useHomeMotion.js";
 import AboutCard from "./AboutCard.jsx";
 import AboutPanel from "./AboutPanel.jsx";
 import SectionHeading from "./SectionHeading.jsx";
@@ -19,6 +20,54 @@ const SHOWCASES = {
 // "How Lorelight works": three cards, and at most one open panel at a time (all closed at first).
 export default function AboutSection() {
   const [openId, setOpenId] = useState(null);
+  // How each card's icon appeared the first time that card was on screen, by card id:
+  // "tracing" (drawn in with light) or "drawn" (shown complete, because motion was off then).
+  // A card is missing until it has been seen.
+  const [iconEntrances, setIconEntrances] = useState({});
+  const { isMotionAllowed } = useHomeMotion();
+
+  // Watch each card that hasn't been seen yet, so on phones (cards stacked) every icon traces
+  // in when its own card scrolls into view. A decision is kept afterwards, so icons that were
+  // shown complete never vanish to be traced again when the animations are resumed.
+  useEffect(() => {
+    // The cards still waiting, as button element → card id
+    const waitingCards = new Map();
+    ABOUT_ITEMS.forEach((item) => {
+      const card = document.getElementById(`about-card-${item.id}`);
+      if (card && !iconEntrances[item.id]) {
+        waitingCards.set(card, item.id);
+      }
+    });
+    if (waitingCards.size === 0) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const seenIds = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) => waitingCards.get(entry.target));
+        if (seenIds.length > 0) {
+          const entrance = isMotionAllowed ? "tracing" : "drawn";
+          setIconEntrances((current) => {
+            const next = { ...current };
+            seenIds.forEach((id) => {
+              if (!next[id]) {
+                next[id] = entrance;
+              }
+            });
+            return next;
+          });
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px" },
+    );
+    for (const card of waitingCards.keys()) {
+      observer.observe(card);
+    }
+
+    return () => observer.disconnect();
+  }, [iconEntrances, isMotionAllowed]);
 
   // Bring a newly opened panel into view. Only the DOM is touched here, no state is set.
   // If the panel runs past the bottom of the screen, its card scrolls to just under the header:
@@ -45,6 +94,11 @@ export default function AboutSection() {
     document.getElementById(`about-card-${id}`)?.focus();
   }
 
+  // Before a card is first seen, its icon's lines wait hidden ("waiting") so they can be traced in
+  function getIconState(id) {
+    return iconEntrances[id] ?? (isMotionAllowed ? "waiting" : "drawn");
+  }
+
   return (
     <section
       id={SECTION_IDS.about}
@@ -60,10 +114,12 @@ export default function AboutSection() {
         {/* DOM order is card, panel, card, panel… From md up, the cards share row 1 and the
             open panel spans row 2; below md, each panel opens right under its card. */}
         <div className="mt-12 grid gap-4 md:grid-cols-3 md:gap-6 lg:mt-16">
-          {ABOUT_ITEMS.map((item) => (
+          {ABOUT_ITEMS.map((item, index) => (
             <Fragment key={item.id}>
               <AboutCard
                 item={item}
+                index={index}
+                iconState={getIconState(item.id)}
                 isOpen={openId === item.id}
                 onToggle={() => handleToggle(item.id)}
               />

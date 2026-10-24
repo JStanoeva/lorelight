@@ -1,0 +1,649 @@
+/*
+  Categories from 1024 px: the category orrery (CategoryOrrery). Plain CSS, no @apply.
+  - The wheel's angle arrives as --turn (useOrreryTurn sets it once per frame on .orrery-wheel).
+    Every star reads it to find its place on the ring with sin()/cos(), and the engraved layers
+    rotate with it, so only transforms change while the wheel turns (no layout, no repaint).
+  - The ring, lens and orbit sizes arrive as --star-ring, --lens-radius, --band-radius and
+    --limb-radius (shares of the wheel's width) from orreryGeometry.js, the same numbers the SVG
+    engraving is drawn with, so the two never drift apart.
+  - Everything inside the wheel is sized in em, and the wheel's font size follows its width, so
+    the whole instrument shrinks like a picture when the window is short.
+  - Pausing: the section sets data-motion="paused" and the shared rule in home.css freezes every
+    animation in it.
+*/
+@layer components {
+  /* From lg the orrery replaces the list of categories; below lg the list stays */
+  .orrery {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .orrery {
+      display: flex;
+      justify-content: center;
+      margin-top: 2.5rem;
+    }
+  }
+
+  .orrery-wheel {
+    /* As large as the window below the header allows, between 37rem (where the names are
+       still comfortably readable) and 42.5rem */
+    --orrery-size: clamp(37rem, 100svh - var(--header-height) - 2rem, 42.5rem);
+    --turn: 0deg;
+    position: relative;
+    flex: none;
+    width: var(--orrery-size);
+    height: var(--orrery-size);
+    /* 16 px on a full-size wheel; every em inside scales with it */
+    font-size: calc(var(--orrery-size) / 42.5);
+  }
+
+  /* Soft violet light behind the whole instrument */
+  .orrery-wheel::before {
+    content: "";
+    position: absolute;
+    inset: -6%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--color-lantern-700) 26%, transparent) 0,
+      color-mix(in oklab, var(--color-lantern-900) 30%, transparent) 45%,
+      transparent 68%
+    );
+    pointer-events: none;
+  }
+
+  /* ---------- Engraving (SVG layers) ---------- */
+  .orrery-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .orrery-band {
+    transform: rotate(calc(var(--turn) * -0.4));
+    will-change: transform;
+  }
+
+  .orrery-rete {
+    transform: rotate(var(--turn));
+    will-change: transform;
+  }
+
+  .orrery-ring {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-lantern-300) 28%, transparent);
+    stroke-width: 1.4;
+  }
+
+  .orrery-ring-strong {
+    stroke: color-mix(in oklab, var(--color-lantern-300) 42%, transparent);
+    stroke-width: 2;
+  }
+
+  .orrery-ring-dashed {
+    stroke-dasharray: 3 7;
+  }
+
+  .orrery-tick {
+    stroke: color-mix(in oklab, var(--color-lantern-300) 26%, transparent);
+    stroke-width: 1.3;
+  }
+
+  .orrery-tick-major {
+    stroke: color-mix(in oklab, var(--color-lantern-300) 50%, transparent);
+    stroke-width: 2;
+  }
+
+  .orrery-fiducial {
+    fill: var(--color-gold-400);
+    filter: drop-shadow(0 0 5px color-mix(in oklab, var(--color-gold-400) 80%, transparent));
+  }
+
+  .orrery-reading-line {
+    stroke: color-mix(in oklab, var(--color-gold-400) 45%, transparent);
+    stroke-width: 1.6;
+    stroke-dasharray: 2 6;
+  }
+
+  .orrery-band-ring {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-lantern-500) 45%, transparent);
+    stroke-width: 1.3;
+  }
+
+  .orrery-band-hatch {
+    stroke: color-mix(in oklab, var(--color-lantern-300) 20%, transparent);
+    stroke-width: 1.2;
+  }
+
+  .orrery-band-diamond {
+    fill: color-mix(in oklab, var(--color-lantern-300) 45%, transparent);
+  }
+
+  .orrery-track {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-lantern-300) 32%, transparent);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-dasharray: 0.5 11;
+  }
+
+  .orrery-spoke {
+    stroke: color-mix(in oklab, var(--color-lantern-500) 26%, transparent);
+    stroke-width: 1.2;
+    stroke-dasharray: 2 8;
+  }
+
+  /* The neighbour lines (pathLength="1", so a dash of 1 is the whole line) */
+  .orrery-thread {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-lantern-300) 38%, transparent);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+  }
+
+  .orrery-thread-lit {
+    stroke: color-mix(in oklab, var(--color-lantern-300) 90%, transparent);
+    stroke-width: 2.4;
+  }
+
+  /* ---------- Orbiting lights (the "planets" of the orrery) ---------- */
+  .orrery-orbit {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .orrery-orbit > span {
+    position: absolute;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background-color: var(--color-lantern-300);
+    box-shadow: 0 0 8px 2px color-mix(in oklab, var(--color-lantern-300) 55%, transparent);
+  }
+
+  .orrery-orbit-band {
+    rotate: 40deg;
+  }
+
+  .orrery-orbit-band > span {
+    top: calc(50% - var(--orrery-size) * var(--band-radius) - 2.5px);
+  }
+
+  .orrery-orbit-limb {
+    rotate: 205deg;
+  }
+
+  .orrery-orbit-limb > span {
+    top: calc(50% - var(--orrery-size) * var(--limb-radius) - 2px);
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+  }
+
+  /* ---------- The central light ---------- */
+  .orrery-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 11em;
+    height: 11em;
+    margin: -5.5em 0 0 -5.5em;
+    pointer-events: none;
+  }
+
+  .orrery-wheel[data-open="true"] .orrery-core {
+    opacity: 0;
+  }
+
+  .orrery-core > * {
+    grid-area: 1 / 1;
+  }
+
+  .orrery-core-glow {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--color-gold-300) 50%, transparent) 0,
+      color-mix(in oklab, var(--color-gold-400) 16%, transparent) 30%,
+      transparent 66%
+    );
+  }
+
+  .orrery-core-star {
+    width: 1.75em;
+    height: 2.5em;
+    color: var(--color-gold-300);
+    filter: drop-shadow(0 0 10px var(--color-gold-400));
+  }
+
+  /* ---------- Category stars ---------- */
+  .orrery-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .orrery-star {
+    /* Where the star is now: its own place on the wheel plus the wheel's turn */
+    --theta: calc(var(--angle) + var(--turn));
+    --reach: calc(var(--orrery-size) * var(--star-ring) * var(--ring));
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2.75em;
+    height: 2.75em;
+    margin: -1.375em 0 0 -1.375em;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    transform: translate(
+      calc(var(--reach) * sin(var(--theta))),
+      calc(var(--reach) * -1 * cos(var(--theta)))
+    );
+    will-change: transform;
+  }
+
+  /* The focus ring is pulled inside the button: the ring is sized in px while the gap to the
+     name scales with the wheel, so outside the button it would touch the name */
+  .orrery-star:focus-visible {
+    outline-offset: -4px;
+  }
+
+  /* Halo, flare and glyph are centred on the star's point (some are wider than the button) */
+  .orrery-star > :not(.orrery-star-label) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  .orrery-star-halo {
+    width: 3.5em;
+    height: 3.5em;
+    opacity: 0.75;
+  }
+
+  /* The twinkle runs on the halo's ::before, so hover and selection can still set the halo's
+     own opacity and scale */
+  .orrery-star-halo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, currentColor 55%, transparent) 0,
+      color-mix(in oklab, currentColor 14%, transparent) 38%,
+      transparent 64%
+    );
+  }
+
+  .orrery-star-glyph {
+    width: 0.875em;
+    height: 1.25em;
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+
+  /* A four-ray lens flare in the star's hue, hidden until the star is chosen. It turns with the
+     star (rotate by --theta), so its long ray always runs along the ring and never across the
+     star's own name, which sits straight outwards; the short ray ends before the name begins. */
+  .orrery-star-flare {
+    width: 6.5em;
+    height: 2em;
+    opacity: 0;
+    scale: 0.3;
+    transform: rotate(var(--theta));
+    background:
+      linear-gradient(to right, transparent, currentColor 50%, transparent) center / 100% 1.5px no-repeat,
+      linear-gradient(to bottom, transparent, currentColor 50%, transparent) center / 1.5px 100% no-repeat;
+  }
+
+  /* The name stays upright on the outside of the ring: it is pushed outwards along the star's
+     direction, and anchored by its near edge (sin/cos of the same angle), so it never covers
+     its own star wherever the wheel has turned. The gap is 24 px on a full-size wheel. */
+  .orrery-star-label {
+    --gap: calc(var(--orrery-size) * 0.035);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(
+      calc(-50% + (50% + var(--gap)) * sin(var(--theta))),
+      calc(-50% - (50% + var(--gap)) * cos(var(--theta)))
+    );
+    font-size: 0.71875em;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-parchment-300);
+    text-shadow:
+      0 0 6px var(--color-night-950),
+      0 0 2px var(--color-night-950);
+    will-change: transform;
+  }
+
+  .orrery-star[aria-expanded="true"] .orrery-star-halo {
+    opacity: 1;
+    scale: 1.5;
+  }
+
+  .orrery-star[aria-expanded="true"] .orrery-star-glyph {
+    scale: 1.45;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+
+  .orrery-star[aria-expanded="true"] .orrery-star-flare {
+    opacity: 0.85;
+    scale: 1;
+  }
+
+  .orrery-star[aria-expanded="true"] .orrery-star-label,
+  .orrery-star:focus-visible .orrery-star-label {
+    color: var(--color-parchment-100);
+  }
+
+  .orrery-star:focus-visible .orrery-star-halo {
+    opacity: 1;
+    scale: 1.25;
+  }
+
+  /* Same condition as Tailwind's hover: variant, so a tap never leaves a star stuck in hover */
+  @media (hover: hover) {
+    .orrery-star:hover .orrery-star-halo {
+      opacity: 1;
+      scale: 1.25;
+    }
+
+    .orrery-star:hover .orrery-star-label {
+      color: var(--color-parchment-100);
+    }
+
+    .orrery-star:not([aria-expanded="true"]):hover .orrery-star-flare {
+      opacity: 0.45;
+      scale: 0.7;
+    }
+  }
+
+  /* ---------- The reading lens ---------- */
+  /* It sits inside the hatched band with a small gap, so the band frames it as a whole ring */
+  .orrery-lens {
+    --lens-size: calc(var(--orrery-size) * var(--lens-radius) * 2);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: var(--lens-size);
+    height: var(--lens-size);
+    margin: calc(var(--lens-size) / -2) 0 0 calc(var(--lens-size) / -2);
+    padding: 2em;
+    border: 1px solid color-mix(in oklab, currentColor 40%, var(--color-night-700));
+    border-radius: 50%;
+    text-align: center;
+    background: radial-gradient(
+      circle at 50% 38%,
+      var(--color-night-800) 0,
+      var(--color-night-900) 48%,
+      var(--color-night-950) 100%
+    );
+    box-shadow:
+      0 0 0 0.25em color-mix(in oklab, var(--color-night-950) 75%, transparent),
+      0 0 4.375em -0.5em color-mix(in oklab, currentColor 38%, transparent),
+      inset 0 0 2.875em -1em color-mix(in oklab, currentColor 50%, transparent);
+  }
+
+  .orrery-lens[hidden] {
+    display: none;
+  }
+
+  /* Closing: the lens fades out with its last category in it (with motion, see below) */
+  .orrery-lens[data-closing="true"] {
+    opacity: 0;
+    scale: 0.94;
+  }
+
+  .orrery-lens-content {
+    max-width: 15.5em;
+  }
+
+  /* Never below 20 px on a small wheel: Cinzel is only used from 20 px, where it stays readable */
+  .orrery-lens-title {
+    font-size: max(1.375em, var(--text-xl));
+    color: var(--color-parchment-100);
+  }
+
+  .orrery-lens-description {
+    margin-top: 0.5em;
+    font-size: 0.9375em;
+    line-height: 1.55;
+    color: var(--color-parchment-300);
+  }
+
+  .orrery-lens-examples {
+    margin-top: 0.5em;
+    font-size: 0.8125em;
+    line-height: 1.5;
+    color: var(--color-parchment-500);
+  }
+
+  .orrery-lens-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375em;
+    margin-top: 0.875em;
+    font-size: 0.875em;
+    font-weight: 600;
+    color: var(--color-gold-400);
+    text-decoration: none;
+  }
+
+  .orrery-lens-link:hover {
+    color: var(--color-gold-300);
+  }
+
+  /* Forced colours (Windows High Contrast) drop the lens's gradient, so the engraved spokes
+     would show through its text: the lens gets a solid system background instead */
+  @media (forced-colors: active) {
+    .orrery-lens {
+      background: Canvas;
+    }
+  }
+
+  /* ---------- Motion: opt-in only. With reduced motion the wheel is a complete still ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .orrery-core {
+      transition: opacity 400ms ease-out;
+    }
+
+    .orrery-star-halo,
+    .orrery-star-glyph,
+    .orrery-star-flare {
+      transition:
+        opacity 300ms ease-out,
+        scale 450ms cubic-bezier(0.3, 1.5, 0.5, 1);
+    }
+
+    .orrery-star-label {
+      transition: color 200ms ease-out;
+    }
+
+    .orrery-thread {
+      transition:
+        stroke 400ms ease-out,
+        stroke-width 400ms ease-out;
+    }
+
+    .orrery-lens {
+      transition:
+        opacity 550ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        scale 550ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 400ms ease-out,
+        box-shadow 400ms ease-out;
+    }
+
+    /* --lens-close-time comes from CategoryOrrery, which empties the lens when it is over */
+    .orrery-lens[data-closing="true"] {
+      transition-duration: var(--lens-close-time);
+      transition-timing-function: ease-in;
+    }
+
+    .orrery-lens-content {
+      transition:
+        opacity 450ms ease-out,
+        translate 450ms ease-out;
+    }
+
+    /* @starting-style gives the values a transition starts from when an element appears, so
+       the lens and its text fade in when they open. Only while the wheel is moving: a paused
+       wheel opens the lens at once. (Transitions, unlike animations, never replay when the
+       visitor presses play again.) */
+    @starting-style {
+      .orrery[data-motion="running"] .orrery-lens {
+        opacity: 0;
+        scale: 0.88;
+      }
+
+      .orrery[data-motion="running"] .orrery-lens-content {
+        opacity: 0;
+        translate: 0 0.375em;
+      }
+    }
+
+    .orrery-star-halo::before {
+      animation: orrery-twinkle var(--twinkle-duration) ease-in-out var(--twinkle-delay) infinite
+        alternate;
+    }
+
+    .orrery-core-glow {
+      animation: orrery-breathe 6s ease-in-out infinite alternate;
+    }
+
+    .orrery-orbit-band {
+      animation: orrery-orbit-forward 48s linear infinite;
+    }
+
+    .orrery-orbit-limb {
+      animation: orrery-orbit-backward 84s linear infinite;
+    }
+
+    /* Before the wheel is first seen, the lines wait undrawn; then they draw in once, one
+       after another around the ring, starting at the reading position */
+    .orrery-wheel[data-lines="waiting"] .orrery-thread {
+      stroke-dashoffset: 1;
+    }
+
+    .orrery-wheel[data-lines="drawing"] .orrery-thread {
+      animation: orrery-draw 900ms cubic-bezier(0.4, 0, 0.2, 1) var(--draw-delay) backwards;
+    }
+
+    /* The flare bursts once when the chosen star reaches the top, then breathes */
+    .orrery-wheel[data-arrived="true"] .orrery-star[aria-expanded="true"] .orrery-star-flare {
+      animation:
+        orrery-flare-burst 1s cubic-bezier(0.2, 0.8, 0.3, 1),
+        orrery-flare-pulse 3s ease-in-out 1s infinite alternate;
+    }
+  }
+}
+
+@keyframes orrery-twinkle {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes orrery-breathe {
+  from {
+    opacity: 0.7;
+    scale: 0.92;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1.06;
+  }
+}
+
+@keyframes orrery-orbit-forward {
+  from {
+    rotate: 40deg;
+  }
+
+  to {
+    rotate: 400deg;
+  }
+}
+
+@keyframes orrery-orbit-backward {
+  from {
+    rotate: 205deg;
+  }
+
+  to {
+    rotate: -155deg;
+  }
+}
+
+@keyframes orrery-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The burst peaks at 1.3 times the flare's size, so even then its short ray stays clear of the
+   star's name */
+@keyframes orrery-flare-burst {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+    rotate: -20deg;
+  }
+
+  35% {
+    opacity: 1;
+    scale: 1.3;
+  }
+
+  100% {
+    opacity: 0.85;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+
+@keyframes orrery-flare-pulse {
+  from {
+    opacity: 0.85;
+    scale: 1;
+  }
+
+  to {
+    opacity: 0.55;
+    scale: 0.82;
+  }
+}

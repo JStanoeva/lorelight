@@ -1,15 +1,27 @@
 /*
-  The About panels' previews (Create, Share, Explore). Plain CSS that reads only the project's
-  own tokens; layout and spacing between blocks come from utilities in the JSX.
-  The previews are still pictures for now: nothing here moves.
+  The About panels' previews (Create, Share, Explore): little films drawn out of light.
+
+  How they work: useShowcasePlayback moves a clock from cue to cue, and each part of a picture
+  carries data-* attributes saying whether its cue has passed (data-on="true" …).
+  The rules OUTSIDE the motion media query describe the finished picture (that is also the
+  reduced-motion still) and hide the parts whose cue hasn't come yet. The rules INSIDE
+  @media (prefers-reduced-motion: no-preference) only add the animations that lead there, so an
+  animation without a "to" keyframe simply ends on the finished look.
+  Paused, off screen or tab hidden: the showcase sets data-motion="paused", and the shared rule
+  in home.css holds every animation on the frame it is on.
+  Colours: lavender for drawn light, gold only for light that means "public / saved" and for
+  the Replay control (gold = action).
+  Plain CSS that reads only the project's own tokens; spacing between blocks comes from
+  utilities in the JSX.
 */
 @layer components {
-  /* Shared flat frame around every preview */
+  /* ---------- Frame and sample content ---------- */
+
   .preview-frame {
     border: 1px solid var(--color-night-700);
     border-radius: 0.75rem;
     background-color: color-mix(in oklab, var(--color-night-950) 60%, transparent);
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   @media (width >= 40rem) {
@@ -42,14 +54,6 @@
     color: var(--color-lantern-300);
   }
 
-  /* Sample cards */
-  .mock-card {
-    border: 1px solid var(--color-night-700);
-    border-radius: 0.5rem;
-    background-color: var(--color-night-800);
-    padding: 0.875rem 1rem;
-  }
-
   .mock-label {
     font-size: 0.75rem;
     line-height: 1rem;
@@ -69,13 +73,6 @@
 
   .mock-entry-title {
     font-size: 1.0625rem;
-    line-height: 1.35;
-    font-weight: 600;
-    color: var(--color-parchment-100);
-  }
-
-  .mock-result-title {
-    font-size: 0.9375rem;
     line-height: 1.35;
     font-weight: 600;
     color: var(--color-parchment-100);
@@ -108,34 +105,16 @@
     height: 0.875rem;
   }
 
-  /* Neutral chips: tags and the catalog's filter pills */
-  .tag-chip,
-  .mock-pill {
+  .tag-chip {
     display: inline-flex;
     align-items: center;
     border: 1px solid var(--color-night-700);
     border-radius: 9999px;
     background-color: var(--color-night-900);
+    padding: 0.0625rem 0.5rem;
     font-size: 0.75rem;
     line-height: 1rem;
     color: var(--color-parchment-300);
-  }
-
-  .tag-chip {
-    padding: 0.0625rem 0.5rem;
-  }
-
-  .mock-pill {
-    padding: calc(0.25rem - 1px) calc(0.625rem - 1px);
-  }
-
-  /* Create: the thread from the Project down to its entry */
-  .thread {
-    display: block;
-    width: 3rem;
-    height: 2rem;
-    margin-left: 0.75rem;
-    color: var(--color-lantern-300);
   }
 
   /* Share: the three visibility steps */
@@ -149,13 +128,6 @@
     padding: 0.75rem;
   }
 
-  /* The light comes on. Gold appears only as light (a glow), never as a border or text. */
-  .visibility-step-lit {
-    border-color: color-mix(in oklab, var(--color-lantern-300) 50%, transparent);
-    background-color: var(--color-night-800);
-    box-shadow: 0 0 32px -8px color-mix(in oklab, var(--color-gold-400) 40%, transparent);
-  }
-
   /* Unlit star, lined up with the row of chips */
   .visibility-star {
     flex: none;
@@ -165,25 +137,6 @@
     color: var(--color-night-500);
   }
 
-  .visibility-star-lit {
-    color: var(--color-gold-300);
-    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-gold-400) 70%, transparent));
-  }
-
-  /* Explore: a still picture of the catalog's search field */
-  .mock-search {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid var(--color-night-500);
-    border-radius: 0.5rem;
-    background-color: var(--color-night-950);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: var(--color-parchment-100);
-  }
-
   .mock-search-icon {
     flex: none;
     width: 1rem;
@@ -191,26 +144,1746 @@
     color: var(--color-parchment-500);
   }
 
-  /* Explore: the Constellation the saved entry joins */
-  .constellation-strip {
-    display: block;
-    width: 100%;
-    max-width: 16rem;
-    height: auto;
+  /* ---------- Shared showcase pieces ---------- */
+
+  .showcase-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 2rem;
   }
 
-  .constellation-line {
+  /* An action, so it is gold like the card hints */
+  .replay-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 9999px;
+    background-color: var(--color-night-900);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-400);
+  }
+
+  /* A 44px tall touch target (32px pill + 6px above and below), without making the pill or
+     the row it sits in any taller */
+  .replay-button::before {
+    content: "";
+    position: absolute;
+    inset: -6px 0;
+  }
+
+  .replay-button:hover {
+    border-color: color-mix(in oklab, var(--color-gold-400) 60%, transparent);
+    color: var(--color-gold-300);
+  }
+
+  .replay-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex: none;
+  }
+
+  /* The stage: a patch of night sky the pictures are drawn on */
+  .showcase-stage {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin-top: 0.75rem;
+    padding: 0.625rem;
+    border-radius: 0.625rem;
+    background-image: radial-gradient(
+      120% 70% at 50% 0%,
+      color-mix(in oklab, var(--color-lantern-900) 70%, transparent),
+      transparent 75%
+    );
+  }
+
+  @media (width >= 40rem) {
+    .showcase-stage {
+      padding: 0.875rem;
+    }
+  }
+
+  .stardust {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .stardust-mote {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background-color: var(--color-lantern-300);
+    box-shadow: 0 0 6px 1px color-mix(in oklab, var(--color-lantern-300) 50%, transparent);
+    opacity: 0.35;
+  }
+
+  .showcase-scene {
+    position: relative;
+  }
+
+  .showcase-scene[data-fading="true"] {
+    opacity: 0;
+  }
+
+  /* Every card-like part: invisible until its cue (it still takes its place, so nothing jumps) */
+  .light-card {
+    position: relative;
+  }
+
+  .light-card[data-on="false"] {
+    opacity: 0;
+  }
+
+  .create-world,
+  .create-entry,
+  .share-card {
+    border: 1px solid var(--color-night-700);
+    border-radius: 0.5rem;
+    background-color: var(--color-night-800);
+    padding: 0.875rem 1rem;
+  }
+
+  /* The line of light along a card's edge, resting as a faint lavender rim */
+  .light-outline {
+    position: absolute;
+    inset: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .light-outline rect {
+    fill: none;
+    stroke: var(--color-lantern-300);
+    stroke-width: 1.25;
+    stroke-dasharray: 1;
+    opacity: 0.28;
+  }
+
+  /* Letters written by light, and words written in: hidden until their cue */
+  [data-filled="false"] .light-letter,
+  [data-typed="false"] .light-letter,
+  [data-written="false"] .light-write {
+    opacity: 0;
+  }
+
+  /* ---------- Create ---------- */
+
+  .create-link {
+    position: relative;
+    height: 2.75rem;
+    margin-left: 0.5rem;
+  }
+
+  .create-threads {
+    display: block;
+    width: 4.5rem;
+    height: 2.75rem;
+    overflow: visible;
+    filter: drop-shadow(0 0 3px color-mix(in oklab, var(--color-lantern-300) 70%, transparent));
+  }
+
+  .create-strand {
+    stroke: var(--color-lantern-300);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    opacity: 0.6;
+  }
+
+  .create-strand-soft {
+    stroke-width: 1;
+    opacity: 0.32;
+  }
+
+  .create-strand-faint {
+    stroke-width: 1;
+    opacity: 0.18;
+  }
+
+  .create-knot {
+    fill: var(--color-lantern-300);
+  }
+
+  /* A bead of light that runs down the thread (only while motion plays) */
+  .create-pulse {
+    stroke: var(--color-parchment-100);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 0.001 2;
+    stroke-dashoffset: 0.3;
+    opacity: 0;
+  }
+
+  .create-link[data-thread="false"] .create-strand {
+    stroke-dashoffset: 1;
+  }
+
+  .create-link[data-thread="false"] .create-knot {
+    opacity: 0;
+  }
+
+  .create-dust {
+    position: absolute;
+    left: 0.25rem;
+    top: -0.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    pointer-events: none;
+  }
+
+  .create-dust-mote {
+    position: absolute;
+    left: calc(var(--i) * 4px);
+    top: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: var(--color-lantern-300);
+    box-shadow: 0 0 6px 2px color-mix(in oklab, var(--color-lantern-300) 60%, transparent);
+    opacity: 0;
+  }
+
+  /* The finished entry keeps a soft violet halo; indented under its world */
+  .create-entry {
+    margin-left: 1.5rem;
+    box-shadow: 0 0 26px -12px color-mix(in oklab, var(--color-lantern-500) 70%, transparent);
+  }
+
+  @media (width >= 40rem) {
+    .create-entry {
+      margin-left: 2.5rem;
+    }
+  }
+
+  /* While it is still a form: see-through, its edge drawn only by the line of light */
+  .create-entry[data-finished="false"] {
+    border-color: transparent;
+    background-color: color-mix(in oklab, var(--color-night-900) 60%, transparent);
+    box-shadow: none;
+  }
+
+  .create-entry[data-finished="false"] .light-outline rect {
+    opacity: 0.75;
+  }
+
+  /* A soft band of light that sweeps across the entry as it is finished */
+  .create-sweep {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .create-sweep::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 60%;
+    background-image: linear-gradient(
+      100deg,
+      transparent 10%,
+      color-mix(in oklab, var(--color-lantern-300) 8%, transparent) 35%,
+      color-mix(in oklab, var(--color-lantern-300) 20%, transparent) 50%,
+      color-mix(in oklab, var(--color-lantern-300) 8%, transparent) 65%,
+      transparent 90%
+    );
+    translate: -120% 0;
+  }
+
+  .create-field {
+    position: relative;
+  }
+
+  .create-field-inline {
+    display: inline-flex;
+  }
+
+  /* Field hints such as "Title": they show only while the entry is a form */
+  .create-placeholder {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--color-parchment-500);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .create-entry[data-on="true"][data-finished="false"] [data-filled="false"] > .create-placeholder {
+    opacity: 1;
+  }
+
+  /* A dashed guide line under each field of the form */
+  .create-field::after {
+    content: "";
+    position: absolute;
+    left: -0.25rem;
+    right: -0.25rem;
+    bottom: -0.2rem;
+    border-bottom: 1px dashed color-mix(in oklab, var(--color-lantern-300) 45%, transparent);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .create-entry[data-on="true"][data-finished="false"] .create-field::after {
+    opacity: 1;
+  }
+
+  .create-description {
+    display: block;
+    text-wrap: pretty;
+  }
+
+  [data-filled="false"] > .create-badge,
+  [data-filled="false"] .create-tag,
+  [data-filled="false"] > .create-description,
+  .create-entry[data-finished="false"] .create-private {
+    opacity: 0;
+  }
+
+  /* ---------- Share ---------- */
+
+  .share-stage {
+    --sky-h: 9rem;
+    --card-top: calc(var(--sky-h) + 1.25rem);
+    --card-h: 4.25rem;
+    /* From the card's centre (under the horizon) up to the star, 3rem down the sky */
+    --rise-y: calc(3rem - var(--card-top) - var(--card-h) / 2);
+    height: 17.25rem;
+    padding: 0;
+  }
+
+  /* Phones: a lower sky, so the stage is no taller than it needs to be */
+  @media (width < 40rem) {
+    .share-stage {
+      --sky-h: 7.5rem;
+      height: 15.75rem;
+    }
+  }
+
+  /* The Lore Catalog as a small sky; z-index makes it its own layer, so its stars sit on it */
+  .share-sky {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 0;
+    height: var(--sky-h);
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-lantern-900) 90%, var(--color-night-950)),
+      color-mix(in oklab, var(--color-lantern-900) 45%, transparent) 70%,
+      transparent
+    );
+  }
+
+  .share-sky-label {
+    position: absolute;
+    left: 0.875rem;
+    top: 0.75rem;
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-lantern-300);
+  }
+
+  .share-stage .showcase-scene {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The horizon: a band of violet mist between your desk and the catalog's sky */
+  .share-horizon {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--sky-h) - 0.75rem);
+    height: 1.5rem;
+    background-image: radial-gradient(
+      55% 100% at 50% 50%,
+      color-mix(in oklab, var(--color-lantern-300) 32%, transparent),
+      transparent 72%
+    );
+    opacity: 0.25;
+    scale: 1.6 1;
+  }
+
+  .share-horizon::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 50%;
+    height: 1px;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--color-lantern-300) 70%, transparent),
+      transparent
+    );
+  }
+
+  .share-horizon[data-open="false"] {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .share-horizon[data-on="false"] {
+    opacity: 0;
+  }
+
+  /* The entry, under the horizon, centred and never wider than the stage. It stays there: it
+     is still in its Project when it is published. */
+  .share-card,
+  .share-ascent {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--card-top);
+    width: min(14rem, 100% - 1.5rem);
+    height: var(--card-h);
+    margin-inline: auto;
+  }
+
+  .share-card {
+    padding: 0.625rem 1rem;
+  }
+
+  /* Locked: dim. Entry public: a little brighter. Both public: in full light, glowing gold. */
+  .share-card[data-entry="false"] {
+    filter: saturate(0.35) brightness(0.7);
+  }
+
+  .share-card[data-entry="true"][data-open="false"] {
+    filter: saturate(0.7) brightness(0.88);
+  }
+
+  .share-card[data-glow="true"] {
+    border-color: color-mix(in oklab, var(--color-gold-300) 70%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-gold-300) 45%, transparent),
+      0 0 30px 0 color-mix(in oklab, var(--color-gold-400) 50%, transparent);
+  }
+
+  /* The lock and the globe share one spot: the lock until the entry is public, then the globe */
+  .share-status {
+    display: inline-grid;
+  }
+
+  .share-status > * {
+    grid-area: 1 / 1;
+    display: inline-flex;
+  }
+
+  .share-lock {
+    color: var(--color-parchment-300);
+  }
+
+  .share-globe {
+    color: var(--color-lantern-300);
+  }
+
+  .share-card[data-open="true"] .share-lock,
+  .share-card[data-open="false"] .share-globe {
+    opacity: 0;
+  }
+
+  /* The card's light: a gold copy of the card (same padding, so its words sit exactly on the
+     card's) that rises into the sky and shrinks to the star's point. Its finished look is
+     "gone into the star", so it shows only while it moves. */
+  .share-ascent {
+    padding: 0.625rem 1rem;
+    color: var(--color-gold-300);
+    border: 1px solid color-mix(in oklab, var(--color-gold-300) 80%, transparent);
+    border-radius: 0.5rem;
+    background-color: var(--color-night-800);
+    background-image: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--color-gold-300) 45%, transparent),
+      color-mix(in oklab, var(--color-gold-400) 12%, transparent)
+    );
+    box-shadow: 0 0 28px 4px color-mix(in oklab, var(--color-gold-400) 55%, transparent);
+    pointer-events: none;
+    opacity: 0;
+    translate: 0 var(--rise-y);
+    scale: 0.06;
+  }
+
+  .share-ascent-title {
+    display: block;
+    color: var(--color-gold-300);
+    text-shadow: 0 0 10px color-mix(in oklab, var(--color-gold-400) 70%, transparent);
+  }
+
+  .share-trail {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--card-top) + var(--card-h) / 2);
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .share-trail-mote {
+    position: absolute;
+    left: calc(-2px + (var(--i) - 2) * 9px);
+    top: -2px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--color-gold-300);
+    box-shadow: 0 0 8px 2px color-mix(in oklab, var(--color-gold-400) 60%, transparent);
+    opacity: 0;
+  }
+
+  .share-blocked {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--sky-h) + 1rem);
+    width: 6rem;
+    height: 1rem;
+    margin-left: -3rem;
+    pointer-events: none;
+  }
+
+  .share-blocked-mote {
+    position: absolute;
+    left: calc(var(--i) * 1.1rem);
+    top: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: var(--color-lantern-300);
+    box-shadow: 0 0 6px 2px color-mix(in oklab, var(--color-lantern-300) 55%, transparent);
+    opacity: 0;
+  }
+
+  /* The star the entry becomes: a point 3rem down the sky; its pieces are placed around it */
+  .share-star {
+    position: absolute;
+    left: 50%;
+    top: 3rem;
+    width: 0;
+    height: 0;
+  }
+
+  .share-star::before {
+    content: "";
+    position: absolute;
+    left: -1.25rem;
+    top: -1.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-gold-300);
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  .share-star-lines {
+    position: absolute;
+    left: -3.75rem;
+    top: -1.25rem;
+    width: 7.5rem;
+    height: 2.5rem;
+    overflow: visible;
+  }
+
+  .share-star-lines path {
+    stroke: var(--color-lantern-300);
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    opacity: 0.45;
+  }
+
+  .share-star-lines circle {
+    fill: var(--color-lantern-300);
+    opacity: 0.8;
+  }
+
+  /* The logo star's arms cross 50% across and 59% down */
+  .share-star-glyph {
+    position: absolute;
+    left: -9px;
+    top: -15px;
+    width: 18px;
+    height: 25.5px;
+    overflow: visible;
+    fill: var(--color-gold-300);
+    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-gold-400) 80%, transparent));
+  }
+
+  .share-star-label {
+    position: absolute;
+    left: 0;
+    top: 0.875rem;
+    translate: -50% 0;
+    white-space: nowrap;
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--color-parchment-100);
+  }
+
+  .share-star[data-on="false"] {
+    opacity: 0;
+  }
+
+  .share-switches {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.75rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .share-switches[data-on="false"] {
+    opacity: 0;
+  }
+
+  .share-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    color: var(--color-parchment-300);
+  }
+
+  .share-switch-track {
+    position: relative;
+    width: 2rem;
+    height: 1.125rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 9999px;
+    background-color: var(--color-night-800);
+  }
+
+  .share-switch-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: var(--color-parchment-500);
+  }
+
+  .share-switch[data-checked="true"] .share-switch-track {
+    border-color: color-mix(in oklab, var(--color-lantern-300) 60%, transparent);
+    background-color: color-mix(in oklab, var(--color-lantern-500) 45%, var(--color-night-800));
+  }
+
+  .share-switch[data-checked="true"] .share-switch-knob {
+    translate: 0.875rem 0;
+    background-color: var(--color-lantern-300);
+    box-shadow: 0 0 8px 1px color-mix(in oklab, var(--color-lantern-300) 60%, transparent);
+  }
+
+  /* High-contrast mode replaces background colours with the page colour, which would hide the
+     knob; system colours keep it visible, and "on" in the highlight colour */
+  @media (forced-colors: active) {
+    .share-switch-knob {
+      background-color: CanvasText;
+    }
+
+    .share-switch[data-checked="true"] .share-switch-knob {
+      background-color: Highlight;
+    }
+  }
+
+  /* The readable list: the step being shown gets a lavender edge; the last one lights up */
+  .share-rule[data-state="current"] {
+    border-color: color-mix(in oklab, var(--color-lantern-300) 50%, transparent);
+    box-shadow: 0 0 22px -10px color-mix(in oklab, var(--color-lantern-300) 70%, transparent);
+  }
+
+  .share-rule-last[data-lit="true"] {
+    border-color: color-mix(in oklab, var(--color-lantern-300) 50%, transparent);
+    background-color: var(--color-night-800);
+    box-shadow: 0 0 32px -8px color-mix(in oklab, var(--color-gold-400) 40%, transparent);
+  }
+
+  .share-rule-last[data-lit="true"] .share-rule-star {
+    color: var(--color-gold-300);
+    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-gold-400) 70%, transparent));
+  }
+
+  /* ---------- Explore ---------- */
+
+  /* Fixed heights, so the flight from the saved card to its new star is the same at any width */
+  .explore-stage {
+    --label-h: 1rem;
+    --strip-gap: 0.25rem;
+    --strip-w: 13.75rem;
+    --strip-h: 2.75rem;
+    --gap: 0.75rem;
+    --search-h: 2.5rem;
+    --row-h: 2.875rem;
+    --row-pitch: 3.25rem;
+    --rows-top: calc(
+      var(--label-h) + var(--strip-gap) + var(--strip-h) + var(--gap) + var(--search-h) +
+        var(--gap)
+    );
+    /* From the top match's save star to the Constellation's new star (182, 24 of 200 × 40) */
+    --src-x: calc(0.625rem + 0.375rem + 1px);
+    --src-y: calc(var(--rows-top) + 0.875rem);
+    --dst-x: calc(var(--strip-w) * 0.91);
+    --dst-y: calc(var(--label-h) + var(--strip-gap) + var(--strip-h) * 0.6);
+  }
+
+  .explore-constellation .mock-label {
+    display: block;
+    height: var(--label-h);
+    line-height: var(--label-h);
+  }
+
+  .explore-constellation[data-on="false"] {
+    opacity: 0;
+  }
+
+  .explore-strip {
+    display: block;
+    width: var(--strip-w);
+    height: var(--strip-h);
+    margin-top: var(--strip-gap);
+    overflow: visible;
+  }
+
+  .explore-strip-line {
     stroke: var(--color-lantern-500);
     stroke-width: 1.25;
     stroke-linecap: round;
     stroke-linejoin: round;
+    stroke-dasharray: 1;
   }
 
-  .constellation-dot {
+  .explore-strip-dot {
     fill: var(--color-lantern-300);
   }
 
-  .constellation-new-star {
+  .explore-strip-new-star {
     fill: var(--color-gold-300);
+    filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-gold-400) 80%, transparent));
+  }
+
+  .explore-strip-flare {
+    fill: none;
+    stroke: var(--color-gold-300);
+    stroke-width: 1;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .explore-constellation[data-joined="false"] .explore-strip-new-line {
+    stroke-dashoffset: 1;
+  }
+
+  .explore-constellation[data-joined="false"] .explore-strip-new-star {
+    opacity: 0;
+  }
+
+  .explore-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: var(--search-h);
+    margin-top: var(--gap);
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-night-500);
+    border-radius: 0.5rem;
+    background-color: var(--color-night-950);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-parchment-100);
+  }
+
+  .explore-search-text {
+    position: relative;
+  }
+
+  .explore-search-placeholder {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    color: var(--color-parchment-500);
+    opacity: 0;
+  }
+
+  .explore-search[data-on="true"][data-typed="false"] .explore-search-placeholder {
+    opacity: 1;
+  }
+
+  .explore-results {
+    position: relative;
+    height: calc(var(--row-pitch) * 3 + var(--row-h));
+    margin-top: var(--gap);
+  }
+
+  .explore-results[data-on="false"] {
+    opacity: 0;
+  }
+
+  /* Each result sits in a row slot (--from), and moves to its new slot (--to) after the search */
+  .explore-row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.125rem;
+    height: var(--row-h);
+    padding: 0 0.625rem;
+    border: 1px solid var(--color-night-700);
+    border-radius: 0.5rem;
+    background-color: var(--color-night-800);
+    translate: 0 calc(var(--from) * var(--row-pitch));
+  }
+
+  .explore-row[data-filtered="true"] {
+    translate: 0 calc(var(--to) * var(--row-pitch));
+  }
+
+  .explore-row[data-filtered="true"][data-match="true"] {
+    border-color: color-mix(in oklab, var(--color-lantern-500) 60%, transparent);
+  }
+
+  .explore-row[data-filtered="true"][data-match="false"] {
+    opacity: 0.32;
+    filter: saturate(0.3);
+  }
+
+  .explore-row-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  /* The title never shrinks below its own width (so the "dragon" matches stay readable, also
+     with larger text spacing); when the row is too narrow, the badge gives way instead */
+  .explore-row-title {
+    flex: 1 0 auto;
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    color: var(--color-parchment-100);
+  }
+
+  .explore-row .badge {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* The narrowest phones keep the whole title (so the "dragon" matches can be read) and leave
+     out the category badge, which the story doesn't need */
+  @media (width < 22.5rem) {
+    .explore-row .badge {
+      display: none;
+    }
+  }
+
+  .explore-save {
+    flex: none;
+    width: 0.75rem;
+    height: 1.0625rem;
+    overflow: visible;
+    fill: transparent;
+    stroke: var(--color-parchment-500);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+
+  .explore-row[data-saved="true"] .explore-save {
+    fill: var(--color-gold-300);
+    stroke: var(--color-gold-300);
+    filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-gold-400) 80%, transparent));
+  }
+
+  .explore-row-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding-left: 1.25rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-parchment-300);
+  }
+
+  .explore-heart {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex: none;
+    overflow: visible;
+    fill: transparent;
+    stroke: var(--color-parchment-500);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+  }
+
+  .explore-row[data-appreciated="true"] .explore-heart {
+    fill: var(--color-gold-300);
+    stroke: var(--color-gold-300);
+  }
+
+  /* The count: the old and the new number share one cell; the new one rolls in from below */
+  .explore-count {
+    display: inline-grid;
+    overflow: hidden;
+    height: 1rem;
+  }
+
+  .explore-count > span {
+    grid-area: 1 / 1;
+  }
+
+  .explore-count-new {
+    opacity: 0;
+    translate: 0 100%;
+  }
+
+  .explore-row[data-appreciated="true"] .explore-count-old {
+    opacity: 0;
+    translate: 0 -100%;
+  }
+
+  .explore-row[data-appreciated="true"] .explore-count-new {
+    opacity: 1;
+    translate: 0 0;
+    color: var(--color-parchment-100);
+  }
+
+  /* The saved entry's light and its trail, starting at the save star */
+  .explore-flight {
+    position: absolute;
+    left: var(--src-x);
+    top: var(--src-y);
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .explore-flyer {
+    position: absolute;
+    left: calc(-5px + var(--i) * 1px);
+    top: calc(-5px + var(--i) * 1px);
+    width: calc(10px - var(--i) * 2px);
+    height: calc(10px - var(--i) * 2px);
+    border-radius: 50%;
+    background-color: #fff6dc;
+    box-shadow:
+      0 0 6px 2px var(--color-gold-300),
+      0 0 18px 6px color-mix(in oklab, var(--color-gold-400) 45%, transparent);
+    opacity: 0;
+  }
+
+  /* ---------- Still pictures ---------- */
+
+  /* A still showcase shows the finished picture without playing up to it, so its parts drop
+     their entrance animations (a paused one would show its first, invisible keyframe). The
+     scene itself keeps its fade, so a still picture can fade out when the loop starts over. */
+  .showcase[data-still="true"] .showcase-scene *,
+  .showcase[data-still="true"] .showcase-scene *::before,
+  .showcase[data-still="true"] .showcase-scene *::after {
+    animation: none !important;
+  }
+
+  /* ---------- All motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Stardust drifts and twinkles, each mote on its own timing */
+    .stardust-mote {
+      animation: showcase-mote-drift var(--duration) ease-in-out var(--delay) infinite alternate;
+    }
+
+    .showcase-scene[data-fading="true"] {
+      animation: showcase-fade-out 800ms ease-in both;
+    }
+
+    /* A card is drawn: the light runs round its edge, then the card fills in behind it */
+    .light-card[data-on="true"] {
+      animation: showcase-card-in 900ms ease-out 550ms both;
+    }
+
+    .light-card[data-on="true"] .light-outline rect {
+      animation: showcase-outline-draw 1300ms cubic-bezier(0.5, 0, 0.3, 1) both;
+    }
+
+    .light-card[data-on="true"] .light-outline {
+      animation: showcase-outline-glow 1600ms ease-out both;
+    }
+
+    [data-written="true"] .light-write {
+      animation: showcase-write 1000ms ease-out both;
+      animation-delay: calc(var(--d, 0) * 240ms);
+    }
+
+    [data-filled="true"] .light-letter,
+    [data-typed="true"] .light-letter {
+      animation: showcase-letter 700ms ease-out both;
+      animation-delay: calc(var(--i) * var(--letter-gap));
+    }
+
+    /* Create */
+    .create-link[data-dust="true"] .create-dust-mote {
+      animation: showcase-dust-fall 1500ms ease-in-out both;
+      animation-delay: calc(var(--i) * 110ms);
+    }
+
+    .create-link[data-thread="true"] .create-strand {
+      animation: showcase-trace 1000ms cubic-bezier(0.5, 0, 0.3, 1) both;
+    }
+
+    .create-link[data-thread="true"] .create-strand-soft {
+      animation-delay: 150ms;
+    }
+
+    .create-link[data-thread="true"] .create-strand-faint {
+      animation-delay: 300ms;
+    }
+
+    .create-link[data-thread="true"] .create-knot {
+      animation: showcase-ignite 700ms ease-out both;
+    }
+
+    .create-link[data-thread="true"] .create-knot-end {
+      animation-delay: 800ms;
+    }
+
+    .create-link[data-thread="true"] .create-pulse {
+      animation: showcase-pulse 3400ms ease-in-out 1100ms infinite;
+    }
+
+    .create-link[data-thread="true"] .create-pulse-late {
+      animation-delay: 1800ms;
+    }
+
+    .create-entry[data-on="true"][data-finished="false"] [data-filled="false"] > .create-placeholder,
+    .create-entry[data-on="true"][data-finished="false"] .create-field::after {
+      animation: showcase-fade-in 600ms ease-out 500ms both;
+    }
+
+    [data-filled="true"] > .create-placeholder {
+      animation: showcase-fade-from-visible 350ms ease-out both;
+    }
+
+    .create-entry[data-finished="true"] .create-field::after {
+      animation: showcase-fade-from-visible 800ms ease-out both;
+    }
+
+    [data-filled="true"] > .create-badge {
+      animation: showcase-pop 650ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    }
+
+    [data-filled="true"] .create-tag {
+      animation: showcase-pop 550ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+      animation-delay: calc(var(--i) * 280ms);
+    }
+
+    [data-filled="true"] > .create-description {
+      animation: showcase-write 1100ms ease-out both;
+    }
+
+    .create-entry[data-finished="true"] {
+      animation: showcase-settle 1200ms ease-out both;
+    }
+
+    .create-entry[data-finished="true"] .create-sweep {
+      animation: showcase-sweep-show 1200ms ease-out both;
+    }
+
+    .create-entry[data-finished="true"] .create-sweep::before {
+      animation: showcase-sweep-move 1200ms ease-in-out both;
+    }
+
+    .create-entry[data-finished="true"] .create-private {
+      animation: showcase-pop 600ms cubic-bezier(0.3, 1.5, 0.5, 1) 450ms both;
+    }
+
+    /* Share */
+    .share-horizon[data-on="true"] {
+      animation: showcase-fade-in 900ms ease-out both;
+    }
+
+    .share-horizon[data-open="true"] {
+      animation: showcase-mist-part 900ms ease-out both;
+    }
+
+    .share-card {
+      transition:
+        filter 700ms ease-out,
+        border-color 600ms ease-out,
+        box-shadow 600ms ease-out;
+    }
+
+    .share-card[data-glow="true"] {
+      animation: showcase-gold-bloom 1000ms ease-out both;
+    }
+
+    .share-card[data-open="true"] .share-lock {
+      animation: showcase-dissolve 700ms ease-out both;
+    }
+
+    .share-card[data-open="true"] .share-globe {
+      animation: showcase-pop 600ms cubic-bezier(0.3, 1.5, 0.5, 1) 450ms both;
+    }
+
+    .share-ascent[data-on="true"] {
+      animation: showcase-ascent 1400ms cubic-bezier(0.45, 0, 0.55, 1) both;
+    }
+
+    .share-ascent[data-on="true"] > * {
+      animation: showcase-ascent-words 1400ms linear both;
+    }
+
+    .share-trail[data-on="true"] .share-trail-mote {
+      animation: showcase-trail 1500ms cubic-bezier(0.45, 0, 0.35, 1) both;
+      animation-delay: calc(250ms + var(--i) * 90ms);
+    }
+
+    .share-blocked[data-on="true"] .share-blocked-mote {
+      animation: showcase-blocked 1800ms ease-out both;
+      animation-delay: calc(var(--i) * 140ms);
+    }
+
+    .share-switch-track {
+      transition:
+        background-color 450ms ease-out,
+        border-color 450ms ease-out;
+    }
+
+    .share-switch-knob {
+      transition:
+        translate 450ms cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 450ms ease-out,
+        box-shadow 450ms ease-out;
+    }
+
+    .share-switch[data-waiting="true"] .share-switch-track {
+      animation: showcase-wait 1500ms ease-in-out infinite;
+    }
+
+    .share-switches[data-on="true"] {
+      animation: showcase-fade-in 700ms ease-out 700ms both;
+    }
+
+    .share-star[data-on="true"]::before {
+      animation: showcase-flare 1100ms ease-out both;
+    }
+
+    .share-star[data-on="true"] .share-star-glyph {
+      animation:
+        showcase-star-ignite 900ms ease-out both,
+        showcase-twinkle 3200ms ease-in-out 1200ms infinite;
+    }
+
+    .share-star[data-on="true"] .share-star-lines path {
+      animation: showcase-trace 900ms ease-out 350ms both;
+    }
+
+    .share-star[data-on="true"] .share-star-lines circle {
+      animation: showcase-fade-in 600ms ease-out 900ms both;
+    }
+
+    .share-star[data-on="true"] .share-star-label {
+      animation: showcase-write 900ms ease-out 500ms both;
+    }
+
+    .share-rule {
+      transition:
+        border-color 500ms ease-out,
+        background-color 500ms ease-out,
+        box-shadow 500ms ease-out;
+    }
+
+    .share-rule-star {
+      transition:
+        color 500ms ease-out,
+        filter 500ms ease-out;
+    }
+
+    /* Explore */
+    .explore-constellation[data-on="true"] .explore-strip-line:not(.explore-strip-new-line) {
+      animation: showcase-trace 1400ms ease-out 200ms both;
+    }
+
+    .explore-constellation[data-on="true"] .explore-strip-dot {
+      animation:
+        showcase-ignite 600ms ease-out both,
+        showcase-twinkle 2800ms ease-in-out infinite;
+      animation-delay: calc(var(--i) * 300ms), calc(var(--i) * 700ms + 1600ms);
+    }
+
+    .explore-constellation[data-joined="true"] .explore-strip-new-line {
+      animation: showcase-trace 500ms ease-out both;
+    }
+
+    .explore-constellation[data-joined="true"] .explore-strip-new-star {
+      animation:
+        showcase-star-ignite 900ms ease-out 250ms both,
+        showcase-twinkle 3200ms ease-in-out 1500ms infinite;
+    }
+
+    .explore-constellation[data-joined="true"] .explore-strip-flare {
+      animation: showcase-flare 1000ms ease-out 250ms both;
+    }
+
+    .explore-search[data-on="true"][data-typed="true"] .explore-search-placeholder {
+      animation: showcase-fade-from-visible 250ms ease-out both;
+    }
+
+    .explore-results[data-on="true"] .explore-row {
+      animation: showcase-row-in 700ms ease-out both;
+      animation-delay: calc(var(--i) * 120ms);
+    }
+
+    .explore-row[data-filtered="true"][data-match="true"] {
+      animation: showcase-row-rise 900ms cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .explore-row[data-filtered="true"][data-match="false"] {
+      animation: showcase-row-sink 900ms cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .explore-row[data-appreciated="true"] .explore-heart {
+      animation: showcase-heart 700ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    }
+
+    .explore-row[data-appreciated="true"] .explore-count-old {
+      animation: showcase-count-out 450ms ease-in both;
+    }
+
+    .explore-row[data-appreciated="true"] .explore-count-new {
+      animation: showcase-count-in 450ms ease-out 150ms both;
+    }
+
+    .explore-row[data-saved="true"] .explore-save {
+      animation: showcase-heart 650ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    }
+
+    .explore-flight[data-on="true"] .explore-flyer {
+      animation: showcase-fly 1150ms cubic-bezier(0.45, 0, 0.25, 1) both;
+      animation-delay: calc(var(--i) * 55ms);
+    }
+  }
+}
+
+/* ---------- Keyframes (a missing "to" means: end on the finished look) ---------- */
+
+@keyframes showcase-trace {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes showcase-ignite {
+  from {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px var(--color-lantern-300));
+  }
+}
+
+@keyframes showcase-mote-drift {
+  from {
+    opacity: 0.12;
+    translate: 0 0;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  to {
+    opacity: 0.18;
+    translate: 5px -16px;
+  }
+}
+
+@keyframes showcase-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes showcase-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes showcase-fade-from-visible {
+  from {
+    opacity: 1;
+  }
+}
+
+@keyframes showcase-card-in {
+  from {
+    border-color: transparent;
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+@keyframes showcase-outline-draw {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+
+  75% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes showcase-outline-glow {
+  0%,
+  60% {
+    filter: drop-shadow(0 0 4px var(--color-lantern-300));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+@keyframes showcase-write {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    translate: 0 5px;
+    text-shadow: 0 0 12px var(--color-lantern-300);
+  }
+
+  55% {
+    opacity: 1;
+    filter: blur(0);
+    text-shadow: 0 0 10px color-mix(in oklab, var(--color-lantern-300) 70%, transparent);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    translate: 0 0;
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+/* One letter: it flares white-lavender as the "pen" passes, then cools to parchment */
+@keyframes showcase-letter {
+  0% {
+    opacity: 0;
+    color: #fffaf0;
+    text-shadow:
+      0 0 4px var(--color-lantern-300),
+      0 0 14px var(--color-lantern-500);
+  }
+
+  20% {
+    opacity: 1;
+    color: #fffaf0;
+    text-shadow:
+      0 0 6px var(--color-lantern-300),
+      0 0 16px var(--color-lantern-500);
+  }
+
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 0 transparent,
+      0 0 0 transparent;
+  }
+}
+
+@keyframes showcase-dust-fall {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: calc(30px + var(--i) * 3px) 44px;
+  }
+}
+
+/* The bead of light runs down the thread in the first half, then rests out of sight */
+@keyframes showcase-pulse {
+  0% {
+    stroke-dashoffset: 0.3;
+    opacity: 1;
+  }
+
+  50% {
+    stroke-dashoffset: -1.3;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -1.3;
+    opacity: 1;
+  }
+}
+
+@keyframes showcase-pop {
+  0% {
+    opacity: 0;
+    scale: 0.6;
+    filter: drop-shadow(0 0 8px var(--color-lantern-300));
+  }
+
+  60% {
+    opacity: 1;
+    scale: 1.06;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+/* The form becomes a card: its edge firms up and a violet halo breathes once */
+@keyframes showcase-settle {
+  0% {
+    border-color: transparent;
+    background-color: color-mix(in oklab, var(--color-night-900) 60%, transparent);
+    box-shadow: 0 0 0 transparent;
+  }
+
+  45% {
+    box-shadow: 0 0 34px -6px color-mix(in oklab, var(--color-lantern-300) 55%, transparent);
+  }
+}
+
+/* Keeps the sweep's band visible while it moves; it is hidden again afterwards */
+@keyframes showcase-sweep-show {
+  0%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes showcase-sweep-move {
+  from {
+    translate: -120% 0;
+  }
+
+  to {
+    translate: 260% 0;
+  }
+}
+
+@keyframes showcase-mist-part {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes showcase-gold-bloom {
+  0% {
+    box-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-gold-300) 45%, transparent),
+      0 0 44px 2px color-mix(in oklab, var(--color-gold-400) 70%, transparent);
+  }
+}
+
+/* The card's light brightens right over the card (its words turn gold), then lifts off like a
+   card of its own, floats up through the parted mist and loses its card shape (dark body,
+   corners, border), rounding into a point of light where the star appears */
+@keyframes showcase-ascent {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    scale: 1;
+  }
+
+  15% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+    border-radius: 0.5rem;
+  }
+
+  45% {
+    opacity: 1;
+    translate: 0 calc(var(--rise-y) * 0.4);
+    scale: 0.7;
+    background-color: var(--color-night-800);
+  }
+
+  80% {
+    opacity: 0.9;
+    translate: 0 calc(var(--rise-y) * 0.92);
+    scale: 0.18;
+    border-color: transparent;
+    border-radius: 50%;
+    background-color: transparent;
+  }
+
+  100% {
+    opacity: 0;
+    border-color: transparent;
+    border-radius: 50%;
+    background-color: transparent;
+  }
+}
+
+/* The copy's words melt into its light while it shrinks, so it ends as a clean point */
+@keyframes showcase-ascent-words {
+  0%,
+  40% {
+    opacity: 1;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The golden stardust gathers into the star's point as it rises */
+@keyframes showcase-trail {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+
+  20% {
+    opacity: 0.9;
+  }
+
+  85% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    translate: calc((var(--i) - 2) * -9px) var(--rise-y);
+  }
+}
+
+@keyframes showcase-dissolve {
+  0% {
+    opacity: 1;
+    scale: 1;
+  }
+
+  40% {
+    opacity: 1;
+    scale: 1.25;
+    filter: drop-shadow(0 0 6px var(--color-lantern-300));
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+/* Light from the entry tries to rise but fades out at the horizon */
+@keyframes showcase-blocked {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+
+  30% {
+    opacity: 0.9;
+  }
+
+  75% {
+    opacity: 0.4;
+    translate: 0 -1.6rem;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 -2rem;
+  }
+}
+
+@keyframes showcase-wait {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  50% {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-lantern-300) 30%, transparent);
+  }
+}
+
+@keyframes showcase-flare {
+  0% {
+    opacity: 0.9;
+    scale: 0.2;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.8;
+  }
+}
+
+@keyframes showcase-star-ignite {
+  0% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+
+  40% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px var(--color-gold-300));
+  }
+}
+
+@keyframes showcase-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes showcase-row-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--from) * var(--row-pitch) + 8px);
+  }
+}
+
+@keyframes showcase-row-rise {
+  0% {
+    translate: 0 calc(var(--from) * var(--row-pitch));
+    box-shadow: 0 0 0 transparent;
+  }
+
+  60% {
+    box-shadow: 0 0 22px -6px color-mix(in oklab, var(--color-lantern-300) 60%, transparent);
+  }
+}
+
+@keyframes showcase-row-sink {
+  from {
+    translate: 0 calc(var(--from) * var(--row-pitch));
+    opacity: 1;
+    filter: saturate(1);
+  }
+}
+
+@keyframes showcase-heart {
+  0% {
+    scale: 1;
+  }
+
+  45% {
+    scale: 1.4;
+    filter: drop-shadow(0 0 6px var(--color-gold-300));
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes showcase-count-out {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes showcase-count-in {
+  from {
+    opacity: 0;
+    translate: 0 100%;
+  }
+}
+
+/* An arc: up first, then gliding across to the new star */
+@keyframes showcase-fly {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+
+  12% {
+    opacity: calc(1 - var(--i) * 0.22);
+  }
+
+  50% {
+    translate: calc((var(--dst-x) - var(--src-x)) * 0.3) calc((var(--dst-y) - var(--src-y)) * 0.85);
+  }
+
+  88% {
+    opacity: calc(1 - var(--i) * 0.22);
+  }
+
+  100% {
+    opacity: 0;
+    translate: calc(var(--dst-x) - var(--src-x)) calc(var(--dst-y) - var(--src-y));
   }
 }

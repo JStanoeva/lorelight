@@ -12,6 +12,16 @@
     overflow-x: clip;
   }
 
+  /* "Pause animations" (HomeMotionProvider): a section with endless motion sets
+     data-motion="paused" on itself while the visitor has paused it. !important is needed
+     because every animation shorthand resets the play state to running. */
+  [data-motion="paused"],
+  [data-motion="paused"] *,
+  [data-motion="paused"] *::before,
+  [data-motion="paused"] *::after {
+    animation-play-state: paused !important;
+  }
+
   /* relative: content paints above any absolute decorative layer placed before it */
   .home-container {
     @apply relative site-column px-4 sm:px-6;

@@ -1,0 +1,66 @@
+/*
+  Home hero: the animated sky layer (NebulaCanvas). It sits between the CSS painting
+  (HeroBackdrop) and the readability scrim, in DOM order without z-index. Plain CSS in the
+  components layer (like hero.css), so utilities still win.
+*/
+@layer components {
+  .nebula-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .nebula-layer > * {
+    position: absolute;
+  }
+
+  .nebula-canvas-host {
+    inset: 0;
+  }
+
+  /* The canvas is painted at a lower resolution; CSS stretches it to the full hero. It starts
+     invisible and fades in once its first frame is on screen, over the matching CSS still. */
+  .nebula-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+  .nebula-canvas-host.is-ready > .nebula-canvas {
+    opacity: 1;
+  }
+
+  /* The star and the flares are painted again above the canvas, so they stay crisp over the
+     moving sky. Until the canvas is ready (and without WebGL) the CSS painting below already
+     shows them, so the copies stay hidden: two stacked stars would glow too bright. */
+  .nebula-canvas-host:not(.is-ready) ~ * {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* A slow, soft fade: the painted clouds come alive instead of popping in (the shader paints
+       the CSS light meanwhile, see nebulaRenderer.js) */
+    .nebula-canvas {
+      transition: opacity 2s ease-in-out;
+    }
+
+    /* The lantern's star breathes slowly, like the light the shader paints around it */
+    .nebula-layer .hero-star {
+      animation: nebula-star-breathe 9s ease-in-out infinite alternate;
+    }
+  }
+}
+
+@keyframes nebula-star-breathe {
+  from {
+    filter: drop-shadow(0 0 8px var(--color-gold-300)) drop-shadow(0 0 22px var(--color-gold-400));
+  }
+
+  to {
+    filter: drop-shadow(0 0 12px var(--color-gold-300)) drop-shadow(0 0 34px var(--color-gold-400));
+  }
+}
