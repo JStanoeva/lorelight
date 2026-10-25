@@ -2,9 +2,9 @@ import { Link } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import EmptyState from "../../../shared/components/EmptyState.jsx";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
-import Loader from "../../../shared/components/Loader.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import ProjectCard from "../components/ProjectCard.jsx";
+import ProjectsLoading from "../components/ProjectsLoading.jsx";
 import { useProjects } from "../hooks/useProjects.js";
 import "../styles/my-projects.css";
 
@@ -19,7 +19,7 @@ export default function MyProjectsPage() {
   let content;
 
   if (isLoading) {
-    content = <Loader label="Loading your projects…" />;
+    content = <ProjectsLoading />;
   } else if (error) {
     content = <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
   } else if (!hasProjects) {

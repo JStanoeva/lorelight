@@ -409,7 +409,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 | `src/features/profile/styles/profile.css`                | the Creator Profile and its "All …" pages                                          |
 | `src/features/profile/styles/edit-profile.css`           | Edit Profile: the avatar preview and the star colours                              |
 | `src/features/profile/styles/nebula-avatar.css`          | avatar pictures and the generated avatar                                           |
-| `src/features/projects/styles/my-projects.css`           | the My Projects page                                                               |
+| `src/features/projects/styles/my-projects.css`           | the My Projects page and its loading animation                                     |
 | `src/features/projects/styles/workspace.css`             | the Project sidebar (on Project Details and Lore Details) and the Project overview |
 
 ---
