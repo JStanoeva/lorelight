@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog.jsx";
 import FormField from "../../../shared/components/FormField.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
@@ -18,6 +19,10 @@ export default function DeleteProjectDialog({ project, entryCount, onCancel, onD
   const [targetId, setTargetId] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
+  // Delete was pressed while "Move" had no project chosen. The select's error is derived from it,
+  // so it goes away as soon as a project is chosen.
+  const [hasMissedTarget, setHasMissedTarget] = useState(false);
+  const selectRef = useRef(null);
 
   // Lore can only move to another of the user's own projects
   const otherProjects = projects.filter((item) => item.id !== project.id);
@@ -28,8 +33,11 @@ export default function DeleteProjectDialog({ project, entryCount, onCancel, onD
   const isCheckingProjects = entryCount > 0 && isLoadingProjects;
 
   async function handleConfirm() {
+    // Like every other form: the error appears under the field it's about, and focus moves there.
+    // flushSync renders the error first, so the screen reader reads it together with the field.
     if (isMoving && !targetId) {
-      setError("Choose the project that should receive the lore.");
+      flushSync(() => setHasMissedTarget(true));
+      selectRef.current.focus();
       return;
     }
 
@@ -101,12 +109,15 @@ export default function DeleteProjectDialog({ project, entryCount, onCancel, onD
           )}
 
           {isMoving && (
+            // FormField passes the ref on to the <select> (in React 19, ref is a normal prop)
             <FormField
               as="select"
+              ref={selectRef}
               label="Move the lore to"
               value={targetId}
               onChange={(event) => setTargetId(event.target.value)}
               hint="Moved entries arrive outside any folder."
+              error={hasMissedTarget && !targetId ? "Choose the project that should receive the lore." : undefined}
             >
               <option value="">Choose a project</option>
               {otherProjects.map((item) => (

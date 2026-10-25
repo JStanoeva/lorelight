@@ -594,11 +594,16 @@
     text-underline-offset: 3px;
   }
 
+  /* When the cell is too narrow (very small phones, or larger letter spacing set by the user), the
+     date wraps under "Pinned" instead of running under the Remove button */
   .pin-card-date {
     min-width: 0;
     font-size: 0.75rem;
-    white-space: nowrap;
     color: var(--color-parchment-500);
+  }
+
+  .pin-card-date-value {
+    white-space: nowrap;
   }
 
   /* Above the stretched link too */

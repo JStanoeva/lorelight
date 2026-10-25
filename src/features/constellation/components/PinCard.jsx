@@ -115,8 +115,9 @@ export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemo
               <span className="sr-only">By </span>
               <span className="pin-card-author-name">{authorName}</span>
             </Link>
+            {/* The date itself never breaks, so on a very narrow card it moves under "Pinned" */}
             <time dateTime={entry.saved_at} className="pin-card-date">
-              Pinned {formatDate(entry.saved_at)}
+              Pinned <span className="pin-card-date-value">{formatDate(entry.saved_at)}</span>
             </time>
 
             {isOwner && (
