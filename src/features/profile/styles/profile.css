@@ -734,6 +734,16 @@
     margin-top: 0.25rem;
   }
 
+  /* Narrow phones: the crest goes above the title (like the profile's own card on phones), so a
+     long one-word name (a display name starts as the username) has the full width and doesn't
+     break in the middle */
+  @media (width < 30rem) {
+    .profile-all-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
   .profile-all-text {
     display: flex;
     flex-direction: column;

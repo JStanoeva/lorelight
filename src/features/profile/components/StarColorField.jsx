@@ -11,7 +11,7 @@ export default function StarColorField({ value, error, onChange, onMouseDown }) 
   const errorId = useId();
 
   return (
-    <fieldset className="star-color-field" aria-describedby={error ? `${hintId} ${errorId}` : hintId}>
+    <fieldset className="star-color-field" aria-describedby={error ? `${errorId} ${hintId}` : hintId}>
       <legend className="label">Star colour</legend>
       <p id={hintId} className="field-hint mt-1.5">
         Tints your profile's sky, avatar frame and accents.

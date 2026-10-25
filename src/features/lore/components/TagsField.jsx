@@ -25,7 +25,7 @@ export default function TagsField({ value, onChange, onBlur, error }) {
         placeholder="dragon, ancient magic, north"
         autoComplete="off"
         aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${hintId} ${errorId}` : hintId}
+        aria-describedby={error ? `${errorId} ${hintId}` : hintId}
         className="input"
       />
 

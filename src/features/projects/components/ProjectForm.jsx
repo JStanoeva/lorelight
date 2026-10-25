@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link } from "react-router";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import FormField from "../../../shared/components/FormField.jsx";
@@ -32,12 +33,22 @@ export default function ProjectForm({ initialValues, submitLabel, pendingLabel, 
     }
   }
 
-  // The submit button was disabled, so focus goes back into the form, to the first field
+  // The submit button was disabled, so focus goes back into the form, to the first field (the
+  // title). focus() doesn't scroll when that field already has focus, so the page scrolls to the
+  // alert itself; flushSync renders the alert first, so it's there to scroll to.
   function showServerError(form, message) {
-    setServerError(message);
-    setFailedAttempts((count) => count + 1);
-    setIsPending(false);
-    form.elements.namedItem("title").focus();
+    // The user left the page (e.g. through a header link) while the request was running
+    if (!form.isConnected) {
+      return;
+    }
+
+    flushSync(() => {
+      setServerError(message);
+      setFailedAttempts((count) => count + 1);
+      setIsPending(false);
+    });
+    form.elements.namedItem("title").focus({ preventScroll: true });
+    form.querySelector('[role="alert"]').scrollIntoView({ block: "nearest" });
   }
 
   async function handleSubmit(event) {
@@ -89,7 +100,7 @@ export default function ProjectForm({ initialValues, submitLabel, pendingLabel, 
         onChange={handleChange}
         onBlur={handleBlur}
         error={getShownError("description")}
-        hint={`What is this world about? ${descriptionLength} / ${PROJECT_DESCRIPTION_MAX.toLocaleString("en-US")} characters.`}
+        hint={`What is this world about? ${descriptionLength.toLocaleString("en-US")} / ${PROJECT_DESCRIPTION_MAX.toLocaleString("en-US")} characters.`}
         className="resize-y"
       />
 
@@ -166,9 +177,16 @@ export default function ProjectForm({ initialValues, submitLabel, pendingLabel, 
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 border-t border-night-700 pt-5">
-        <Link to={cancelTo} onMouseDown={handleMouseDown} className="btn btn-ghost">
-          Cancel
-        </Link>
+        {/* Leaving can't stop a request that's already running: the page would still open the saved project */}
+        {isPending ? (
+          <button type="button" disabled className="btn btn-ghost">
+            Cancel
+          </button>
+        ) : (
+          <Link to={cancelTo} onMouseDown={handleMouseDown} className="btn btn-ghost">
+            Cancel
+          </Link>
+        )}
         <SubmitButton isPending={isPending} label={submitLabel} pendingLabel={pendingLabel} />
       </div>
     </form>

@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link } from "react-router";
 import { useFolders } from "../../projects/hooks/useFolders.js";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
@@ -73,13 +74,23 @@ export default function LoreForm({
   }
 
   // The submit button was disabled, so focus goes back into the form: to the Folder select when
-  // the chosen folder is gone, otherwise to the first field
+  // the chosen folder is gone, otherwise to the first field. focus() doesn't scroll when that field
+  // already has focus, so the page scrolls to the alert itself; flushSync renders the alert first,
+  // so it's there to scroll to.
   function showServerError(form, message) {
-    setServerError(message);
-    setFailedAttempts((count) => count + 1);
-    setIsPending(false);
+    // The user left the page (e.g. through a header link) while the request was running
+    if (!form.isConnected) {
+      return;
+    }
+
+    flushSync(() => {
+      setServerError(message);
+      setFailedAttempts((count) => count + 1);
+      setIsPending(false);
+    });
     const fieldName = message === FOLDER_GONE_MESSAGE ? "folder_id" : "project_id";
-    form.elements.namedItem(fieldName).focus();
+    form.elements.namedItem(fieldName).focus({ preventScroll: true });
+    form.querySelector('[role="alert"]').scrollIntoView({ block: "nearest" });
   }
 
   // Edit only: if the folders of the entry's own project can't be loaded, the select still offers

@@ -245,7 +245,10 @@
   .pin-surface {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
+    /* clip (not hidden): the corner rings reach past the edges, and with hidden a script or
+       find-in-page could still scroll the surface sideways. clip cuts them off without making the
+       surface a scroll container. */
+    overflow: clip;
     padding: 2.25rem 0.875rem 2.5rem;
     border-radius: 0.75rem;
     background:

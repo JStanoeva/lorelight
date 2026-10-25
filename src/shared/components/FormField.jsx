@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 // Renders a label, a control (input, textarea or select) and its messages,
-// and links them by id so screen readers announce the hint and the error.
+// and links them by id so screen readers announce the error and the hint.
 // `describedById` links one more message rendered outside the field, such as a status line.
 export default function FormField({
   label,
@@ -16,7 +16,8 @@ export default function FormField({
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const describedBy = [hint && hintId, error && errorId, describedById].filter(Boolean).join(" ");
+  // The error comes first (like PasswordInput), so a screen reader reads the problem before the hint
+  const describedBy = [error && errorId, hint && hintId, describedById].filter(Boolean).join(" ");
 
   return (
     <div className="flex flex-col gap-1.5">
