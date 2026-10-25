@@ -869,34 +869,73 @@
     gap: 1.5rem;
   }
 
+  /* Each card leans a little (--tilt) and the lantern reaches it --delay into the 4.5s loop.
+     Phones show two cards, so the second one waits half the loop and the beat stays even. */
   .pin-ghost {
+    --delay: 0s;
     position: relative;
     width: 5.5rem;
     height: 7.25rem;
     rotate: var(--tilt, 0deg);
     transform-origin: 50% 0;
-    border: 1px dashed rgb(95 108 168 / 0.6);
+    border: 1px dashed rgb(95 108 168 / 0.9);
     border-radius: 0.75rem;
-    background: linear-gradient(180deg, rgb(33 43 86 / 0.6), rgb(27 36 71 / 0.35));
+    background: linear-gradient(180deg, rgb(33 43 86 / 0.75), rgb(27 36 71 / 0.5));
+  }
+
+  .pin-ghost:nth-child(2) {
+    --delay: 2.25s;
   }
 
   .pin-ghost:nth-child(3) {
     display: none;
   }
 
-  /* Its pin */
+  /* Its pin: dim gold at rest, like the stars on My Projects' ghost folders. It sits above the
+     card's light (::after). */
   .pin-ghost::before {
     content: "";
     position: absolute;
     top: 0;
     left: 50%;
+    z-index: 1;
     width: 0.625rem;
     height: 0.625rem;
     translate: -50% -50%;
     border-radius: 999px;
-    background: var(--color-lantern-300);
-    box-shadow: 0 0 10px var(--color-lantern-300);
-    opacity: 0.7;
+    background: var(--color-gold-300);
+    box-shadow: 0 0 10px var(--color-gold-400);
+    opacity: 0.45;
+  }
+
+  /* The card in lantern light: a gold edge over the dashed one, a warm wash spreading from the top
+     (amber, because a paler gold turns grey on the night blue; the lower half gets a little more
+     night blue for the same reason), a halo around the edge and the lantern's wider glow above it.
+     The light is a layer of its own that only fades in and out, so the card itself never moves. */
+  .pin-ghost::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid rgb(232 193 112 / 0.8);
+    border-radius: inherit;
+    background:
+      radial-gradient(110% 60% at 50% 0%, rgb(240 180 90 / 0.28), rgb(240 180 90 / 0.08) 50%, transparent),
+      linear-gradient(180deg, transparent 40%, rgb(27 36 71 / 0.35));
+    box-shadow:
+      0 0 0.75rem rgb(232 193 112 / 0.3),
+      0 -1.25rem 3.5rem 0.5rem rgb(232 193 112 / 0.3);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Still (reduced motion): the lantern rests on the second card, the right one on phones and the
+     middle one from 640px */
+  .pin-ghost:nth-child(2)::before {
+    opacity: 0.9;
+  }
+
+  .pin-ghost:nth-child(2)::after {
+    opacity: 0.8;
   }
 
   /* ---------- Sizes ---------- */
@@ -965,7 +1004,13 @@
       height: 8.5rem;
     }
 
+    /* Three ghost cards, 1.5s apart */
+    .pin-ghost:nth-child(2) {
+      --delay: 1.5s;
+    }
+
     .pin-ghost:nth-child(3) {
+      --delay: 3s;
       display: block;
     }
   }
@@ -1062,16 +1107,14 @@
       animation: pin-loosen 0.8s ease-in-out infinite alternate;
     }
 
-    .pin-ghost {
-      animation: pin-ghost-glow 1.6s ease-in-out infinite alternate;
+    /* The lantern passes over the ghost cards: only their pin and their light fade in and out.
+       "backwards" keeps a card dim until the lantern reaches it. */
+    .pin-ghost::before {
+      animation: pin-ghost-pin 4.5s ease-in-out var(--delay) infinite backwards;
     }
 
-    .pin-ghost:nth-child(2) {
-      animation-delay: 0.3s;
-    }
-
-    .pin-ghost:nth-child(3) {
-      animation-delay: 0.6s;
+    .pin-ghost::after {
+      animation: pin-ghost-lantern 4.5s ease-in-out var(--delay) infinite backwards;
     }
   }
 
@@ -1102,12 +1145,29 @@
     }
   }
 
-  @keyframes pin-ghost-glow {
-    from {
+  /* Each card is lit for about a quarter of the loop, then all the cards rest dim for a moment */
+  @keyframes pin-ghost-lantern {
+    0%,
+    27%,
+    100% {
+      opacity: 0;
+    }
+
+    11%,
+    16% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pin-ghost-pin {
+    0%,
+    27%,
+    100% {
       opacity: 0.45;
     }
 
-    to {
+    11%,
+    16% {
       opacity: 1;
     }
   }
@@ -1149,6 +1209,26 @@
 
     .pin-card[data-pending] .pin-card-paper {
       outline-color: Highlight;
+    }
+
+    /* Ghost cards: outlines and pins in the text colour, the lit card's edge in the highlight
+       colour (this mode drops the light's gradients and shadows). The pins stay fully lit, and
+       forced-color-adjust makes sure no browser swaps their background for the page colour. */
+    .pin-ghost {
+      border-color: CanvasText;
+    }
+
+    .pin-ghost::before,
+    .pin-ghost:nth-child(2)::before {
+      forced-color-adjust: none;
+      background: CanvasText;
+      box-shadow: none;
+      opacity: 1;
+      animation: none;
+    }
+
+    .pin-ghost::after {
+      border: 2px solid Highlight;
     }
   }
 }
