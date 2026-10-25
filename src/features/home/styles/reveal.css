@@ -2,7 +2,8 @@
   Home fade-in: the lantern lights each part of a section the first time it comes into view.
   The chapter star ignites and its hairlines draw outward, headings appear in warm gold light
   and cool to their own colours, the content rises in, the About cards and the FAQ questions
-  catch a gold edge, and the closing lantern brightens from dim.
+  catch a gold edge, and the closing lantern is drawn and lit (its own intro is in
+  closing-lantern.css).
   useSectionReveal writes each part's state onto it (the parts carry data-reveal-item):
   no data-reveal = not seen yet (hidden here), "fading" = its fade-in runs, after
   --reveal-delay, "shown" = done.
@@ -213,37 +214,31 @@
       transition: color 1000ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms);
     }
 
-    /* ---------- Closing strip: the lantern brightens from dim to its own glow ---------- */
+    /* ---------- Closing strip: a gold pen draws the lantern, then it lights up ---------- */
 
-    /* Its own drop-shadow (home.css) comes first, so the two filter lists blend: brightness and
-       saturate end at their neutral 1 */
-    .closing-lantern[data-reveal-item]:not([data-reveal]) img {
-      filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.45)) brightness(0.3) saturate(0.6);
-    }
-
+    /* The drawing's own intro (the pen, the metal, the star, the glass) is in
+       closing-lantern.css, next to the layers it moves. Here: the strip's halo and bloom
+       (home.css), which wait in the dark until the star is lit. */
     .closing-lantern[data-reveal-item]:not([data-reveal])::before,
     .closing-lantern[data-reveal-item]:not([data-reveal])::after {
       opacity: 0;
     }
 
-    /* The lantern is seen dim first, so it appears faster than the other parts */
+    /* The pen starts drawing at once, so the lantern appears faster than the other parts */
     .closing-lantern[data-reveal-item][data-reveal="fading"] {
       transition:
         opacity 500ms ease-out var(--reveal-delay, 0ms),
         translate 1000ms var(--reveal-ease) var(--reveal-delay, 0ms);
     }
 
-    .closing-lantern[data-reveal-item][data-reveal="fading"] img {
-      transition: filter 1600ms var(--reveal-cool) var(--reveal-delay, 0ms);
-    }
-
-    /* The halo spreads with the light, and the bloom on the star catches last */
+    /* The halo spreads as the glass fills with light (+1000 ms), and the bloom on the star
+       catches last (+1150 ms), like the drawing's engraving (closing-lantern.css) */
     .closing-lantern[data-reveal-item][data-reveal="fading"]::before {
-      transition: opacity 1600ms ease-out var(--reveal-delay, 0ms);
+      transition: opacity 900ms ease-out calc(var(--reveal-delay, 0ms) + 1000ms);
     }
 
     .closing-lantern[data-reveal-item][data-reveal="fading"]::after {
-      transition: opacity 1100ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 450ms);
+      transition: opacity 700ms ease-out calc(var(--reveal-delay, 0ms) + 1150ms);
     }
   }
 }

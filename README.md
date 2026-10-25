@@ -371,7 +371,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
     - the data hooks that reload when the logged-in user changes (through `useViewerKey`)
   - **`HomeMotionContext`** is provided by `HomeMotionProvider`, which wraps the Home page.
     - It shares the "Pause animations" switch (`isMotionPaused`, `setIsMotionPaused`), the system's reduced-motion setting (`prefersReducedMotion`) and `isMotionAllowed` (true when the animations are not paused and reduced motion is off).
-    - Its consumers (through `useHomeMotion`) are the welcome banner, the About section and its previews, the category wheel and the fade-ins of every section (`useSectionReveal`). One press of the button pauses them all.
+    - Its consumers (through `useHomeMotion`) are the welcome banner, the About section and its previews, the category wheel, the closing section's lantern and the fade-ins of every section (`useSectionReveal`). One press of the button pauses them all.
 
 ### Component Styling
 
@@ -380,7 +380,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - Every other CSS file sits in a `styles/` folder next to the components that use it, and those components import it (for example, `LoreCard.jsx` imports `lore-card.css`).
   - Values that differ per item (such as a creator's star colour or the position of a generated star) are set through the `style` prop, mostly as CSS variables.
   - The app has one dark theme. The animations respect the system's reduced-motion setting.
-- **External CSS files (27):**
+- **External CSS files (28):**
 
 | File                                                     | What it styles                                                                     |
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -399,6 +399,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 | `src/features/home/styles/showcases.css`                 | the three animated examples (Create, Share, Explore)                               |
 | `src/features/home/styles/categories.css`                | the category list on small screens                                                 |
 | `src/features/home/styles/orrery.css`                    | the category wheel on large screens                                                |
+| `src/features/home/styles/closing-lantern.css`           | the animated lantern in the closing section                                        |
 | `src/features/home/styles/reveal.css`                    | how the Home sections fade in when they come into view                             |
 | `src/features/lore/styles/catalog.css`                   | the Lore Catalog page: header, search bar, toolbar, notices                        |
 | `src/features/lore/styles/category-chips.css`            | the category filter buttons (also on My Constellation)                             |

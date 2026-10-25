@@ -18,7 +18,7 @@ export default function Footer() {
     <footer className="border-t border-night-700 bg-night-900">
       <div className="site-column flex flex-col items-center gap-4 px-4 py-8 text-sm text-parchment-500 sm:px-6 lg:flex-row lg:justify-between">
         <div className="flex items-center gap-2">
-          <img src="/favicon.png" alt="" className="size-6" />
+          <img src="/favicon.svg" alt="" className="size-6" />
           <span>&copy; 2026 Lorelight · Where your worlds come to light.</span>
         </div>
 

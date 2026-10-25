@@ -90,7 +90,7 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
           onClick={handleBrandClick}
           className="flex items-center gap-2 font-display text-xl font-bold text-parchment-100 no-underline hover:text-gold-300"
         >
-          <img src="/favicon.png" alt="" className="size-9" />
+          <img src="/favicon.svg" alt="" className="size-9" />
           Lorelight
         </Link>
 

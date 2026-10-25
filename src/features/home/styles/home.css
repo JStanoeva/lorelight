@@ -224,13 +224,15 @@
     @apply relative mx-auto max-w-2xl px-4;
   }
 
-  /* In the logo PNG, the star's crossing point sits 50% across and about 65% down */
+  /* The lantern drawing (ClosingLantern, closing-lantern.css) fills this box. Its star's arms
+     cross 50% across and 65.6% down (LIGHT in lanternShapes.js). */
   .closing-lantern {
     @apply relative isolate mx-auto w-36 sm:w-44;
   }
 
   /* Halo behind the lantern. closest-side makes the glow fade out before the nearest edge of its
-     box (the bottom one), so the box never shows as a hard line. */
+     box (the bottom one), so the box never shows as a hard line. Its 64% is measured in that
+     enlarged box (inset -70%), so the halo's centre sits below the star, not on it. */
   .closing-lantern::before {
     content: "";
     position: absolute;
@@ -245,31 +247,24 @@
     );
   }
 
-  /* Bloom in front of the star */
+  /* Bloom in front of the star: small and soft, because the drawing has a halo of its own */
   .closing-lantern::after {
     content: "";
     position: absolute;
     left: 50%;
-    top: 65%;
-    width: 40%;
+    top: 65.6%;
+    width: 30%;
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: 50%;
     mix-blend-mode: screen;
-    opacity: 0.8;
+    opacity: 0.5;
     pointer-events: none;
     background-image: radial-gradient(
       circle,
       color-mix(in oklab, var(--color-gold-300) 70%, transparent),
       transparent 70%
     );
-  }
-
-  .closing-lantern img {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.45));
   }
 
   .closing-text {

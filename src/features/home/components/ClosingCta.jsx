@@ -1,9 +1,11 @@
 import { SECTION_IDS } from "../constants/homeSections.js";
 import { useSectionReveal } from "../hooks/useSectionReveal.js";
+import ClosingLantern from "./ClosingLantern.jsx";
 import HomeCtas from "./HomeCtas.jsx";
 
 // The last call to action before the footer, with the same CTA pair as the hero. It fades in
-// the first time it comes into view: the lantern, then the heading, the text and the buttons.
+// the first time it comes into view: the lantern (drawn and lit), then the heading, the text
+// and the buttons.
 export default function ClosingCta({ isLoggedIn = false, isAuthLoading = false }) {
   const setSectionElement = useSectionReveal();
 
@@ -17,16 +19,10 @@ export default function ClosingCta({ isLoggedIn = false, isAuthLoading = false }
       <div className="starfield closing-stars" aria-hidden="true" />
 
       <div className="closing-content">
-        {/* Decorative: the heading below carries the meaning, so the image has an empty alt */}
+        {/* Decorative: the heading below carries the meaning, so screen readers skip the
+            lantern. As a part of the fade-in, this wrapper also plays the lantern's intro. */}
         <div className="closing-lantern" aria-hidden="true" data-reveal-item>
-          <img
-            src="/favicon.png"
-            alt=""
-            width="176"
-            height="176"
-            loading="lazy"
-            decoding="async"
-          />
+          <ClosingLantern />
         </div>
 
         {/* relative: positioned elements paint in DOM order, so the text paints above the

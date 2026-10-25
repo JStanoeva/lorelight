@@ -1,0 +1,322 @@
+/*
+  The closing strip's lantern (ClosingLantern): the drawing's own layers and its two kinds of
+  motion, kept apart on purpose. Plain CSS, no @apply.
+  - The intro is this part's fade-in (useSectionReveal writes data-reveal and --reveal-delay
+    onto the .closing-lantern wrapper; reveal.css fades the wrapper and the strip's halo). It
+    lives here, not in reveal.css, because it moves the drawing's own layers, which only this
+    component knows. It follows reveal.css's rules: transitions only (the shared pause rule in
+    home.css freezes keyframes, and a half-drawn lantern must never stay on screen), the
+    "fading" rules only set transitions (the lit look is the default look), and everything
+    ends 1.9 s after --reveal-delay, within the hook's 2.2 s.
+  - The idle loop (the star breathing, the sparkles, the ring's glint) is keyframes, frozen by
+    the shared pause rule while the svg has data-motion="paused".
+  With reduced motion none of the rules that move apply: the lantern is lit from the first
+  paint and the sparkles stay hidden.
+*/
+@layer components {
+  .lantern {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* The star scales around the point where its arms cross: (256, 336) in the 512 viewBox */
+  .lantern-star,
+  .lantern-star-breath,
+  .lantern-glow-breath {
+    transform-origin: 256px 336px;
+  }
+
+  /* Only seen while they move */
+  .lantern-pen,
+  .lantern-sparkle,
+  .lantern-glint-arc,
+  .lantern-glint-star {
+    opacity: 0;
+  }
+
+  /* ---------- Intro: a gold pen draws the lantern, then it lights up ---------- */
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .lantern {
+      --lantern-pen-time: 1100ms;
+      --lantern-pen-ease: cubic-bezier(0.5, 0, 0.3, 1);
+    }
+
+    /* Every line is one dash as long as the line (pathLength="1"); moving the dash draws it */
+    .lantern-ink {
+      stroke-dasharray: 1 2;
+    }
+
+    /* The pen: a short bright dash at the front of the outline (its offset follows the
+       outline's, 0.02 behind) */
+    .lantern-pen path {
+      stroke-dasharray: 0.02 2;
+      stroke-dashoffset: -0.98;
+    }
+
+    /* Waiting: nothing drawn, nothing lit */
+    .closing-lantern:not([data-reveal]) .lantern-ink {
+      stroke-dashoffset: 1.05;
+    }
+
+    .closing-lantern:not([data-reveal]) .lantern-pen {
+      opacity: 1;
+    }
+
+    .closing-lantern:not([data-reveal]) .lantern-pen path {
+      stroke-dashoffset: 0.03;
+    }
+
+    .closing-lantern:not([data-reveal]) :is(.lantern-metal, .lantern-glass, .lantern-engraving, .lantern-spill, .lantern-glow) {
+      opacity: 0;
+    }
+
+    .closing-lantern:not([data-reveal]) .lantern-star {
+      opacity: 0;
+      scale: 0.2;
+    }
+
+    /* Lighting up (times after --reveal-delay):
+       0–1100 ms    the outline is drawn from the ring down both sides, the pen ahead of it
+       300–1200 ms  the inner lines (hips, rails, arches)
+       650–1350 ms  the metal fills in under the lines
+       950–1700 ms  the star ignites (a small overshoot, peaking near 1.04, so its top tip stays
+                    under the front window's arch even while it breathes)
+       1000–1900 ms the glass fills with light, the halo spreads, the engraving catches it
+       The strip's halo and bloom (reveal.css) follow the star at +1000 and +1150 ms. */
+    .closing-lantern[data-reveal="fading"] .lantern-ink {
+      transition: stroke-dashoffset var(--lantern-pen-time) var(--lantern-pen-ease) var(--reveal-delay, 0ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-ink-detail {
+      transition: stroke-dashoffset 900ms var(--lantern-pen-ease) calc(var(--reveal-delay, 0ms) + 300ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-pen path {
+      transition: stroke-dashoffset var(--lantern-pen-time) var(--lantern-pen-ease) var(--reveal-delay, 0ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-pen {
+      transition: opacity 250ms ease-out calc(var(--reveal-delay, 0ms) + 1050ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-metal {
+      transition: opacity 700ms ease-out calc(var(--reveal-delay, 0ms) + 650ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-star {
+      transition:
+        opacity 300ms ease-out calc(var(--reveal-delay, 0ms) + 950ms),
+        scale 750ms cubic-bezier(0.34, 1.4, 0.6, 1) calc(var(--reveal-delay, 0ms) + 950ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-glass {
+      transition: opacity 900ms cubic-bezier(0.45, 0, 0.25, 1) calc(var(--reveal-delay, 0ms) + 1000ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] .lantern-glow {
+      transition: opacity 850ms ease-out calc(var(--reveal-delay, 0ms) + 1050ms);
+    }
+
+    .closing-lantern[data-reveal="fading"] :is(.lantern-engraving, .lantern-spill) {
+      transition: opacity 700ms ease-out calc(var(--reveal-delay, 0ms) + 1150ms);
+    }
+  }
+
+  /* ---------- Idle: the star breathes, sparkles travel the frame, the ring glints ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lantern-star-breath {
+      animation: lantern-star-breathe 5.6s ease-in-out infinite alternate;
+    }
+
+    .lantern-glow-breath {
+      animation: lantern-halo-breathe 5.6s ease-in-out infinite alternate;
+    }
+
+    /* One 21 s cycle shared by all four, so they take turns (one at a time, with long rests).
+       The 3.5 s delay keeps them away from the intro (it ends at 1.9 s). The idle loop already
+       runs while the lantern waits just below the screen, so until the intro starts they're
+       left out (display: none drops their animations, and showing them starts the delay
+       again). */
+    .closing-lantern:not([data-reveal]) :is(.lantern-sparkle, .lantern-glint-arc, .lantern-glint-star) {
+      display: none;
+    }
+
+    .lantern-sparkle-roof {
+      animation: lantern-travel-roof 21s linear 3.5s infinite;
+    }
+
+    .lantern-sparkle-post {
+      animation: lantern-travel-post 21s linear 3.5s infinite;
+    }
+
+    .lantern-glint-arc {
+      animation: lantern-glint-arc 21s ease-in-out 3.5s infinite;
+    }
+
+    .lantern-glint-star {
+      animation: lantern-glint-star 21s ease-in-out 3.5s infinite;
+    }
+
+    .lantern-sparkle-sill {
+      animation: lantern-travel-sill 21s linear 3.5s infinite;
+    }
+  }
+}
+
+@keyframes lantern-star-breathe {
+  from {
+    transform: scale(0.97);
+  }
+
+  to {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes lantern-halo-breathe {
+  from {
+    opacity: 0.78;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* Down the left edge of the roof, from the collar to the eave's corner ball: points on the left
+   hip's curve (HIP_OUTER in lanternShapes.js). At 16% it reaches the ball (HIP_TO_BEAD.end,
+   mirrored to the left: 256 - 121.5 = 134.5), at 18% the ball's centre (EAVE_BEAD). */
+@keyframes lantern-travel-roof {
+  0% {
+    opacity: 0;
+    transform: translate(226px, 134px) scale(0.3);
+  }
+
+  4% {
+    opacity: 1;
+    transform: translate(204.1px, 153.3px) scale(1);
+  }
+
+  8% {
+    transform: translate(180.8px, 171.4px) scale(0.8);
+  }
+
+  12% {
+    transform: translate(156.1px, 188.3px) scale(1);
+  }
+
+  16% {
+    opacity: 1;
+    transform: translate(134.5px, 201.4px) scale(0.85);
+  }
+
+  18% {
+    opacity: 0;
+    transform: translate(127px, 201px) scale(0.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(127px, 201px) scale(0.3);
+  }
+}
+
+/* Down the right corner post */
+@keyframes lantern-travel-post {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translate(375.5px, 241px) scale(0.3);
+  }
+
+  33% {
+    opacity: 1;
+    transform: translate(373.8px, 259px) scale(1);
+  }
+
+  40% {
+    transform: translate(367.3px, 336px) scale(0.8);
+  }
+
+  46% {
+    opacity: 1;
+    transform: translate(360.9px, 412px) scale(1);
+  }
+
+  48%,
+  100% {
+    opacity: 0;
+    transform: translate(359.5px, 429px) scale(0.3);
+  }
+}
+
+/* The ring catches the light: a brief highlight on its upper left and a turning glint */
+@keyframes lantern-glint-arc {
+  0%,
+  58% {
+    opacity: 0;
+  }
+
+  61% {
+    opacity: 0.9;
+  }
+
+  65%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes lantern-glint-star {
+  0%,
+  58% {
+    opacity: 0;
+    transform: translate(236.9px, 38.9px) scale(0) rotate(0deg);
+  }
+
+  61% {
+    opacity: 1;
+    transform: translate(236.9px, 38.9px) scale(1) rotate(45deg);
+  }
+
+  64%,
+  100% {
+    opacity: 0;
+    transform: translate(236.9px, 38.9px) scale(0) rotate(90deg);
+  }
+}
+
+/* Along the sill, left to right */
+@keyframes lantern-travel-sill {
+  0%,
+  74% {
+    opacity: 0;
+    transform: translate(146px, 444px) scale(0.3);
+  }
+
+  77% {
+    opacity: 1;
+    transform: translate(180px, 444px) scale(1);
+  }
+
+  85% {
+    transform: translate(268px, 444px) scale(0.8);
+  }
+
+  92% {
+    opacity: 1;
+    transform: translate(345px, 444px) scale(1);
+  }
+
+  94%,
+  100% {
+    opacity: 0;
+    transform: translate(366px, 444px) scale(0.3);
+  }
+}
