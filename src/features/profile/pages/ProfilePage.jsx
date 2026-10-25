@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import ProfileCollections from "../components/ProfileCollections.jsx";
 import ProfileErrorState from "../components/ProfileErrorState.jsx";
@@ -50,6 +51,7 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page" style={{ "--star": starColor.hex }}>
+      <PageTitle title={profile.display_name} />
       <ProfileHero seed={profile.id}>
         <ProfileHeader
           profile={profile}

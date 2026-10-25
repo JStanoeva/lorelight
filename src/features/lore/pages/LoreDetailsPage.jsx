@@ -5,6 +5,7 @@ import { withAppreciationChange, withoutEntry } from "../../projects/utils/proje
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import LoreArticle from "../components/LoreArticle.jsx";
 
@@ -70,6 +71,7 @@ export default function LoreDetailsPage() {
 
   return (
     <>
+      <PageTitle title={entry.title} />
       {projectError && (
         <div className="mb-6">
           <ErrorMessage

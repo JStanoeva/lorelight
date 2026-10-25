@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FormField from "../../../shared/components/FormField.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import SubmitButton from "../../../shared/components/SubmitButton.jsx";
 import { useForm } from "../../../shared/hooks/useForm.js";
 import AuthAlert from "../components/AuthAlert.jsx";
@@ -50,6 +51,7 @@ export default function LoginPage() {
 
   return (
     <AuthPanel title="Welcome back" subtitle="Log in to continue to your worlds.">
+      <PageTitle title="Log in" />
       {/* A new key on every failure re-creates the alert, so it is announced again even
           when the message is the same as last time */}
       {serverError && <AuthAlert key={failedAttempts} message={serverError} />}

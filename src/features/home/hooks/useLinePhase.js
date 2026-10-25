@@ -17,8 +17,11 @@ export function useLinePhase(elementRef, isMotionAllowed) {
     }
 
     // A window shorter than the wheel can never show three quarters of it; then three
-    // quarters of what fits is enough, so the lines always get drawn
-    const largestVisibleShare = Math.min(1, window.innerHeight / element.offsetHeight);
+    // quarters of what fits is enough, so the lines always get drawn. A hidden wheel (below
+    // 1024 px) is 0 px tall. In a window that is 0 px tall too (e.g. a hidden preview frame),
+    // 0 / 0 would give an invalid threshold and crash the page, so it falls back to the full share.
+    const largestVisibleShare =
+      element.offsetHeight > 0 ? Math.min(1, window.innerHeight / element.offsetHeight) : 1;
     const drawInThreshold = DRAW_IN_SHARE * largestVisibleShare;
 
     // The state is set only inside the observer's callback, never directly in the effect. The

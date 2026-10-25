@@ -3,6 +3,7 @@ import { flushSync } from "react-dom";
 import { useSearchParams } from "react-router";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import CatalogHero from "../components/CatalogHero.jsx";
 import CatalogNotice from "../components/CatalogNotice.jsx";
@@ -55,9 +56,10 @@ export default function LoreCatalogPage() {
   }
 
   // The clicked button disappears with its filter, so focus moves to the result count, which
-  // stays in place and soon reads the new number
+  // stays in place and soon reads the new number. flushSync renders the change first (the count
+  // is empty while the new results load), so the old number isn't read out on focus.
   function removeFilters(changes) {
-    changeFilters(changes);
+    flushSync(() => changeFilters(changes));
     countRef.current?.focus();
   }
 
@@ -103,6 +105,7 @@ export default function LoreCatalogPage() {
 
   return (
     <>
+      <PageTitle title="Lore Catalog" />
       <CatalogHero query={filters.q} searchInputRef={searchInputRef} onSearch={handleSearch} />
       <CategoryChips value={filters.category} onChange={(category) => changeFilters({ category })} />
 

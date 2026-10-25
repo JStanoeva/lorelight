@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import { useNavigate } from "react-router";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import ProfileForm from "../components/ProfileForm.jsx";
 import { useOwnProfile } from "../hooks/useOwnProfile.js";
@@ -16,6 +18,7 @@ import "../styles/edit-profile.css";
 export default function EditProfilePage() {
   const navigate = useNavigate();
   const { profile, isLoading, error, refetch } = useOwnProfile();
+  const headingRef = useRef(null);
 
   async function handleSave(payload) {
     const updated = await profileService.updateProfile(profile.id, payload);
@@ -26,6 +29,12 @@ export default function EditProfilePage() {
     }
 
     navigate(`/profile/${profile.id}`);
+  }
+
+  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  function handleRetry() {
+    refetch();
+    headingRef.current.focus();
   }
 
   if (!isLoading && !error && !profile) {
@@ -41,7 +50,7 @@ export default function EditProfilePage() {
   if (isLoading) {
     content = <Loader label="Loading your profile…" />;
   } else if (error) {
-    content = <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
+    content = <ErrorMessage message={getErrorMessage(error)} onRetry={handleRetry} />;
   } else {
     content = (
       <>
@@ -61,8 +70,12 @@ export default function EditProfilePage() {
 
   return (
     <section className="page">
+      <PageTitle title="Edit Profile" />
       <div className="mx-auto max-w-2xl">
-        <h1 className="page-title">Edit Profile</h1>
+        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
+        <h1 ref={headingRef} tabIndex={-1} className="page-title">
+          Edit Profile
+        </h1>
         <div className="mt-2">{content}</div>
       </div>
     </section>

@@ -63,9 +63,10 @@ export default function ConstellationBoard({
     }
   }
 
-  // The button disappears with the empty view, so focus moves to the count line
+  // The button disappears with the empty view, so focus moves to the count line. flushSync renders
+  // the change first, so the line already holds the new count when it gets focus.
   function handleShowAll() {
-    onCategoryChange("");
+    flushSync(() => onCategoryChange(""));
     countRef.current?.focus();
   }
 

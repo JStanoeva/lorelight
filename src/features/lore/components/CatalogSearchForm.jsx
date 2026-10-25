@@ -17,8 +17,10 @@ export default function CatalogSearchForm({ initialQuery, inputRef, onSearch }) 
 
   return (
     <form role="search" onSubmit={handleSubmit} className="catalog-search">
+      {/* Starts with the placeholder's words, the only ones on screen, so voice control users can
+          say what they see to reach the field */}
       <label htmlFor={inputId} className="sr-only">
-        Search lore
+        Search titles, text, tags of public lore
       </label>
       <Icon name="search" size={20} className="catalog-search-icon" />
       <input

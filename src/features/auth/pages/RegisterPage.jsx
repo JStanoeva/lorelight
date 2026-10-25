@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import FormField from "../../../shared/components/FormField.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import SubmitButton from "../../../shared/components/SubmitButton.jsx";
 import { useForm } from "../../../shared/hooks/useForm.js";
 import AuthAlert from "../components/AuthAlert.jsx";
@@ -87,6 +88,7 @@ export default function RegisterPage() {
       title="Create your account"
       subtitle="Start writing, organizing and sharing the lore of your worlds."
     >
+      <PageTitle title="Register" />
       {/* A new key on every failure re-creates the alert, so it is announced again even
           when the message is the same as last time */}
       {serverError && <AuthAlert key={failedAttempts} message={serverError} />}

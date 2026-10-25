@@ -30,6 +30,9 @@ export default function ProjectSidebar({
 }) {
   const [filterText, setFilterText] = useState("");
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  // The last deleted folder, read out by screen readers since its row is gone. `count` goes up with
+  // every delete, so the line is replaced and announced again even when two folders share a name.
+  const [deleted, setDeleted] = useState({ name: "", count: 0 });
   const filterId = useId();
   const treeRef = useRef(null);
 
@@ -44,13 +47,21 @@ export default function ProjectSidebar({
   const unfiledEntries = getFolderEntries(shownEntries, null);
   const isEmpty = folders.length === 0 && entries.length === 0;
 
+  // The form is gone after saving, so focus moves to the new folder's button, and screen readers
+  // hear its name. flushSync shows the folder (and removes the form) first. While filtering, the
+  // empty new folder is hidden, so the tree takes focus instead.
   async function handleCreateFolder(name) {
     const folder = await folderService.createFolder(project.id, name);
-    onFolderSaved(folder);
-    closeFolderForm();
+    flushSync(() => {
+      onFolderSaved(folder);
+      setIsCreatingFolder(false);
+    });
+    // SidebarFolder's button points at its entry list, whose id is "ws-folder-" + the folder's id
+    const folderButton = treeRef.current.querySelector(`[aria-controls="ws-folder-${folder.id}"]`);
+    (folderButton ?? treeRef.current).focus();
   }
 
-  // The form is gone after saving or cancelling, so focus moves to the tree (flushSync first)
+  // The form is gone after cancelling, so focus moves to the tree (flushSync first)
   function closeFolderForm() {
     flushSync(() => setIsCreatingFolder(false));
     treeRef.current.focus();
@@ -60,7 +71,9 @@ export default function ProjectSidebar({
   // of the page. flushSync removes the folder (and its open dialog) first: nothing outside an open
   // dialog can take focus.
   function handleFolderDeleted(folderId) {
+    const folder = folders.find((item) => item.id === folderId);
     flushSync(() => onFolderDeleted(folderId));
+    setDeleted((current) => ({ name: folder.name, count: current.count + 1 }));
     treeRef.current.focus();
   }
 
@@ -148,7 +161,9 @@ export default function ProjectSidebar({
         </>
       )}
 
-      <div ref={treeRef} className="ws-tree" tabIndex={-1}>
+      {/* A short name, so focus landing here (after a folder is deleted or the new-folder form is
+          cancelled) isn't read as every folder and entry inside */}
+      <div ref={treeRef} className="ws-tree" tabIndex={-1} role="group" aria-label="Folders and entries">
         {(shownFolders.length > 0 || (isOwner && !isFiltering)) && <p className="ws-tree-label">Folders</p>}
 
         {isCreatingFolder && (
@@ -202,6 +217,12 @@ export default function ProjectSidebar({
 
         {isEmpty && <p className="ws-tree-note">{isOwner ? "No lore entries yet" : "No public lore yet"}</p>}
       </div>
+
+      {/* Always rendered, so a change of its text is noticed. A new key per delete replaces the
+          text, so it's announced every time */}
+      <p role="status" className="sr-only">
+        {deleted.name && <span key={deleted.count}>Deleted the folder “{deleted.name}”.</span>}
+      </p>
     </nav>
   );
 }

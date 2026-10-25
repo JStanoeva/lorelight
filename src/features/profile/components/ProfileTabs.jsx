@@ -12,6 +12,11 @@ export default function ProfileTabs({ activeValue, counts, onSelect, getTabId, g
   const tabRefs = useRef([]);
 
   function handleKeyDown(event, index) {
+    // Leave browser shortcuts such as Alt+← (Back) alone
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+
     const lastIndex = PROFILE_TABS.length - 1;
     let nextIndex = null;
 

@@ -1,9 +1,11 @@
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import { useProfile } from "../hooks/useProfile.js";
 import { useRetryFocus } from "../hooks/useRetryFocus.js";
 import { getStarColor } from "../utils/getStarColor.js";
 import { sortByNewest } from "../utils/profileStats.js";
+import { getAllPageTitle } from "../utils/profileTabText.js";
 import AllCollectionHeader from "./AllCollectionHeader.jsx";
 import AllCollectionSkeleton from "./AllCollectionSkeleton.jsx";
 import ProfileCollectionGrid from "./ProfileCollectionGrid.jsx";
@@ -48,6 +50,7 @@ export default function AllCollectionView({ userId, tab }) {
 
   return (
     <div className={isBoard ? "profile-page profile-page-board" : "profile-page"} style={{ "--star": starColor.hex }}>
+      <PageTitle title={getAllPageTitle(tab, profile.display_name)} />
       <ProfileHero seed={profile.id} isCompact>
         <AllCollectionHeader
           profile={profile}

@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/hooks/useAuth.js";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import DeleteProjectDialog from "../components/DeleteProjectDialog.jsx";
 import ProjectHeader from "../components/ProjectHeader.jsx";
@@ -35,6 +36,7 @@ export default function ProjectDetailsPage() {
 
   return (
     <>
+      <PageTitle title={project.title} />
       <ProjectHeader
         project={project}
         entryCount={entries.length}

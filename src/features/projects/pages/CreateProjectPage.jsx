@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import ProjectForm from "../components/ProjectForm.jsx";
 import { projectService } from "../services/projectService.js";
 import { EMPTY_PROJECT_VALUES } from "../utils/projectValidation.js";
@@ -15,6 +16,7 @@ export default function CreateProjectPage() {
 
   return (
     <section className="page">
+      <PageTitle title="Create Project" />
       <div className="mx-auto max-w-2xl">
         <h1 className="page-title">Create Project</h1>
         <p className="mt-2 text-parchment-300">

@@ -1,11 +1,14 @@
 import { Link } from "react-router";
+import PageTitle from "./PageTitle.jsx";
 
+// Its title is the page's h1, so it names the browser tab too (e.g. "Lore not found · Lorelight")
 export default function NotFoundState({
   title = "Page not found",
   text = "The page you are looking for does not exist.",
 }) {
   return (
     <div className="flex flex-col items-center gap-4 py-16 text-center">
+      <PageTitle title={title} />
       <h1 className="page-title">{title}</h1>
       <p className="max-w-prose text-parchment-300">{text}</p>
       <div className="mt-2 flex flex-wrap justify-center gap-3">

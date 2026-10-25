@@ -23,12 +23,14 @@ export default function Footer() {
         </div>
 
         <nav aria-label="Footer">
-          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+          {/* Each link is 28 px tall for easier tapping (its padding is invisible). The list's negative
+              margin and the missing row gap keep the footer exactly as tall as the text needs. */}
+          <ul className="-my-1 flex flex-wrap justify-center gap-x-6">
             <li>
               <Link
                 to="/lore"
                 onMouseDown={handleMouseDown}
-                className="text-parchment-300 no-underline hover:text-gold-300"
+                className="inline-block py-1 text-parchment-300 no-underline hover:text-gold-300"
               >
                 Lore Catalog
               </Link>
@@ -39,7 +41,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 onMouseDown={handleMouseDown}
-                className="text-parchment-300 no-underline hover:text-gold-300"
+                className="inline-block py-1 text-parchment-300 no-underline hover:text-gold-300"
               >
                 GitHub repository
               </a>
@@ -50,7 +52,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 onMouseDown={handleMouseDown}
-                className="text-parchment-300 no-underline hover:text-gold-300"
+                className="inline-block py-1 text-parchment-300 no-underline hover:text-gold-300"
               >
                 MIT License
               </a>

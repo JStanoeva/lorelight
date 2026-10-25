@@ -51,6 +51,14 @@ export default function ConfirmDialog({
     dialogRef.current.close();
   }
 
+  // While the request runs, a click does nothing
+  function handleConfirmClick() {
+    if (isPending) {
+      return;
+    }
+    onConfirm();
+  }
+
   return (
     <dialog
       ref={dialogRef}
@@ -77,15 +85,23 @@ export default function ConfirmDialog({
         <button type="button" onClick={handleCancelClick} disabled={isPending} className="btn btn-ghost">
           {cancelLabel}
         </button>
+        {/* aria-disabled instead of disabled while the request runs: a disabled button would drop
+            keyboard focus to the page, and after a failure the next Tab would leave the dialog */}
         <button
           type="button"
-          onClick={onConfirm}
-          disabled={isPending || isConfirmDisabled}
+          onClick={handleConfirmClick}
+          disabled={isConfirmDisabled}
+          aria-disabled={isPending || undefined}
           className="btn btn-danger"
         >
           {isPending ? pendingLabel : confirmLabel}
         </button>
       </div>
+      {/* Focus stays on the button while it waits, so this hidden line tells screen reader users
+          what is happening. Always rendered, so a change of its text is noticed. */}
+      <p role="status" className="sr-only">
+        {isPending ? pendingLabel : ""}
+      </p>
     </dialog>
   );
 }

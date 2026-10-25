@@ -489,6 +489,18 @@
     height: 1.625rem;
   }
 
+  /* Save while the folder saves: aria-disabled keeps keyboard focus on it (see FolderNameForm), so
+     it gets the look of the disabled Cancel beside it, also in High Contrast mode */
+  .ws-inline-form .ws-icon-button[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    .ws-inline-form .ws-icon-button[aria-disabled="true"] {
+      color: GrayText;
+    }
+  }
+
   /* ---------- Main column ---------- */
   .ws-main {
     min-width: 0;

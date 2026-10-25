@@ -76,6 +76,7 @@ export default function AvatarLinkField({ seed, value, starColor, error, onChang
       </div>
 
       <div className="edit-avatar-field">
+        {/* "photo" (a link to the user's picture) tells browsers and assistive tools what this field is for */}
         <FormField
           label="Avatar link (optional)"
           name="avatar_url"
@@ -87,7 +88,7 @@ export default function AvatarLinkField({ seed, value, starColor, error, onChang
           error={error}
           hint="A link to a picture, starting with https://. Without one, your profile shows a generated nebula."
           describedById={statusId}
-          autoComplete="off"
+          autoComplete="photo"
           spellCheck={false}
         />
 

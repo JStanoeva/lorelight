@@ -1,9 +1,11 @@
+import { useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import { useProjects } from "../../projects/hooks/useProjects.js";
 import EmptyState from "../../../shared/components/EmptyState.jsx";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import LoreForm from "../components/LoreForm.jsx";
 import { loreService } from "../services/loreService.js";
@@ -14,6 +16,7 @@ export default function CreateLorePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { projects, isLoading, error, refetch } = useProjects(user.id);
+  const headingRef = useRef(null);
 
   // "Add Lore", the sidebar's "New lore entry" and a folder's "New lore entry here" link here
   // through getNewEntryPath (?projectId=…&folderId=…). The project is used only if it is one of
@@ -44,12 +47,18 @@ export default function CreateLorePage() {
     }
   }
 
+  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  function handleRetry() {
+    refetch();
+    headingRef.current.focus();
+  }
+
   let content;
 
   if (isLoading) {
     content = <Loader label="Loading your projects…" />;
   } else if (error) {
-    content = <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
+    content = <ErrorMessage message={getErrorMessage(error)} onRetry={handleRetry} />;
   } else if (projects.length === 0) {
     content = (
       <EmptyState
@@ -80,8 +89,12 @@ export default function CreateLorePage() {
 
   return (
     <section className="page">
+      <PageTitle title="Create Lore" />
       <div className="mx-auto max-w-2xl">
-        <h1 className="page-title">Create Lore</h1>
+        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
+        <h1 ref={headingRef} tabIndex={-1} className="page-title">
+          Create Lore
+        </h1>
         <p className="mt-2 text-parchment-300">
           A lore entry is one piece of your world: a character, a place, a legend. It starts private: only you
           can see it until you make it public.

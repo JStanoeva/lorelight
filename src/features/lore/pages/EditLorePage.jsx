@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 import OwnerGuard from "../../auth/guards/OwnerGuard.jsx";
 import { useAuth } from "../../auth/hooks/useAuth.js";
@@ -5,6 +6,7 @@ import { useProjects } from "../../projects/hooks/useProjects.js";
 import ErrorMessage from "../../../shared/components/ErrorMessage.jsx";
 import Loader from "../../../shared/components/Loader.jsx";
 import NotFoundState from "../../../shared/components/NotFoundState.jsx";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import LoreForm from "../components/LoreForm.jsx";
 import { useLoreEntry } from "../hooks/useLoreEntry.js";
@@ -23,6 +25,7 @@ export default function EditLorePage() {
     error: projectsError,
     refetch: refetchProjects,
   } = useProjects(user.id);
+  const headingRef = useRef(null);
 
   async function handleSave(payload) {
     try {
@@ -39,6 +42,17 @@ export default function EditLorePage() {
     }
   }
 
+  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  function handleRetry() {
+    refetch();
+    headingRef.current.focus();
+  }
+
+  function handleRetryProjects() {
+    refetchProjects();
+    headingRef.current.focus();
+  }
+
   if (!isLoading && !error && !entry) {
     return (
       <section className="page">
@@ -52,14 +66,14 @@ export default function EditLorePage() {
   if (isLoading) {
     content = <Loader label="Loading the lore entry…" />;
   } else if (error) {
-    content = <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
+    content = <ErrorMessage message={getErrorMessage(error)} onRetry={handleRetry} />;
   } else {
     let formContent;
 
     if (isLoadingProjects) {
       formContent = <Loader label="Loading your projects…" />;
     } else if (projectsError) {
-      formContent = <ErrorMessage message={getErrorMessage(projectsError)} onRetry={refetchProjects} />;
+      formContent = <ErrorMessage message={getErrorMessage(projectsError)} onRetry={handleRetryProjects} />;
     } else {
       formContent = (
         <>
@@ -90,8 +104,12 @@ export default function EditLorePage() {
 
   return (
     <section className="page">
+      <PageTitle title="Edit Lore" />
       <div className="mx-auto max-w-2xl">
-        <h1 className="page-title">Edit Lore</h1>
+        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
+        <h1 ref={headingRef} tabIndex={-1} className="page-title">
+          Edit Lore
+        </h1>
         <div className="mt-2">{content}</div>
       </div>
     </section>

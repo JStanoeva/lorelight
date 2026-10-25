@@ -49,9 +49,10 @@
     }
   }
 
-  /* Buttons */
+  /* Buttons. aria-disabled looks like disabled: ConfirmDialog's confirm button uses it while its
+     request runs, so it keeps keyboard focus */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-colors disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-colors disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60;
   }
 
   /* not-disabled: keeps hover effects off disabled buttons (links are never disabled) */
@@ -64,7 +65,16 @@
   }
 
   .btn-danger {
-    @apply border border-danger/60 text-danger not-disabled:hover:bg-danger/10;
+    @apply border border-danger/60 text-danger not-disabled:not-aria-disabled:hover:bg-danger/10;
+  }
+
+  /* High Contrast mode draws a disabled button in grey; an aria-disabled one gets the same grey, so
+     ConfirmDialog's waiting confirm button matches the disabled Cancel beside it */
+  @media (forced-colors: active) {
+    .btn[aria-disabled="true"] {
+      color: GrayText;
+      border-color: GrayText;
+    }
   }
 
   /* Larger call-to-action size (48px tall). Defined after .btn so its padding and size win. */

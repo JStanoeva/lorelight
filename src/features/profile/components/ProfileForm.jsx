@@ -90,6 +90,7 @@ export default function ProfileForm({ profileId, initialValues, cancelTo, onSubm
         onMouseDown={handleMouseDown}
       />
 
+      {/* "nickname" (a screen name) tells browsers and assistive tools what this field is for */}
       <FormField
         label="Display name"
         name="display_name"
@@ -98,7 +99,7 @@ export default function ProfileForm({ profileId, initialValues, cancelTo, onSubm
         onBlur={handleBlur}
         error={getShownError("display_name")}
         hint={`Shown on your profile and next to your lore. ${displayNameLength} / ${DISPLAY_NAME_MAX} characters.`}
-        autoComplete="off"
+        autoComplete="nickname"
       />
 
       <FormField

@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import { getCategoryFilter } from "../../lore/utils/catalogFilters.js";
+import PageTitle from "../../../shared/components/PageTitle.jsx";
 import ConstellationBoard from "../components/ConstellationBoard.jsx";
 import ConstellationHero from "../components/ConstellationHero.jsx";
 import { useConstellation } from "../hooks/useConstellation.js";
@@ -39,6 +40,7 @@ export default function ConstellationPage() {
 
   return (
     <div className="constellation-page">
+      <PageTitle title="My Constellation" />
       <div className="constellation-sky" aria-hidden="true" />
       <ConstellationHero />
       <ConstellationBoard
