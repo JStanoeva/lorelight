@@ -2,7 +2,8 @@ import { useState } from "react";
 
 // Each question keeps its own open state, so answers open independently: closing one answer
 // never shifts the question the user is clicking. The answer stays in the DOM (only hidden),
-// so aria-controls always points at an existing element.
+// so aria-controls always points at an existing element. Each question is a row of the FAQ
+// section's fade-in (useSectionReveal), so the questions follow each other quickly.
 export default function FaqItem({ item }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -14,7 +15,7 @@ export default function FaqItem({ item }) {
   }
 
   return (
-    <li className="faq-item">
+    <li className="faq-item" data-reveal-item="row">
       <h3 className="faq-question">
         <button
           id={questionId}

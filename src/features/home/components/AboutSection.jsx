@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { ABOUT_ITEMS } from "../constants/aboutItems.js";
 import { SECTION_IDS } from "../constants/homeSections.js";
 import { useHomeMotion } from "../hooks/useHomeMotion.js";
+import { useSectionReveal } from "../hooks/useSectionReveal.js";
 import AboutCard from "./AboutCard.jsx";
 import AboutPanel from "./AboutPanel.jsx";
 import SectionHeading from "./SectionHeading.jsx";
@@ -25,6 +26,8 @@ export default function AboutSection() {
   // A card is missing until it has been seen.
   const [iconEntrances, setIconEntrances] = useState({});
   const { isMotionAllowed } = useHomeMotion();
+  // The section fades in the first time it comes into view: its heading, then the cards
+  const setSectionElement = useSectionReveal();
 
   // Watch each card that hasn't been seen yet, so on phones (cards stacked) every icon traces
   // in when its own card scrolls into view. A decision is kept afterwards, so icons that were
@@ -101,6 +104,7 @@ export default function AboutSection() {
 
   return (
     <section
+      ref={setSectionElement}
       id={SECTION_IDS.about}
       aria-labelledby="about-title"
       className="home-section about-section"

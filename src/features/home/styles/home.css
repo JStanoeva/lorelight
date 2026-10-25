@@ -155,13 +155,18 @@
     @apply mx-auto flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center;
   }
 
-  /* FAQ: a single column of questions separated by hairlines */
+  /* FAQ: a single column of questions separated by hairlines. The top hairline belongs to the
+     first question, so it fades in with that question (reveal.css). */
   .faq-list {
-    @apply mx-auto max-w-3xl border-t border-night-700;
+    @apply mx-auto max-w-3xl;
   }
 
   .faq-item {
     @apply border-b border-night-700;
+  }
+
+  .faq-item:first-child {
+    @apply border-t;
   }
 
   /* Resets the base Cinzel h3: Cinzel is too heavy at question length. text-pretty avoids a

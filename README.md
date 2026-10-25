@@ -167,7 +167,8 @@ All routes are defined in `src/app/App.jsx`. The route guards are in `src/featur
   - three short animated examples: Create, Share and Explore
   - the 12 lore categories, each with a link to its lore in the catalog (a slowly turning wheel of stars on large screens, a list on small screens)
   - a FAQ and a final call to action
-  - a "Pause animations" button that stops every animation. With the system's reduced-motion setting, the page shows still pictures instead.
+  - every section fades in, part by part, the first time it comes into view (the welcome banner as the page opens)
+  - a "Pause animations" button that stops every animation. With the system's reduced-motion setting, the page shows still pictures instead. In both cases, the sections appear without fading in.
 
 ### Nested & Parameterized Routes
 
@@ -333,7 +334,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 
 - **Which hooks are used, and where?**
   - `useState`: form values, loading and error states, open menus and dialogs
-  - `useEffect`: loading data (the data hooks), the login listener (`AuthProvider`), the avatar link check on Edit Profile (`useDebouncedValue`, `useImageCheck`) and starting or stopping the Home animations
+  - `useEffect`: loading data (the data hooks), the login listener (`AuthProvider`), the avatar link check on Edit Profile (`useDebouncedValue`, `useImageCheck`) and starting or stopping the Home animations and fade-ins
   - `useContext`: reading `AuthContext` (through `useAuth`) and `HomeMotionContext` (through `useHomeMotion`)
   - `useCallback`: functions the data hooks return, such as `refetch` (used by Try again) and `removeEntry` (takes a card off My Constellation without reloading the board)
   - `useMemo`: the category counts and filtered cards on My Constellation, the generated star backgrounds, and the layout of the Home category wheel
@@ -341,14 +342,14 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useRef`: elements that receive keyboard focus (such as the catalog search box), the confirmation dialog, the Home page's animated sky, and a flag that ignores double clicks on Appreciate, Save and Remove
   - `useId`: links form labels, hints and error messages to their inputs
   - Router hooks: `useParams` (ids in the URL), `useNavigate` (redirects after saving), `useSearchParams` (filters and tabs in the URL), `useLocation` (the page to return to after login), `useOutletContext` (data from `ProjectWorkspaceLayout`)
-  - Custom hooks (27), by feature:
+  - Custom hooks (28), by feature:
     - auth: `useAuth` (reads `AuthContext`), `useViewerKey` (data hooks reload when the logged-in user changes)
     - lore: `useLoreList` (Lore Catalog), `useLoreEntry` (Lore Details, Edit Lore)
     - projects: `useProjects` (My Projects, the lore form's Project list, the Delete Project dialog), `useProject` (Project Details, the Project sidebar, Edit Project), `useFolders` (the lore form's folder list)
     - appreciation: `useAppreciation` (Appreciate button)
     - constellation: `useSaveStatus` (Save button), `useConstellation` (My Constellation), `usePinPositions` (the dotted lines on the board)
     - profile: `useProfile` (Creator Profile and its "All …" pages), `useOwnProfile` (Edit Profile), `useRetryFocus` (keeps keyboard focus after Try again)
-    - home: `useHomeMotion`, `useShowcasePlayback`, `useOrreryTurn`, `useLinePhase` (the Home animations and the Pause animations button)
+    - home: `useHomeMotion`, `useShowcasePlayback`, `useOrreryTurn`, `useLinePhase` (the Home animations and the Pause animations button), `useSectionReveal` (fades in each section's parts as they come into view)
     - shared: `useForm` (the Login, Register, Lore, Project and Edit Profile forms), `useDebouncedValue` and `useImageCheck` (the avatar link check), `useOutsideClick` (closes the sidebar menus)
     - shared, used on the Home page: `useActiveSection` and `useIsBelowHeader` (the header), `usePrefersReducedMotion`, `useInView` and `useIsPageVisible` (stop the Home animations while they are off screen, the tab is hidden or reduced motion is on)
 - **Give one example of mount / update / unmount behavior in your app.** `useLoreList` on the Lore Catalog (`src/features/lore/hooks/useLoreList.js`):
@@ -370,7 +371,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
     - the data hooks that reload when the logged-in user changes (through `useViewerKey`)
   - **`HomeMotionContext`** is provided by `HomeMotionProvider`, which wraps the Home page.
     - It shares the "Pause animations" switch (`isMotionPaused`, `setIsMotionPaused`), the system's reduced-motion setting (`prefersReducedMotion`) and `isMotionAllowed` (true when the animations are not paused and reduced motion is off).
-    - Its consumers (through `useHomeMotion`) are the welcome banner, the About section and its previews, and the category wheel. One press of the button pauses them all.
+    - Its consumers (through `useHomeMotion`) are the welcome banner, the About section and its previews, the category wheel and the fade-ins of every section (`useSectionReveal`). One press of the button pauses them all.
 
 ### Component Styling
 
@@ -379,7 +380,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - Every other CSS file sits in a `styles/` folder next to the components that use it, and those components import it (for example, `LoreCard.jsx` imports `lore-card.css`).
   - Values that differ per item (such as a creator's star colour or the position of a generated star) are set through the `style` prop, mostly as CSS variables.
   - The app has one dark theme. The animations respect the system's reduced-motion setting.
-- **External CSS files (26):**
+- **External CSS files (27):**
 
 | File                                                     | What it styles                                                                     |
 | -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -398,6 +399,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 | `src/features/home/styles/showcases.css`                 | the three animated examples (Create, Share, Explore)                               |
 | `src/features/home/styles/categories.css`                | the category list on small screens                                                 |
 | `src/features/home/styles/orrery.css`                    | the category wheel on large screens                                                |
+| `src/features/home/styles/reveal.css`                    | how the Home sections fade in when they come into view                             |
 | `src/features/lore/styles/catalog.css`                   | the Lore Catalog page: header, search bar, toolbar, notices                        |
 | `src/features/lore/styles/category-chips.css`            | the category filter buttons (also on My Constellation)                             |
 | `src/features/lore/styles/lore-card.css`                 | the lore cards                                                                     |
@@ -510,7 +512,7 @@ Services contain no React code, and pages contain no Supabase code.
 | `appreciations`       | One row per user per appreciated entry                                                              |
 | `constellation_saves` | One row per user per saved entry                                                                    |
 
-All ids are UUIDs (a profile uses its user's id from Supabase Auth). Uploaded images are stored in a public Supabase Storage bucket (`images`), in one folder per user.
+All ids are UUIDs (a profile uses its user's id from Supabase Auth). Pictures (project covers, lore images and avatars) are saved as links. The database also has a storage bucket (`images`) ready for image uploads, which are planned for a later version.
 
 ### Security
 
@@ -521,7 +523,6 @@ The database enforces the rules with Row Level Security, not only the UI:
 - Other users see a folder only while it holds public lore.
 - Users can add appreciations and saves only for public lore, and can add or remove only their own.
 - Saved lore that becomes private is removed from every Constellation automatically.
-- Users can upload images only into their own Storage folder (JPEG, PNG or WebP, up to 2 MB) and delete only their own images. Nobody can list other users' files.
 - Guests can only read, and nobody can change ids, owners, usernames or dates through the API.
 
 The database tables, rules, triggers and policies are stored as numbered SQL files in `supabase/migrations/`, with demo content in `supabase/seed.sql`.

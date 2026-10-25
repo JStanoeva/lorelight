@@ -30,6 +30,7 @@ const WHEEL_STYLE = { ...ORRERY_CSS_SIZES, "--lens-close-time": `${LENS_CLOSE_MS
 // Nothing moves while the visitor pauses the animations, off screen, on a hidden tab or with
 // reduced motion (choosing a star then only highlights it where it is). The idle turn also
 // stops while a star is chosen and while the pointer or the keyboard focus rests on the wheel.
+// The whole orrery is one part of the Categories section's fade-in (useSectionReveal).
 export default function CategoryOrrery({ categories }) {
   const { isMotionAllowed } = useHomeMotion();
   const [setRootElement, isInView] = useInView("120px");
@@ -138,7 +139,12 @@ export default function CategoryOrrery({ categories }) {
   const lensCategory = lensIndex === null ? null : categories[lensIndex];
 
   return (
-    <div ref={setRootElement} className="orrery" data-motion={isMoving ? "running" : "paused"}>
+    <div
+      ref={setRootElement}
+      className="orrery"
+      data-motion={isMoving ? "running" : "paused"}
+      data-reveal-item
+    >
       <div
         ref={wheelRef}
         className="orrery-wheel"

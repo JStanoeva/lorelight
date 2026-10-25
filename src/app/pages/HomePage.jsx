@@ -5,8 +5,10 @@ import ClosingCta from "../../features/home/components/ClosingCta.jsx";
 import FaqSection from "../../features/home/components/FaqSection.jsx";
 import HeroSection from "../../features/home/components/HeroSection.jsx";
 import HomeMotionProvider from "../../features/home/context/HomeMotionProvider.jsx";
-// Imported last, after the section styles each component brings in
+// Imported last, after the section styles each component brings in: the shared Home styles,
+// then the fade-in, which changes how the sections' parts look until they have been seen
 import "../../features/home/styles/home.css";
+import "../../features/home/styles/reveal.css";
 
 // An animated introduction that loads no data: every section renders at once, so the
 // header's scroll-spy finds all of them when it starts watching. Only the call-to-action

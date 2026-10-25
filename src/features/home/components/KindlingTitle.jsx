@@ -8,7 +8,7 @@ const FONT_WAIT_MS = 1500;
 
 // The wordmark, one span per letter so each can catch light on its own (hero.css). Screen
 // readers read the hidden plain word; the letter spans are hidden from them, so nobody hears
-// "L, o, r, e…".
+// "L, o, r, e…". The title is a part of the hero's fade-in (useSectionReveal).
 export default function KindlingTitle() {
   // The letters wait (dimly) for the display font, so they never kindle in the fallback font
   // and then jump when Cinzel arrives
@@ -39,6 +39,7 @@ export default function KindlingTitle() {
       id="hero-title"
       className="hero-title kindling-title mt-5"
       data-kindle={isFontReady ? "ready" : "waiting"}
+      data-reveal-item
     >
       <span className="sr-only">{TITLE}</span>
       <span className="kindling-word" aria-hidden="true">

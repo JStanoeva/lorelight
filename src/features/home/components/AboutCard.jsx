@@ -63,6 +63,8 @@ export default function AboutCard({ item, index, iconState, isOpen, onToggle }) 
       className="font-body text-base font-normal md:row-start-1"
       style={{ "--card": index }}
       data-icons={iconState}
+      // A part of the section's fade-in (useSectionReveal)
+      data-reveal-item
     >
       <button
         id={`about-card-${item.id}`}

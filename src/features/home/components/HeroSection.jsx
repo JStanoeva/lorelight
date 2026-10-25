@@ -1,8 +1,10 @@
+import { useCallback } from "react";
 import { Link } from "react-router";
 import { useInView } from "../../../shared/hooks/useInView.js";
 import { useIsPageVisible } from "../../../shared/hooks/useIsPageVisible.js";
 import { HERO_EYEBROW_ID, SECTION_IDS } from "../constants/homeSections.js";
 import { useHomeMotion } from "../hooks/useHomeMotion.js";
+import { useSectionReveal } from "../hooks/useSectionReveal.js";
 import HeroBackdrop from "./HeroBackdrop.jsx";
 import HomeCtas from "./HomeCtas.jsx";
 import KindlingTitle from "./KindlingTitle.jsx";
@@ -15,12 +17,24 @@ import "../styles/hero.css";
 // No z-index is needed: positioned children paint in DOM order, so the CSS painting comes
 // first (the first paint and the fallback), then the animated sky, then the readability scrim,
 // then the text. Everything that moves endlessly (the sky and the CSS twinkling) only runs
-// while motion is allowed, the hero is on screen and the tab is visible.
+// while motion is allowed, the hero is on screen and the tab is visible. The text fades in
+// when the page opens (useSectionReveal, data-reveal-item).
 export default function HeroSection({ isLoggedIn = false, isAuthLoading = false }) {
   const { prefersReducedMotion, isMotionAllowed } = useHomeMotion();
   const [setHeroElement, isHeroInView] = useInView();
+  const setRevealElement = useSectionReveal();
   const isPageVisible = useIsPageVisible();
   const isHeroMoving = isMotionAllowed && isHeroInView && isPageVisible;
+
+  // Both hooks watch the same element. Both setters are state setters, so this ref function
+  // stays the same between renders.
+  const setSectionElement = useCallback(
+    (element) => {
+      setHeroElement(element);
+      setRevealElement(element);
+    },
+    [setHeroElement, setRevealElement],
+  );
 
   // Until the session is known, the actions keep their space but stay hidden ("invisible" also
   // takes them out of the tab order), so nobody sees the wrong buttons flash
@@ -29,7 +43,7 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
 
   return (
     <section
-      ref={setHeroElement}
+      ref={setSectionElement}
       id={SECTION_IDS.hero}
       aria-labelledby="hero-title"
       // One condition for the sky and the CSS motion: when the hero stops (paused, off screen,
@@ -43,28 +57,33 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
 
       <div className="relative my-auto flex w-full max-w-3xl flex-col items-center pt-10 pb-6">
         {/* data-sky-guard marks the small text that the sky's embers and stars stay out of */}
-        <p id={HERO_EYEBROW_ID} className="hero-eyebrow" data-sky-guard>
+        <p id={HERO_EYEBROW_ID} className="hero-eyebrow" data-sky-guard data-reveal-item>
           <StarGlyph className="hero-eyebrow-star" />
           A worldbuilding archive
           <StarGlyph className="hero-eyebrow-star" />
         </p>
         <KindlingTitle />
-        <p className="hero-tagline mt-5" data-sky-guard>
+        <p className="hero-tagline mt-5" data-sky-guard data-reveal-item>
           Where your worlds come to light.
         </p>
         <p
           className="mt-4 max-w-xl text-base leading-[1.7] text-pretty text-parchment-300 sm:text-lg"
           data-sky-guard
+          data-reveal-item
         >
           Keep the lore of your fictional worlds in one place. Write in private, publish when
           you're ready, and explore what other creators share.
         </p>
-        <div className={`mt-9 flex w-full justify-center ${ctaVisibility}`}>
+        <div className={`mt-9 flex w-full justify-center ${ctaVisibility}`} data-reveal-item>
           <HomeCtas isLoggedIn={isLoggedIn} />
         </div>
         {/* Always rendered, so the hero never shifts when the session arrives,
             but only guests can see it */}
-        <p className={`mt-5 text-sm text-parchment-300 ${isGuest ? "" : "invisible"}`} data-sky-guard>
+        <p
+          className={`mt-5 text-sm text-parchment-300 ${isGuest ? "" : "invisible"}`}
+          data-sky-guard
+          data-reveal-item
+        >
           Just here to read?{" "}
           <Link to="/lore" className="underline">
             Browse the Lore Catalog
@@ -76,7 +95,12 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
           and before the scroll cue beside it */}
       <PauseAnimationsButton />
 
-      <a href={`#${SECTION_IDS.about}`} className="hero-cue relative mt-8 mb-6" data-sky-guard>
+      <a
+        href={`#${SECTION_IDS.about}`}
+        className="hero-cue relative mt-8 mb-6"
+        data-sky-guard
+        data-reveal-item
+      >
         <span>See how it works</span>
         <span className="hero-cue-line" aria-hidden="true" />
       </a>

@@ -1,0 +1,249 @@
+/*
+  Home fade-in: the lantern lights each part of a section the first time it comes into view.
+  The chapter star ignites and its hairlines draw outward, headings appear in warm gold light
+  and cool to their own colours, the content rises in, the About cards and the FAQ questions
+  catch a gold edge, and the closing lantern brightens from dim.
+  useSectionReveal writes each part's state onto it (the parts carry data-reveal-item):
+  no data-reveal = not seen yet (hidden here), "fading" = its fade-in runs, after
+  --reveal-delay, "shown" = done.
+
+  Rules for everything in this file:
+  - Transitions only, no keyframes: the pause rule (home.css) freezes animations, and a fade-in
+    frozen half-way would leave text half visible.
+  - The "fading" rules only set transitions, never a look of their own, so a part ends on its
+    normal look and nothing jumps when it becomes "shown". Every transition ends within 2 s of
+    the part's --reveal-delay (the hook marks it "shown" 2.2 s after it).
+  - Nothing changes layout (sizes, margins, fonts), so the header's scroll-spy and the section
+    links stay exact. The hero's text only slides with translate, which the sky allows for when
+    it measures the text (nebulaRenderer.js).
+  - Screens only, and only without reduced motion: otherwise every part is simply there (also
+    when the page is printed).
+*/
+@layer components {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    /* ---------- Shared timing ---------- */
+
+    [data-reveal-item] {
+      /* How far a part rises */
+      --reveal-rise: 0.75rem;
+      /* Rising: a quick start and a long, soft landing */
+      --reveal-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+      /* Cooling: the warm light holds for a moment, then settles gently */
+      --reveal-cool: cubic-bezier(0.45, 0, 0.25, 1);
+    }
+
+    .hero [data-reveal-item] {
+      --reveal-rise: 0.625rem;
+    }
+
+    /* The large parts rise a little further, the slim FAQ rows a little less */
+    [data-reveal-item]:is([data-icons], .orrery) {
+      --reveal-rise: 1.25rem;
+    }
+
+    .faq-item[data-reveal-item] {
+      --reveal-rise: 0.5rem;
+    }
+
+    /* ---------- Every part: hidden until seen, then it rises in ---------- */
+
+    /* The star rule lights up through its own pieces instead (below) */
+    [data-reveal-item]:not([data-reveal], .star-rule) {
+      opacity: 0;
+      translate: 0 var(--reveal-rise);
+    }
+
+    [data-reveal-item][data-reveal="fading"]:not(.star-rule) {
+      transition:
+        opacity 700ms ease-out var(--reveal-delay, 0ms),
+        translate 1000ms var(--reveal-ease) var(--reveal-delay, 0ms);
+    }
+
+    /* The hero title only fades in, and quickly: it never waits unlit on the empty sky, and
+       its letters' own kindling (hero.css) stays the moment to watch */
+    .kindling-title[data-reveal-item] {
+      --reveal-rise: 0px;
+    }
+
+    .kindling-title[data-reveal-item][data-reveal="fading"] {
+      transition: opacity 350ms ease-out var(--reveal-delay, 0ms);
+    }
+
+    /* ---------- Warm text: it appears lit in lantern gold and cools to its own colour ---------- */
+
+    /* Parchment text starts in gold: a warm colour cooling into a warm colour */
+    .hero-eyebrow[data-reveal-item]:not([data-reveal]) {
+      color: var(--color-gold-300);
+      text-shadow:
+        0 0 0.4em color-mix(in oklab, var(--color-gold-400) 90%, transparent),
+        0 0 1.2em color-mix(in oklab, var(--color-gold-400) 55%, transparent);
+    }
+
+    [data-reveal-item]:not([data-reveal]):is(.hero-tagline, .section-title) {
+      color: var(--color-gold-300);
+      text-shadow:
+        0 0 0.3em color-mix(in oklab, var(--color-gold-400) 70%, transparent),
+        0 0 1em color-mix(in oklab, var(--color-gold-400) 45%, transparent);
+    }
+
+    /* The chapter eyebrows are violet, and gold blending into violet passes through pink: they
+       start as warm white light in a gold glow instead, which cools to their violet */
+    .section-eyebrow[data-reveal-item]:not([data-reveal]) {
+      color: var(--color-parchment-100);
+      text-shadow:
+        0 0 0.3em var(--color-gold-400),
+        0 0 1em color-mix(in oklab, var(--color-gold-400) 60%, transparent);
+    }
+
+    /* Body text warms, without a glow */
+    [data-reveal-item]:not([data-reveal]):is(.section-intro, .closing-text) {
+      color: color-mix(in oklab, var(--color-gold-300) 75%, var(--color-parchment-300));
+    }
+
+    /* The text is seen glowing at full strength before it starts to cool */
+    [data-reveal-item][data-reveal="fading"]:is(
+        .hero-eyebrow,
+        .hero-tagline,
+        .section-eyebrow,
+        .section-title,
+        .section-intro,
+        .closing-text
+      ) {
+      transition:
+        opacity 600ms ease-out var(--reveal-delay, 0ms),
+        translate 1000ms var(--reveal-ease) var(--reveal-delay, 0ms),
+        color 1400ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms),
+        text-shadow 1400ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms);
+    }
+
+    /* The hero eyebrow's two little violet stars keep their colour and glow gold with it */
+    .hero-eyebrow[data-reveal-item]:not([data-reveal]) .hero-eyebrow-star {
+      filter: drop-shadow(0 0 3px var(--color-gold-400));
+    }
+
+    .hero-eyebrow[data-reveal-item][data-reveal="fading"] .hero-eyebrow-star {
+      transition: filter 1400ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms);
+    }
+
+    /* ---------- The chapter star (StarRule): it ignites, then its hairlines draw outward ---------- */
+
+    /* A small gold spark with a hot, wide glow. Its first drop-shadow blends into the star's own
+       one (home.css); the second fades out (a missing shadow counts as an empty one). */
+    .star-rule[data-reveal-item]:not([data-reveal]) .star-rule-star {
+      opacity: 0;
+      scale: 0.25;
+      color: var(--color-gold-300);
+      filter: drop-shadow(0 0 4px var(--color-gold-300)) drop-shadow(0 0 14px var(--color-gold-400));
+    }
+
+    /* The scale overshoots a little: the spark flares past its size and settles */
+    .star-rule[data-reveal-item][data-reveal="fading"] .star-rule-star {
+      transition:
+        opacity 300ms ease-out var(--reveal-delay, 0ms),
+        scale 750ms cubic-bezier(0.34, 1.9, 0.6, 1) var(--reveal-delay, 0ms),
+        color 1400ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms),
+        filter 1400ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms);
+    }
+
+    /* Each hairline grows outward: it starts squeezed to nothing at its star end (the origin
+       changes nothing while a line isn't scaled) */
+    .star-rule[data-reveal-item] .star-rule-line {
+      transform-origin: right center;
+    }
+
+    .star-rule[data-reveal-item] .star-rule-line-end {
+      transform-origin: left center;
+    }
+
+    .star-rule[data-reveal-item]:not([data-reveal]) .star-rule-line {
+      scale: 0 1;
+    }
+
+    .star-rule[data-reveal-item][data-reveal="fading"] .star-rule-line {
+      transition: scale 900ms var(--reveal-ease) calc(var(--reveal-delay, 0ms) + 180ms);
+    }
+
+    /* ---------- About: each card's edge catches the light ---------- */
+
+    [data-icons][data-reveal-item]:not([data-reveal]) .about-card {
+      border-color: var(--color-gold-400);
+      box-shadow:
+        0 0 0 1px color-mix(in oklab, var(--color-gold-400) 40%, transparent),
+        0 0 32px -6px color-mix(in oklab, var(--color-gold-400) 60%, transparent);
+    }
+
+    /* While a card fades in, these replace its own hover transitions (about.css); it gets them
+       back once it is shown */
+    [data-icons][data-reveal-item][data-reveal="fading"] .about-card {
+      transition:
+        border-color 1300ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 150ms),
+        box-shadow 1300ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 150ms);
+    }
+
+    /* ---------- Categories (phones and tablets): the list's stars flare as it rises in ---------- */
+
+    [data-reveal-item]:not([data-reveal]) .category-star {
+      filter: drop-shadow(0 0 14px currentColor);
+    }
+
+    [data-reveal-item][data-reveal="fading"] .category-star {
+      transition: filter 1300ms var(--reveal-cool) var(--reveal-delay, 0ms);
+    }
+
+    /* ---------- FAQ: the light runs down the questions ---------- */
+
+    .faq-item[data-reveal-item]:not([data-reveal]) {
+      border-color: color-mix(in oklab, var(--color-gold-400) 80%, var(--color-night-700));
+    }
+
+    .faq-item[data-reveal-item]:not([data-reveal]) .faq-button {
+      color: var(--color-gold-300);
+    }
+
+    /* Like the headings, a question is seen lit before it cools. The list's top hairline is the
+       first question's own top border (home.css), so it rises and cools with that question. */
+    .faq-item[data-reveal-item][data-reveal="fading"] {
+      transition:
+        opacity 600ms ease-out var(--reveal-delay, 0ms),
+        translate 800ms var(--reveal-ease) var(--reveal-delay, 0ms),
+        border-color 1000ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms);
+    }
+
+    .faq-item[data-reveal-item][data-reveal="fading"] .faq-button {
+      transition: color 1000ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 200ms);
+    }
+
+    /* ---------- Closing strip: the lantern brightens from dim to its own glow ---------- */
+
+    /* Its own drop-shadow (home.css) comes first, so the two filter lists blend: brightness and
+       saturate end at their neutral 1 */
+    .closing-lantern[data-reveal-item]:not([data-reveal]) img {
+      filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.45)) brightness(0.3) saturate(0.6);
+    }
+
+    .closing-lantern[data-reveal-item]:not([data-reveal])::before,
+    .closing-lantern[data-reveal-item]:not([data-reveal])::after {
+      opacity: 0;
+    }
+
+    /* The lantern is seen dim first, so it appears faster than the other parts */
+    .closing-lantern[data-reveal-item][data-reveal="fading"] {
+      transition:
+        opacity 500ms ease-out var(--reveal-delay, 0ms),
+        translate 1000ms var(--reveal-ease) var(--reveal-delay, 0ms);
+    }
+
+    .closing-lantern[data-reveal-item][data-reveal="fading"] img {
+      transition: filter 1600ms var(--reveal-cool) var(--reveal-delay, 0ms);
+    }
+
+    /* The halo spreads with the light, and the bloom on the star catches last */
+    .closing-lantern[data-reveal-item][data-reveal="fading"]::before {
+      transition: opacity 1600ms ease-out var(--reveal-delay, 0ms);
+    }
+
+    .closing-lantern[data-reveal-item][data-reveal="fading"]::after {
+      transition: opacity 1100ms var(--reveal-cool) calc(var(--reveal-delay, 0ms) + 450ms);
+    }
+  }
+}

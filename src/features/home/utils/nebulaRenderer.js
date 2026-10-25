@@ -31,6 +31,14 @@ const TEXT_SELECTOR = "[data-sky-guard], .home-ctas";
 // An unused text box: far off the canvas and zero in size
 const NO_BOX = [-100000, -100000, 0, 0];
 
+// How far an element is moved by its CSS `translate` right now, in px. The text slides a little
+// while it fades in (useSectionReveal), so its box is measured where it will settle, and the
+// calm zones behind it never jump when the fade-in ends.
+function readTranslate(element) {
+  const [x, y] = getComputedStyle(element).translate.split(" ").map(parseFloat);
+  return { x: Number.isFinite(x) ? x : 0, y: Number.isFinite(y) ? y : 0 };
+}
+
 // Every line of small text as (centre x, centre y, half width, half height) in CSS px, measured
 // from the hero's bottom-left corner like the shader's coordinates
 function measureTextBoxes(hero) {
@@ -44,9 +52,11 @@ function measureTextBoxes(hero) {
       continue;
     }
     const rect = element.getBoundingClientRect();
+    // The fade-in's slide is set on the text line or on its wrapper (the buttons' row)
+    const slide = readTranslate(element.closest("[data-reveal-item]") ?? element);
     boxes.push(
-      rect.left - heroRect.left + rect.width / 2,
-      heroRect.bottom - rect.bottom + rect.height / 2,
+      rect.left - slide.x - heroRect.left + rect.width / 2,
+      heroRect.bottom - (rect.bottom - slide.y) + rect.height / 2,
       rect.width / 2,
       rect.height / 2,
     );

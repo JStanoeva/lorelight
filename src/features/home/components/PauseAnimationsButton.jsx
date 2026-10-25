@@ -4,7 +4,8 @@ import { useHomeMotion } from "../hooks/useHomeMotion.js";
 // it). It pauses every Home animation, not only the hero's sky (HomeMotionProvider). A toggle
 // button with a fixed name: aria-pressed tells screen readers whether it is on. On phones only
 // the icon shows; the words stay for screen readers. With reduced motion nothing moves, so
-// there is nothing to pause and the button isn't shown.
+// there is nothing to pause and the button isn't shown. It is a part of the hero's fade-in
+// (useSectionReveal).
 export default function PauseAnimationsButton() {
   const { isMotionPaused, setIsMotionPaused, prefersReducedMotion } = useHomeMotion();
 
@@ -18,6 +19,7 @@ export default function PauseAnimationsButton() {
       className="motion-pause"
       aria-pressed={isMotionPaused}
       onClick={() => setIsMotionPaused(!isMotionPaused)}
+      data-reveal-item
     >
       <svg className="motion-pause-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
         <rect x="4" y="3" width="2.5" height="10" rx="1" fill="currentColor" />

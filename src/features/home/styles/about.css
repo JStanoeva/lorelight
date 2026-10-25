@@ -195,14 +195,16 @@
     }
 
     /* Stacked cards (phones) each start when they scroll into view; side by side, the three
-       come into view together and trace card after card (--card) */
+       come into view together and trace card after card (--card). An icon never starts before
+       its card's turn in the section's fade-in (--reveal-delay, written on the same heading by
+       useSectionReveal), so it is never traced while its card is still hidden. */
     [data-icons="tracing"] {
-      --icon-stagger: 0ms;
+      --icon-stagger: var(--reveal-delay, 0ms);
     }
 
     @media (width >= 48rem) {
       [data-icons="tracing"] {
-        --icon-stagger: calc(var(--card, 0) * 260ms);
+        --icon-stagger: max(var(--reveal-delay, 0ms), calc(var(--card, 0) * 260ms));
       }
     }
 
