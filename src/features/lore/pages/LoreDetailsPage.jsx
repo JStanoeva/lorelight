@@ -14,8 +14,8 @@ import LoreArticle from "../components/LoreArticle.jsx";
 export default function LoreDetailsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { entryState, projectState } = useOutletContext();
-  const { entry, isLoading, error, refetch, updateData: updateEntry } = entryState;
+  const { entryState, projectState, retryFocus } = useOutletContext();
+  const { entry, isLoading, error, updateData: updateEntry } = entryState;
   const {
     project,
     folders,
@@ -24,6 +24,8 @@ export default function LoreDetailsPage() {
     refetch: refetchProject,
     updateData,
   } = projectState;
+  // Try again moves focus to the page's heading (see ProjectWorkspaceLayout)
+  const { headingRef, retry } = retryFocus;
 
   // Back on the project's page, the sidebar and the overview still show the contents loaded
   // earlier, so the deleted entry is taken out of them instead of loading everything again.
@@ -51,13 +53,28 @@ export default function LoreDetailsPage() {
     return <Loader label="Loading the lore entry…" />;
   }
 
+  // Without an entry there's no title to show, so the page's h1 is visually hidden. Focus lands on
+  // it after another failed Try again.
   if (error) {
-    return <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
+    return (
+      <>
+        <PageTitle title="Lore entry" />
+        <h1 ref={headingRef} tabIndex={-1} className="sr-only">
+          Lore entry
+        </h1>
+        <ErrorMessage message={getErrorMessage(error)} onRetry={retry} />
+      </>
+    );
   }
 
-  // Invalid id, a deleted entry, someone else's private entry, or one inside a private project
+  // Invalid id, a deleted entry, someone else's private entry, or one inside a private project.
+  // tabIndex -1: focus can land here after Try again.
   if (!entry) {
-    return <NotFoundState title="Lore not found" text="This entry doesn't exist, or it's private." />;
+    return (
+      <div ref={headingRef} tabIndex={-1}>
+        <NotFoundState title="Lore not found" text="This entry doesn't exist, or it's private." />
+      </div>
+    );
   }
 
   // The entry is here, but its project (for the sidebar) is still loading
@@ -81,6 +98,7 @@ export default function LoreDetailsPage() {
         </div>
       )}
       <LoreArticle
+        headingRef={headingRef}
         entry={entry}
         folderName={folder?.name ?? null}
         isOwner={user?.id === entry.author_id}

@@ -4,9 +4,9 @@ import { countCharacters, isEmail } from "../../../shared/utils/validators.js";
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 30;
 const PASSWORD_MIN_LENGTH = 8;
-// Supabase refuses passwords longer than 72 bytes. Letters a–z, digits and the usual symbols
-// take 1 byte each; accented and non-Latin letters (e.g. Cyrillic) take 2, emoji 4.
-const PASSWORD_MAX_BYTES = 72;
+// Supabase refuses passwords longer than 72 bytes. A password may only use Latin letters, numbers
+// and symbols (see hasOnlyAllowedCharacters), which take 1 byte each, so 72 bytes = 72 characters.
+export const PASSWORD_MAX_LENGTH = 72;
 export const PASSWORD_RULE_COUNT = 5;
 
 export const USERNAME_TAKEN_MESSAGE = "That username is already taken. Please choose another.";
@@ -19,6 +19,13 @@ const USERNAME_PATTERN = /^[A-Za-z0-9]+$/;
 // The exact set Supabase Auth counts as symbols (backslash and colon included, space not),
 // so this checklist and the server's password policy agree on what a "special character" is.
 const SPECIAL_CHARACTERS = "!@#$%^&*()_+-=[]{};'\\:\"|<>?,./`~";
+
+// Only Latin letters (A–Z, a–z), numbers and the symbols above: no spaces, other alphabets or emoji
+function hasOnlyAllowedCharacters(password) {
+  return Array.from(password).every(
+    (character) => /[A-Za-z0-9]/.test(character) || SPECIAL_CHARACTERS.includes(character),
+  );
+}
 
 // Index 0 is used for 0 and 1 met rules: a password with text is never "Not set".
 const STRENGTH_LABELS = ["Very weak", "Weak", "Fair", "Good", "Strong"];
@@ -128,7 +135,7 @@ export function validateRegister({ username, email, password, repeatPassword }) 
   if (trimmedUsername === "") {
     errors.username = "Enter a username.";
   } else if (!USERNAME_PATTERN.test(trimmedUsername)) {
-    errors.username = "Use only letters (a–z) and numbers, with no spaces.";
+    errors.username = "Use only Latin letters (a–z) and numbers, with no spaces.";
   } else if (
     trimmedUsername.length < USERNAME_MIN_LENGTH ||
     trimmedUsername.length > USERNAME_MAX_LENGTH
@@ -142,9 +149,10 @@ export function validateRegister({ username, email, password, repeatPassword }) 
 
   if (password === "") {
     errors.password = "Enter a password.";
-  } else if (new TextEncoder().encode(password).length > PASSWORD_MAX_BYTES) {
-    // TextEncoder turns the text into UTF-8 bytes, the unit Supabase counts
-    errors.password = `Use at most ${PASSWORD_MAX_BYTES} characters (fewer with accented or non-Latin letters).`;
+  } else if (!hasOnlyAllowedCharacters(password)) {
+    errors.password = "Use only Latin letters (A–Z), numbers and symbols, with no spaces.";
+  } else if (password.length > PASSWORD_MAX_LENGTH) {
+    errors.password = `Use at most ${PASSWORD_MAX_LENGTH} characters.`;
   } else if (getPasswordStrength(password) < PASSWORD_RULE_COUNT) {
     errors.password = `Your password must meet all ${PASSWORD_RULE_COUNT} rules below.`;
   }
@@ -203,7 +211,7 @@ export function getAuthErrorMessage(error) {
   // Supabase refuses passwords over 72 bytes. validateRegister checks this before sending,
   // so this message is only a fallback (e.g. if Supabase's limit ever changes).
   if (code === "validation_failed" && /password/i.test(message)) {
-    return "Your password is too long. Please use at most 72 characters (fewer with accented or non-Latin letters).";
+    return `Your password is too long. Please use at most ${PASSWORD_MAX_LENGTH} characters.`;
   }
 
   // Supabase checks email addresses more strictly than the form (e.g. "name@mail..com")

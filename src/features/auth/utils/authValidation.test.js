@@ -17,10 +17,11 @@ const validForm = {
   repeatPassword: "Lantern1!",
 };
 
-const usernameCharactersError = "Use only letters (a–z) and numbers, with no spaces.";
+const usernameCharactersError = "Use only Latin letters (a–z) and numbers, with no spaces.";
 const usernameLengthError = "Username must be 3–30 characters.";
 const passwordRulesError = "Your password must meet all 5 rules below.";
-const passwordTooLongError = "Use at most 72 characters (fewer with accented or non-Latin letters).";
+const passwordTooLongError = "Use at most 72 characters.";
+const passwordCharactersError = "Use only Latin letters (A–Z), numbers and symbols, with no spaces.";
 
 describe("getPasswordChecks", () => {
   it("checks length, uppercase, lowercase, number and special character, in that order", () => {
@@ -109,7 +110,7 @@ describe("validateRegister", () => {
     );
   });
 
-  it("accepts a password of exactly 72 bytes and rejects 73", () => {
+  it("accepts a password of exactly 72 characters and rejects 73", () => {
     const password72 = `Lantern1!${"a".repeat(63)}`;
     const password73 = `Lantern1!${"a".repeat(64)}`;
 
@@ -119,12 +120,17 @@ describe("validateRegister", () => {
     );
   });
 
-  it("counts a Cyrillic letter as 2 bytes, so 41 characters can already be too long", () => {
-    const password = `Lantern1!${"я".repeat(32)}`;
+  it("accepts every symbol on the keyboard", () => {
+    const password = "Aa1!@#$%^&*()_+-=[]{};'\\:\"|<>?,./`~";
 
-    expect(validateRegister({ ...validForm, password, repeatPassword: password }).password).toBe(
-      passwordTooLongError,
-    );
+    expect(validateRegister({ ...validForm, password, repeatPassword: password })).toEqual({});
+  });
+
+  it("rejects spaces, other alphabets, accented letters and emoji", () => {
+    expect(validateRegister({ ...validForm, password: "Lantern 1!" }).password).toBe(passwordCharactersError);
+    expect(validateRegister({ ...validForm, password: "Lantern1!я" }).password).toBe(passwordCharactersError);
+    expect(validateRegister({ ...validForm, password: "Läntern1!" }).password).toBe(passwordCharactersError);
+    expect(validateRegister({ ...validForm, password: "Lantern1!🌙" }).password).toBe(passwordCharactersError);
   });
 
   it("asks to repeat the password, and never trims it", () => {

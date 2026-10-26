@@ -1,5 +1,6 @@
 import { STAR_PATH } from "../../home/constants/starPath.js";
 import {
+  PASSWORD_MAX_LENGTH,
   PASSWORD_RULE_COUNT,
   getPasswordChecks,
   getPasswordStrength,
@@ -19,7 +20,8 @@ function getStrengthValueClassName(password, isComplete) {
 // The "night sky" panel under the Register password field: the strength meter and the five
 // password rules, each marked with a star that fills in once the rule is met. Everything is
 // derived from the password during render, so the panel needs no state of its own.
-// `id` goes on the rules list, so the password input can point at it with aria-describedby.
+// `id` goes on the rules list and `${id}-note` on the note about allowed characters under it, so
+// the password input can point at both with aria-describedby.
 export default function PasswordChecklist({ id, password }) {
   const checks = getPasswordChecks(password);
   const strength = getPasswordStrength(password);
@@ -55,6 +57,10 @@ export default function PasswordChecklist({ id, password }) {
           </li>
         ))}
       </ul>
+
+      <p id={`${id}-note`} className="field-hint mt-3">
+        Latin letters (A–Z), numbers and symbols only, with no spaces. Up to {PASSWORD_MAX_LENGTH} characters.
+      </p>
 
       {/* The only live text: one short sentence that changes only when the number of met rules
           changes, so a screen reader never re-reads the whole list on every keystroke */}

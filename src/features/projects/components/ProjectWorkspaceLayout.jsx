@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet, useParams } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import { useLoreEntry } from "../../lore/hooks/useLoreEntry.js";
+import { useRetryFocus } from "../../profile/hooks/useRetryFocus.js";
 import { useProject } from "../hooks/useProject.js";
 import { withoutFolder, withSavedFolder } from "../utils/projectContents.js";
 import ProjectWorkspace from "./ProjectWorkspace.jsx";
@@ -60,7 +61,16 @@ export default function ProjectWorkspaceLayout() {
     }
   }
 
-  const outletContext = { entryState, projectState };
+  // Try again on Lore Details or Project Details moves focus to the page's heading once the entry
+  // and the project have both loaded (or failed again). It lives here, not in the pages: when the
+  // project loads, the sidebar appears around the page and the page mounts again, which would
+  // forget that Try again was pressed. Project Details has no entry, so only its project reloads.
+  const retryFocus = useRetryFocus(
+    entryState.isLoading || projectState.isLoading,
+    entryId ? entryState.refetch : projectState.refetch,
+  );
+
+  const outletContext = { entryState, projectState, retryFocus };
 
   if (isWorkspaceShown) {
     return (

@@ -8,7 +8,8 @@ import { formatEntryCount } from "../utils/projectContents.js";
 import { getFormatLabel, getGenreLabel } from "../utils/projectLabels.js";
 
 // The top of Project Details: banner, title, owner, dates, owner actions and the description.
-export default function ProjectHeader({ project, entryCount, isOwner, onDelete }) {
+// `headingRef` goes to the title (h1), where focus lands after Try again.
+export default function ProjectHeader({ headingRef, project, entryCount, isOwner, onDelete }) {
   const details = [getFormatLabel(project.format), getGenreLabel(project.genre)].filter(Boolean).join(" · ");
 
   return (
@@ -24,7 +25,10 @@ export default function ProjectHeader({ project, entryCount, isOwner, onDelete }
             {details && <span className="ws-details">{details}</span>}
           </div>
 
-          <h1 className="page-title ws-title">{project.title}</h1>
+          {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
+          <h1 ref={headingRef} tabIndex={-1} className="page-title ws-title">
+            {project.title}
+          </h1>
 
           <div className="ws-byline">
             <CreatorLink userId={project.owner_id} profile={project.owner} />

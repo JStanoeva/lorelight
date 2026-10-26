@@ -316,9 +316,9 @@ All inputs are controlled (`value` or `checked` with `onChange`). Forms are sent
 - **Project title:** required; 3–80 characters; spaces at the start and end are removed. **Project description:** optional; up to 1,000 characters.
 - **Project format:** required; one of the formats. **Project genre:** optional ("No genre"); one of the genres.
 - **Folder name:** required; 1–50 characters; spaces at the start and end are removed; unique within its Project (upper and lower case count as the same).
-- **Username** (register, multiple rules): required; 3–30 characters; letters (a–z) and numbers only; saved in lowercase; must not be taken already.
+- **Username** (register, multiple rules): required; 3–30 characters; Latin letters (a–z) and numbers only; saved in lowercase; must not be taken already.
 - **Email:** required; valid email format.
-- **Password** (register, multiple rules): required; at least 8 characters and at most 72 (fewer if it uses accented or non-Latin letters); at least one uppercase letter, one lowercase letter, one number and one special character; must match Repeat Password. A checklist under the field shows which rules are met.
+- **Password** (register, multiple rules): required; at least 8 characters and at most 72; only Latin letters (A–Z), numbers and symbols, with no spaces; at least one uppercase letter, one lowercase letter, one number and one special character; must match Repeat Password. A checklist under the field shows which rules are met.
 - **Display name** (edit profile): required; 1–50 characters. **Bio:** optional; up to 500 characters. Spaces at the start and end are removed from both, and a counter shows how many characters are used.
 - **Avatar link** (edit profile): optional; must be a valid `http(s)` link. A preview shows the picture. A link that doesn't open a picture can still be saved, with a warning.
 - **Star colour** (edit profile): one of six colours; Lantern Gold by default.

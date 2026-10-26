@@ -15,21 +15,38 @@ import ProjectLoreSection from "../components/ProjectLoreSection.jsx";
 export default function ProjectDetailsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { projectState } = useOutletContext();
-  const { project, entries, folders, isLoading, error, refetch } = projectState;
+  const { projectState, retryFocus } = useOutletContext();
+  const { project, entries, folders, isLoading, error } = projectState;
+  // Try again moves focus to the page's heading (see ProjectWorkspaceLayout)
+  const { headingRef, retry } = retryFocus;
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   if (isLoading) {
     return <Loader label="Loading the project…" />;
   }
 
+  // Without a project there's no title to show, so the page's h1 is visually hidden. Focus lands on
+  // it after another failed Try again.
   if (error) {
-    return <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />;
+    return (
+      <>
+        <PageTitle title="Project" />
+        <h1 ref={headingRef} tabIndex={-1} className="sr-only">
+          Project
+        </h1>
+        <ErrorMessage message={getErrorMessage(error)} onRetry={retry} />
+      </>
+    );
   }
 
-  // Invalid id, a deleted project, or someone else's private project
+  // Invalid id, a deleted project, or someone else's private project.
+  // tabIndex -1: focus can land here after Try again.
   if (!project) {
-    return <NotFoundState title="Project not found" text="This project doesn't exist, or it's private." />;
+    return (
+      <div ref={headingRef} tabIndex={-1}>
+        <NotFoundState title="Project not found" text="This project doesn't exist, or it's private." />
+      </div>
+    );
   }
 
   const isOwner = user?.id === project.owner_id;
@@ -38,6 +55,7 @@ export default function ProjectDetailsPage() {
     <>
       <PageTitle title={project.title} />
       <ProjectHeader
+        headingRef={headingRef}
         project={project}
         entryCount={entries.length}
         isOwner={isOwner}

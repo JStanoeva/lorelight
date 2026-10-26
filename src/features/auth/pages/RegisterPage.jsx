@@ -103,7 +103,7 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={handleBlur}
           error={getShownError("username")}
-          hint="3–30 letters (a–z) and numbers. Saved in lowercase."
+          hint="3–30 Latin letters (a–z) and numbers."
           autoComplete="nickname"
           autoCapitalize="none"
           spellCheck={false}
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             onBlur={handleBlur}
             error={getShownError("password")}
             autoComplete="new-password"
-            describedById={rulesId}
+            describedById={`${rulesId} ${rulesId}-note`}
           />
           <PasswordChecklist id={rulesId} password={values.password} />
         </div>
