@@ -49,7 +49,7 @@ The quickest way to review Lorelight is the live app above. To run it on your ow
    - In the Supabase SQL Editor, run the 7 files in `supabase/migrations/` one after another, from `001` to `007`. They create the whole database: tables, rules, triggers, security policies and the image storage bucket.
    - In the Authentication settings, open the Email sign-in provider and turn off **Confirm email**, so new accounts are logged in right after registering.
    - Create accounts through the app's Register page. Accounts can't be added from the Supabase dashboard, because every profile needs a username.
-   - Optionally, run `supabase/seed.sql` afterwards to add demo content.
+   - A new database starts empty, so add your own projects and lore through the app. The live app already has demo content to explore.
 
 5. Start the development server
 
@@ -526,4 +526,4 @@ The database enforces the rules with Row Level Security, not only the UI:
 - Saved lore that becomes private is removed from every Constellation automatically.
 - Guests can only read, and nobody can change ids, owners, usernames or dates through the API.
 
-The database tables, rules, triggers and policies are stored as numbered SQL files in `supabase/migrations/`, with demo content in `supabase/seed.sql`.
+The database tables, rules, triggers and policies are stored as numbered SQL files in `supabase/migrations/`.
