@@ -169,7 +169,7 @@ All routes are defined in `src/app/App.jsx`. The route guards are in `src/featur
   - the 12 lore categories, each with a link to its lore in the catalog (a slowly turning wheel of stars on large screens, a list on small screens)
   - a FAQ and a final call to action
   - every section fades in, part by part, the first time it comes into view (the welcome banner as the page opens)
-  - a "Pause animations" button that stops every animation. With the system's reduced-motion setting, the page shows still pictures instead. In both cases, the sections appear without fading in.
+  - a "Pause animations" button that stops every animation. With the system's reduced-motion setting, the page shows still pictures instead, and the button is hidden. In both cases, the sections appear without fading in.
 
 ### Nested & Parameterized Routes
 
@@ -191,7 +191,7 @@ All routes are defined in `src/app/App.jsx`. The route guards are in `src/featur
 
 ### Catalog / List Page
 
-- **What data is displayed?** The Lore Catalog (`/lore`) shows a grid of cards for public Lore Entries in public Projects. Each card shows the category, title, Project, a short part of the description, up to three tags, the author and the appreciation count.
+- **What data is displayed?** The Lore Catalog (`/lore`) shows a grid of cards for public Lore Entries in public Projects. Each card shows the entry's image (or a generated picture), the category, title, Project, a short part of the description, up to three tags, the author and the appreciation count.
 - **How does the user interact with the list (filter / sort / search)?**
   - **Search** by title, description or an exact tag
   - **Filter** by category with buttons (one category, or All)
@@ -286,7 +286,7 @@ The main CRUD collection is **Lore Entries** (`lore_entries`). Projects (`projec
 - **Appreciations:** `appreciationService.appreciate()` adds the user's row to `appreciations`, and `appreciationService.removeAppreciation()` deletes it.
 - **Constellation saves:** `constellationService.saveLore()` adds a row to `constellation_saves`, and `constellationService.unsaveLore()` deletes it (Save on Lore Details, Remove on My Constellation).
 - These buttons show a waiting state and change only after the database confirms. If a request fails, nothing changes, and a short message says why.
-- **Private Projects:** making a Project private hides all of its lore from everyone else and removes those entries from every Constellation. Making it public again shows its public entries again. Removed saves don't come back.
+- **Private lore:** making an entry private, moving it into a private Project or making its Project private hides that lore from everyone else and removes it from every Constellation. Making it public again shows it again. Removed saves don't come back. Appreciations are kept: the author still sees their count, and they count again once the lore is public.
 
 ---
 
@@ -322,6 +322,8 @@ All inputs are controlled (`value` or `checked` with `onChange`). Forms are sent
 - **Display name** (edit profile): required; 1–50 characters. **Bio:** optional; up to 500 characters. Spaces at the start and end are removed from both, and a counter shows how many characters are used.
 - **Avatar link** (edit profile): optional; must be a valid `http(s)` link. A preview shows the picture. A link that doesn't open a picture can still be saved, with a warning.
 - **Star colour** (edit profile): one of six colours; Lantern Gold by default.
+- **Catalog search:** optional; up to 100 characters; spaces at the start and end are removed.
+- **Delete Project dialog:** when the user chooses to move the lore, choosing the Project to move it to is required.
 
 The database checks the main rules too: lengths, allowed values, link and username format, and unique usernames and folder names. Invalid data is rejected even if someone skips the form.
 
@@ -342,14 +344,14 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - `useTransition`: the waiting state (`isPending`) of the Appreciate, Save and Remove buttons
   - `useRef`: elements that receive keyboard focus (such as the catalog search box), the confirmation dialog, the Home page's animated sky, and a flag that ignores double clicks on Appreciate, Save and Remove
   - `useId`: links form labels, hints and error messages to their inputs
-  - Router hooks: `useParams` (ids in the URL), `useNavigate` (redirects after saving), `useSearchParams` (filters and tabs in the URL), `useLocation` (the page to return to after login), `useOutletContext` (data from `ProjectWorkspaceLayout`)
+  - Router hooks: `useParams` (ids in the URL), `useNavigate` (redirects after saving), `useSearchParams` (filters and tabs in the URL), `useLocation` (the page to return to after login), `useOutletContext` (the entry, the Project and the Try again focus from `ProjectWorkspaceLayout`)
   - Custom hooks (28), by feature:
     - auth: `useAuth` (reads `AuthContext`), `useViewerKey` (data hooks reload when the logged-in user changes)
     - lore: `useLoreList` (Lore Catalog), `useLoreEntry` (Lore Details, Edit Lore)
     - projects: `useProjects` (My Projects, the lore form's Project list, the Delete Project dialog), `useProject` (Project Details, the Project sidebar, Edit Project), `useFolders` (the lore form's folder list)
     - appreciation: `useAppreciation` (Appreciate button)
     - constellation: `useSaveStatus` (Save button), `useConstellation` (My Constellation), `usePinPositions` (the dotted lines on the board)
-    - profile: `useProfile` (Creator Profile and its "All …" pages), `useOwnProfile` (Edit Profile), `useRetryFocus` (keeps keyboard focus after Try again)
+    - profile: `useProfile` (Creator Profile and its "All …" pages), `useOwnProfile` (Edit Profile), `useRetryFocus` (keeps keyboard focus after Try again: on the Creator Profile and its "All …" pages, and, called in `ProjectWorkspaceLayout`, on Lore Details and Project Details)
     - home: `useHomeMotion`, `useShowcasePlayback`, `useOrreryTurn`, `useLinePhase` (the Home animations and the Pause animations button), `useSectionReveal` (fades in each section's parts as they come into view)
     - shared: `useForm` (the Login, Register, Lore, Project and Edit Profile forms), `useDebouncedValue` and `useImageCheck` (the avatar link check), `useOutsideClick` (closes the sidebar menus)
     - shared, used on the Home page: `useActiveSection` and `useIsBelowHeader` (the header), `usePrefersReducedMotion`, `useInView` and `useIsPageVisible` (stop the Home animations while they are off screen, the tab is hidden or reduced motion is on)
@@ -378,7 +380,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 
 - **How are components styled?** With Tailwind CSS 4 utility classes in the JSX (mostly layout and spacing) and external CSS files for the look of each part. Tailwind runs through the `@tailwindcss/vite` plugin. There are no CSS Modules, no CSS-in-JS and no UI library.
   - `src/index.css` is imported once in `main.jsx`. It loads Tailwind, defines the theme colours and fonts (Cinzel and Inter), sets the base styles and pulls in `src/styles/components.css`.
-  - Every other CSS file sits in a `styles/` folder next to the components that use it, and those components import it (for example, `LoreCard.jsx` imports `lore-card.css`).
+  - Every other CSS file sits in a `styles/` folder inside its feature (or in `src/shared/styles/`), and the components or pages that use it import it (for example, `LoreCard.jsx` imports `lore-card.css`, and `HomePage.jsx` imports `home.css` and `reveal.css`).
   - Values that differ per item (such as a creator's star colour or the position of a generated star) are set through the `style` prop, mostly as CSS variables.
   - The app has one dark theme. The animations respect the system's reduced-motion setting.
 - **External CSS files (28):**
@@ -392,7 +394,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 | `src/shared/styles/sigil.css`                            | the generated cover for Projects without an image                                  |
 | `src/features/auth/styles/auth.css`                      | the Login and Register pages                                                       |
 | `src/features/appreciation/styles/appreciate-button.css` | the Appreciate button's count                                                      |
-| `src/features/constellation/styles/constellation.css`    | the My Constellation pin board                                                     |
+| `src/features/constellation/styles/constellation.css`    | the pin board and pin cards (My Constellation and Creator Profiles)                |
 | `src/features/home/styles/home.css`                      | the Home page layout, FAQ and closing section                                      |
 | `src/features/home/styles/hero.css`                      | the Home welcome banner and the Pause animations button                            |
 | `src/features/home/styles/nebula.css`                    | the animated sky behind the welcome banner                                         |
@@ -434,15 +436,16 @@ Invalid fields show a message under the input. The submit button is disabled whi
   - Guests who open a private page are sent to the Login page. Logged-in users who open Login or Register are sent to the Lore Catalog.
   - If logging out fails, a message below the header says so, with a Dismiss button.
 - **Network or data errors:**
-  - Every page that loads data shows a loading state. If the request fails, the page shows an error message with a Try again button instead of crashing.
-  - If saving a form fails, the form keeps what the user typed and shows the error above it.
+  - Every page that loads data shows a loading state. If the request fails, the page shows an error message with a Try again button instead of crashing. When a page fails to load, its Try again button keeps keyboard focus on the page (on the heading, or on the result count in the catalog and on My Constellation) instead of sending it back to the top.
+  - If saving a form fails, the form keeps what the user typed and shows the error above it (in the small folder form, under the field).
   - If Appreciate, Save or Remove fails, nothing changes, and a short message says why.
+  - Nothing is sent twice: while a request runs, the form submit buttons and the Delete, Appreciate, Save and Remove buttons ignore further clicks.
   - In a catalog link, an unknown category or sort is ignored (all categories, newest first).
 - **Empty or missing data states:**
   - When there is nothing to show, the catalog, My Projects, My Constellation and profile tabs say so in a short message. Owners also get a link to the next step (for example "Create a project").
   - A search without results offers to clear the filters.
   - Projects, Lore Entries and profiles without a picture (or with a link that doesn't load) show a generated picture instead of a broken image.
-  - Missing or private records show a "not found" message ("Lore not found", "Project not found", "Creator not found").
+  - Missing or private records, and links with an invalid id, show a "not found" message ("Lore not found", "Project not found", "Creator not found").
   - When a saved entry becomes private, it is removed from every Constellation automatically.
   - Unknown URLs show the Not Found page.
 
@@ -504,6 +507,8 @@ Page (or its layout route) → custom hook → service → Supabase
 
 Example: `/lore/:entryId` → `ProjectWorkspaceLayout` (the layout route around `LoreDetailsPage`) → `useLoreEntry(entryId)` → `loreService.getLoreById()` → Supabase. `LoreDetailsPage` then gets the entry through `useOutletContext()`.
 
+Changes skip the hook: the page or component calls the service directly (for example `CreateLorePage` → `loreService.createLore()` → Supabase).
+
 Services contain no React code, and pages contain no Supabase code.
 
 ### Data Model
@@ -521,10 +526,10 @@ All ids are UUIDs (a profile uses its user's id from Supabase Auth). Pictures (p
 
 ### Security
 
-The database enforces the rules with Row Level Security, not only the UI:
+The database enforces the rules itself (Row Level Security policies, column privileges, foreign keys and triggers), not only the UI:
 
 - A Lore Entry is public only when both the entry and its Project are public. Owners can also read their own private rows.
-- Only the owner can create, change or delete their lore, Projects and folders. Lore can only go into the author's own Projects, and only into a folder of its own Project.
+- Only the owner can create, change or delete their lore, Projects and folders, and users can change only their own profile. Lore can only go into the author's own Projects, and only into a folder of its own Project.
 - Other users see a folder only while it holds public lore.
 - Users can add appreciations and saves only for public lore, and can add or remove only their own.
 - Saved lore that becomes private is removed from every Constellation automatically.
