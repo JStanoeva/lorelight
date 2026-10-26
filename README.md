@@ -67,6 +67,7 @@ The quickest way to review Lorelight is the live app above. To run it on your ow
 | `npm run build`   | Creates the production build in `dist/` |
 | `npm run preview` | Serves the production build locally     |
 | `npm run lint`    | Checks the code with ESLint             |
+| `npm test`        | Runs the unit tests once with Vitest    |
 
 ---
 
@@ -455,6 +456,7 @@ Invalid fields show a message under the input. The submit button is disabled whi
 - **Styling:** Tailwind CSS 4 and external CSS files
 - **Backend:** Supabase (PostgreSQL, Auth, Row Level Security), used through the Supabase JavaScript client
 - **Deployment:** Vercel (frontend), Supabase (backend)
+- **Testing:** Vitest (unit tests for the validation rules and other helper functions)
 
 ### Folder Structure
 
@@ -489,6 +491,8 @@ A feature folder can have:
 - `styles/`: the feature's CSS files
 - `shaders/`: the code that draws the Home page's animated sky (in `home`)
 - `utils/`, `constants/`: helpers and fixed values
+
+Unit tests sit next to the file they test and end in `.test.js` (for example `src/features/lore/utils/tags.test.js`). They check plain helper functions, such as the validation rules, without a browser or Supabase.
 
 `lore/` is its own feature next to `projects/` because lore also appears in the catalog, the Constellation and profiles. `shared/` never imports from `features/`.
 
