@@ -18,19 +18,21 @@
   /* ===== Page (AuthPanel) ===== */
 
   /* flex-grow 1 fills the rest of <main> (a column in MainLayout), so the sky reaches the footer.
-     isolation keeps the sky's z-index: -1 inside this box instead of behind the page. */
+     isolation keeps the sky's z-index: -1 inside this box instead of behind the page.
+     The card isn't centred with justify-content: it places itself (see .auth-card), and the two
+     glows sit at 50vw, the middle of the whole window, so they stay behind it. */
   .auth-page {
     position: relative;
     isolation: isolate;
     flex: 1 0 auto;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     padding: 2.5rem 1rem 4rem;
     background-color: var(--color-night-950);
     background-image:
-      radial-gradient(70% 22rem at 50% 0%, color-mix(in oklab, var(--color-lantern-700) 34%, transparent), transparent 72%),
-      radial-gradient(60% 18rem at 50% 100%, color-mix(in oklab, var(--color-lantern-900) 70%, transparent), transparent 75%);
+      radial-gradient(70% 22rem at 50vw 0%, color-mix(in oklab, var(--color-lantern-700) 34%, transparent), transparent 72%),
+      radial-gradient(60% 18rem at 50vw 100%, color-mix(in oklab, var(--color-lantern-900) 70%, transparent), transparent 75%);
   }
 
   @media (width >= 40rem) {
@@ -109,10 +111,14 @@
 
   /* ===== Card (AuthPanel) ===== */
 
+  /* Centred in the whole window (100vw includes the scrollbar), like the site-column utility, so
+     the card doesn't move sideways when the longer Register form brings a scrollbar and Login
+     doesn't. The 1rem is the page's side padding; on narrow screens the margin is 0. */
   .auth-card {
     position: relative;
     width: 100%;
     max-width: 30rem;
+    margin-left: clamp(0px, (100vw - 30rem) / 2 - 1rem, 100% - 30rem);
     padding: 2rem 1.25rem 1.75rem;
     border: 1px solid var(--color-night-700);
     border-radius: 1rem;
