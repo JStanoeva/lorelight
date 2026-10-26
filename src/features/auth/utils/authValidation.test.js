@@ -29,6 +29,11 @@ describe("getPasswordChecks", () => {
     expect(checks.map((check) => check.id)).toEqual(["length", "uppercase", "lowercase", "number", "special"]);
     expect(checks.map((check) => check.isMet)).toEqual([true, false, true, true, false]);
   });
+
+  it("counts an emoji as one character for the 8-character rule", () => {
+    expect(getPasswordChecks("Ab1!🌙🌙")[0].isMet).toBe(false);
+    expect(getPasswordChecks("Ab1!🌙🌙🌙🌙")[0].isMet).toBe(true);
+  });
 });
 
 describe("getPasswordStrength", () => {

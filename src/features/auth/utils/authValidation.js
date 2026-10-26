@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
-import { isEmail } from "../../../shared/utils/validators.js";
+import { countCharacters, isEmail } from "../../../shared/utils/validators.js";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 30;
@@ -28,7 +28,8 @@ export function getPasswordChecks(password) {
     {
       id: "length",
       label: `At least ${PASSWORD_MIN_LENGTH} characters`,
-      isMet: password.length >= PASSWORD_MIN_LENGTH,
+      // Like every other length rule: an emoji counts as one character (.length would say two)
+      isMet: countCharacters(password) >= PASSWORD_MIN_LENGTH,
     },
     { id: "uppercase", label: "One uppercase letter", isMet: /[A-Z]/.test(password) },
     { id: "lowercase", label: "One lowercase letter", isMet: /[a-z]/.test(password) },
