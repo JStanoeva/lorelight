@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatDate, formatMonthYear, formatShortMonthYear } from "./formatDate.js";
 
-// The dates have no "Z" at the end, so they are read as local time
-// and show the same day in every time zone.
+// No "Z" at the end, so the dates are read as local time and show the same day in every time zone
 
 describe("formatDate", () => {
   it("shows the day, the short month and the year", () => {

@@ -9,8 +9,7 @@ import PageTitle from "../../../shared/components/PageTitle.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import LoreArticle from "../components/LoreArticle.jsx";
 
-// One lore entry. ProjectWorkspaceLayout loads it (useLoreEntry with the URL's entryId) together with
-// its project, and shows the project's sidebar beside this page.
+// ProjectWorkspaceLayout loads the entry and its project and passes them as outlet context.
 export default function LoreDetailsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -24,12 +23,10 @@ export default function LoreDetailsPage() {
     refetch: refetchProject,
     updateData,
   } = projectState;
-  // Try again moves focus to the page's heading (see ProjectWorkspaceLayout)
   const { headingRef, retry } = retryFocus;
 
-  // Back on the project's page, the sidebar and the overview still show the contents loaded
-  // earlier, so the deleted entry is taken out of them instead of loading everything again.
-  // If they never loaded (an error), there's nothing to take it out of: they're loaded again.
+  // The project's loaded contents drop the deleted entry instead of loading everything again.
+  // If they never loaded (an error), there's nothing to take it out of, so they're loaded again.
   function handleDeleted() {
     if (project) {
       updateData((data) => withoutEntry(data, entry.id));
@@ -39,9 +36,8 @@ export default function LoreDetailsPage() {
     navigate(`/projects/${entry.project_id}`);
   }
 
-  // The database has accepted a new appreciation (1) or its removal (-1): the count changes here,
-  // and in the project's loaded entries too, so the overview's cards show the new number without
-  // loading the project again
+  // change is 1 (added) or -1 (removed). The project's loaded entries get it too, so the
+  // overview's cards show the new number without loading the project again.
   function handleAppreciationChange(change) {
     updateEntry((current) => changeAppreciationCount(current, change));
     if (project) {
@@ -53,8 +49,7 @@ export default function LoreDetailsPage() {
     return <Loader label="Loading the lore entry…" />;
   }
 
-  // Without an entry there's no title to show, so the page's h1 is visually hidden. Focus lands on
-  // it after another failed Try again.
+  // No title without an entry, so the h1 is visually hidden; focus lands on it after Try again
   if (error) {
     return (
       <>
@@ -67,8 +62,6 @@ export default function LoreDetailsPage() {
     );
   }
 
-  // Invalid id, a deleted entry, someone else's private entry, or one inside a private project.
-  // tabIndex -1: focus can land here after Try again.
   if (!entry) {
     return (
       <div ref={headingRef} tabIndex={-1}>
@@ -77,13 +70,12 @@ export default function LoreDetailsPage() {
     );
   }
 
-  // The entry is here, but its project (for the sidebar) is still loading
   if (isProjectLoading) {
     return <Loader label="Loading the lore entry…" />;
   }
 
-  // The folder comes from the sidebar's list, so renaming or deleting it there shows here at once.
-  // Without the sidebar (its project failed to load), the copy loaded with the entry is used.
+  // From the sidebar's list, so a rename or delete there shows here at once. Without the sidebar
+  // (its project failed to load), the copy loaded with the entry is used.
   const folder = project ? folders.find((item) => item.id === entry.folder_id) : entry.folder;
 
   return (

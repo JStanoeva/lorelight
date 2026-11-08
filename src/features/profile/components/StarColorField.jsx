@@ -2,10 +2,7 @@ import { useId } from "react";
 import Icon from "../../../shared/components/Icon.jsx";
 import { STAR_COLORS } from "../constants/starColors.js";
 
-// Six native radio buttons (arrow keys move between them), drawn as swatch tiles. The chosen one has
-// a thicker light border and a check mark in its swatch, so it never depends on colour alone.
-// `onMouseDown` (the form's guard) keeps focus where it is when a tile is clicked, so the error of
-// the field being left can't move the tile away from under the pointer.
+// Native radios drawn as tiles; the chosen one gets a check mark, so it never relies on colour
 export default function StarColorField({ value, error, onChange, onMouseDown }) {
   const hintId = useId();
   const errorId = useId();

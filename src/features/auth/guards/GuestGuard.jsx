@@ -4,10 +4,8 @@ import { useAuth } from "../hooks/useAuth.js";
 
 const DEFAULT_TARGET = "/lore";
 
-// location.state can hold anything (any link can set it, and it survives a page reload),
-// so the remembered page is used only when it's a path inside this app. Browsers read
-// "//site.com" and "/\site.com" (also with tabs or line breaks mixed in) as another site,
-// and React Router throws instead of navigating there.
+// location.state can hold anything, so only a path inside this app is used. Browsers read
+// "//site.com" and "/\site.com" (even with whitespace mixed in) as another site.
 function getRedirectTarget(from) {
   const pathname = from?.pathname;
 
@@ -28,7 +26,6 @@ function getRedirectTarget(from) {
   return `${pathname}${search}${hash}`;
 }
 
-// Layout route for /login and /register: logged-in users go to the page they wanted, or the catalog.
 export default function GuestGuard() {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();

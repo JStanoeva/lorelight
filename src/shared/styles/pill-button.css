@@ -1,14 +1,5 @@
-/*
-  The pill-shaped toggle buttons on Lore Details: Appreciate ("♡ Appreciate | 7") and Save
-  ("☆ Save"). This file holds the look they share, the way .btn does for buttons: the pill, its
-  action half with the glyph, the pressed / checking / pending states, the error lines under it,
-  phones, motion and High Contrast mode. A button adds its own class only for what's special about
-  it (appreciate-button.css: the count segment and the heart's pop).
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
 @layer components {
-  /* As tall as .btn (38px), so the pill lines up with Edit and Delete in the same row */
+  /* As tall as .btn (38px), so the pill lines up with the buttons in the same row */
   .pill-button {
     display: inline-flex;
     align-items: stretch;
@@ -35,7 +26,7 @@
     transition: color 150ms ease;
   }
 
-  /* A pill without a second segment (Save has no count): its only segment is padded evenly */
+  /* Without a count segment, the action half is padded evenly */
   .pill-button-action:only-child {
     padding-right: 0.9375rem;
   }
@@ -45,7 +36,6 @@
     transition: color 150ms ease;
   }
 
-  /* Hover only where a click does something (not while waiting) */
   .pill-button:not([aria-disabled="true"]):hover {
     border-color: var(--color-gold-400);
   }
@@ -55,7 +45,6 @@
     color: var(--color-gold-300);
   }
 
-  /* Pressed: a gold border over a soft gold wash, and the filled glyph in gold */
   .pill-button[aria-pressed="true"] {
     border-color: var(--color-gold-400);
     background: rgb(232 193 112 / 0.08);
@@ -65,20 +54,18 @@
     color: var(--color-gold-400);
   }
 
-  /* Waiting (status loading or a request on its way): the click is ignored, so say "busy", not "no" */
+  /* While waiting the click is ignored, so the cursor says "busy", not "no" */
   .pill-button[aria-disabled="true"] {
     cursor: progress;
   }
 
-  /* Status unknown: the action half fades (Appreciate's count, already known, stays readable) */
+  /* Status unknown: only the action half fades, so a known count stays readable */
   .pill-button[data-checking] .pill-button-action {
     opacity: 0.55;
   }
 
-  /* Processing (the request is on its way): the pill keeps its current state, the border and the
-     glyph turn a soft gold, and the glyph breathes (below). Nothing changes width, so the pill
-     doesn't jitter under the pointer (Appreciate's "…" takes the count's place). It lights up (or
-     goes out) only when the answer is there. */
+  /* Request on its way: the pill keeps its state until the answer is there, and nothing changes
+     width, so it doesn't jitter under the pointer. */
   .pill-button[data-pending] {
     border-color: rgb(232 193 112 / 0.55);
   }
@@ -87,7 +74,6 @@
     color: var(--color-gold-300);
   }
 
-  /* The error under the pill after a failed request (nothing on screen was changed) */
   .pill-button-error {
     margin: 0.75rem 0 0;
     font-size: 0.875rem;
@@ -100,7 +86,6 @@
     font-size: 0.875rem;
   }
 
-  /* Phones: the row around the pill stretches it, and its content stays centred */
   @media (width < 40rem) {
     .pill-button-action {
       flex: 1;
@@ -108,24 +93,20 @@
     }
   }
 
-  /* Motion only for people who haven't asked for less: the glyph gently breathing while the request
-     is on its way */
   @media (prefers-reduced-motion: no-preference) {
     .pill-button[data-pending] .pill-button-glyph {
       animation: pill-button-breathe 0.9s ease-in-out infinite alternate;
     }
   }
 
-  /* Without motion, the glyph holds still at its faded breath instead, so the pending state still
-     shows by more than the gold tint */
+  /* A still, faded glyph, so the pending state shows by more than the gold tint */
   @media (prefers-reduced-motion: reduce) {
     .pill-button[data-pending] .pill-button-glyph {
       opacity: 0.45;
     }
   }
 
-  /* High Contrast mode drops the backgrounds: the filled glyph still shows the pressed state, and
-     the system's highlight colour marks it too */
+  /* Forced colours drop the backgrounds, so Highlight marks the pressed state too */
   @media (forced-colors: active) {
     .pill-button {
       border-color: ButtonText;

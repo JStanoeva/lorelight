@@ -14,11 +14,6 @@ import ProfileEmptyState from "./ProfileEmptyState.jsx";
 import ProfileErrorState from "./ProfileErrorState.jsx";
 import ProfileHero from "./ProfileHero.jsx";
 
-// An "All …" page: every item of one of a creator's collections that the viewer may see, newest
-// first, under a compact version of the profile's card. It loads with the same hook as the
-// profile, so the counts always match the tab the visitor came from. Every item is shown at once
-// (no paging yet). The Constellation is shown as its pin board, the others as a card grid.
-// `tab` is one of PROFILE_TABS (ProfileCollectionPage has already checked the URL's collection).
 export default function AllCollectionView({ userId, tab }) {
   const { user } = useAuth();
   const profileState = useProfile(userId);
@@ -33,7 +28,7 @@ export default function AllCollectionView({ userId, tab }) {
     return <ProfileErrorState error={error} onRetry={retry} headingRef={headingRef} />;
   }
 
-  // An invalid id or a creator who doesn't exist. tabIndex -1: focus can land here after Try again.
+  // An invalid id or an unknown creator; tabIndex -1 because focus can land here after Try again
   if (!profile) {
     return (
       <section ref={headingRef} tabIndex={-1} className="page">
@@ -71,7 +66,7 @@ export default function AllCollectionView({ userId, tab }) {
             <ProfileEmptyState tab={tab} isOwner={isOwner} name={profile.display_name} />
           ) : (
             <>
-              {/* Between the page's h1 and the cards' titles, like the catalog's hidden "Lore entries" */}
+              {/* Keeps the heading order between the page's h1 and the cards' h3 titles */}
               <h2 className="sr-only">{tab.listHeading}</h2>
               <ProfileCollectionGrid collection={tab.value} items={items} isOwner={isOwner} />
             </>

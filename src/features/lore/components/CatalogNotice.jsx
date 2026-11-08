@@ -1,8 +1,6 @@
 import StarGlyph from "../../home/components/StarGlyph.jsx";
 
-// A message in place of the cards (empty catalog, no results): an empty star chart with a
-// single star, a heading, one line of text and the actions passed as children.
-// `headingLevel` keeps the page outline right: 2 on its own, 3 under the results heading.
+// headingLevel keeps the page outline right: 2 on its own, 3 under the results heading.
 export default function CatalogNotice({ headingLevel = 2, title, text, children }) {
   return (
     <div className="catalog-notice">

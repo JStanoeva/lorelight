@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
 import { useHomeMotion } from "./useHomeMotion.js";
 
-// The time between two parts that come into view together, so they appear one after another
+// Gap between parts that come into view together
 const STEP_MS = 130;
-// The rows of a list (data-reveal-item="row": the FAQ questions) are slim and many, so the
-// next one follows sooner and the light runs down the list like a wave
+// List rows (data-reveal-item="row") follow sooner, so the light runs down the list like a wave
 const ROW_STEP_MS = 60;
-// How long a part's fade-in may take after its turn (reveal.css keeps every transition within
-// it). After that the part is marked "shown", so it gets its own transitions back.
+// Longest fade-in (reveal.css keeps every transition within it); then the part is "shown"
 const FADE_MS = 2200;
 
-// Shows a part at once. Its change of look can also start the part's own transitions (an About
-// card's border, a FAQ question's colour), so every transition inside it jumps to its end and
-// nothing moves. Only transitions: the title's kindling always plays to its end (hero.css), and
-// an endless animation (the orrery's twinkling stars) has no end to jump to.
+// Revealing a part can start its own transitions, so they jump to their end. Animations are left
+// alone: the title's kindling always plays out, and endless ones have no end.
 function showAtOnce(part) {
   part.dataset.reveal = "shown";
-  // getAnimations() brings the styles up to date first, so it sees the transitions that this
-  // change has just started
+  // getAnimations() flushes styles first, so it sees the transitions this change just started
   part.getAnimations({ subtree: true }).forEach((animation) => {
     if (animation instanceof CSSTransition) {
       animation.finish();
@@ -25,24 +20,14 @@ function showAtOnce(part) {
   });
 }
 
-// The parts of a Home section fade in, each the first time it comes into view (the hero's as
-// soon as the page opens). Returns setElement: pass it as the section's ref. The parts are the
-// elements inside it marked with data-reveal-item ("row" for a list's rows, which follow each
-// other faster). The fade-in only changes how they look, so this hook writes it straight onto
-// them as a data-reveal attribute, like the orrery writes its angle, instead of keeping React
-// state for every part:
-// - no data-reveal: not seen yet, hidden (reveal.css)
-// - "fading": its fade-in runs now, after --reveal-delay
-// - "shown": finished
-// While the animations are paused, every part not seen yet is simply shown. With reduced
-// motion, reveal.css applies nothing, so every part is visible from the start.
+// Fades in each [data-reveal-item] the first time it shows, writing data-reveal on the DOM
+// (no React state): unset = hidden, "fading" after --reveal-delay, then "shown".
 export function useSectionReveal() {
   const { isMotionAllowed, prefersReducedMotion } = useHomeMotion();
   const [element, setElement] = useState(null);
 
-  // prefersReducedMotion is a dependency although the effect doesn't read it: the Pause button
-  // is a part, and it appears again when reduced motion is turned off, so its parts are looked
-  // up again then, even while the animations stay paused
+  // prefersReducedMotion is unread but a dependency: the Pause button (a part) reappears when
+  // reduced motion turns off, so the parts must be looked up again.
   useEffect(() => {
     if (!element) {
       return;
@@ -50,13 +35,12 @@ export function useSectionReveal() {
 
     const waitingParts = element.querySelectorAll("[data-reveal-item]:not([data-reveal])");
 
-    // Paused (or reduced motion): nothing waits hidden, so no content pops in while scrolling
+    // Motion off: nothing waits hidden, so no content pops in while scrolling
     if (!isMotionAllowed) {
       waitingParts.forEach(showAtOnce);
       return;
     }
 
-    // When the next part may start, so parts seen at the same moment take turns
     let nextStartTime = 0;
     const fadingParts = new Set();
     const timeoutIds = [];
@@ -83,14 +67,12 @@ export function useSectionReveal() {
             timeoutIds.push(setTimeout(() => finish(part), delay + FADE_MS));
           });
       },
-      // A part starts once it is 40 px above the bottom of the screen (the hero's scroll cue
-      // and Pause pill, near the bottom, still count on the first screen)
+      // Small enough that the hero's scroll cue and Pause pill still reveal on the first screen
       { rootMargin: "0px 0px -40px 0px" },
     );
     waitingParts.forEach((part) => observer.observe(part));
 
-    // A part that receives keyboard focus is shown at once, so the focus ring never sits on a
-    // part that is still hidden or waiting for its turn
+    // A focused part shows at once, so the focus ring never sits on a hidden part
     function handleFocusIn(event) {
       const part = event.target.closest("[data-reveal-item]");
       if (part && part.dataset.reveal !== "shown") {
@@ -101,9 +83,7 @@ export function useSectionReveal() {
     }
     element.addEventListener("focusin", handleFocusIn);
 
-    // Runs when the page closes and when the visitor pauses or resumes the animations (the
-    // effect then starts again with the new setting): a fade-in that is still running jumps to
-    // its end, so nothing stays half visible
+    // Also runs on pause or resume: running fade-ins jump to their end, never half visible
     return () => {
       element.removeEventListener("focusin", handleFocusIn);
       observer.disconnect();

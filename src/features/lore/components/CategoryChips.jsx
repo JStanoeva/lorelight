@@ -3,14 +3,12 @@ import { LORE_CATEGORIES } from "../constants/categories.js";
 import CategoryChip from "./CategoryChip.jsx";
 import "../styles/category-chips.css";
 
-// Room kept free at the row's right edge, where it fades out on phones (the 3.5rem mask in
-// category-chips.css)
+// The row's right fade on phones (the 3.5rem mask in category-chips.css)
 const FADE_WIDTH = 56;
-// The row's 1rem left padding on phones (category-chips.css), which also covers its short left fade
+// The row's 1rem left padding on phones, which also covers its short left fade
 const ROW_PADDING = 16;
 
-// Scrolls the row just far enough that the chip sits clear of both faded edges. Only the row
-// moves, never the page. On wide screens the row can't scroll, so this changes nothing.
+// Scrolls only the row, never the page, so the chip sits clear of both faded edges.
 function showChip(scroller, chip) {
   const visibleStart = scroller.scrollLeft + ROW_PADDING;
   const visibleEnd = scroller.scrollLeft + scroller.clientWidth - FADE_WIDTH;
@@ -23,12 +21,7 @@ function showChip(scroller, chip) {
   }
 }
 
-// "All" plus the 12 categories as toggle buttons (aria-pressed), one pressed at a time.
-// Pressing the pressed category again goes back to All. On wider screens they wrap into
-// balanced, centred rows (7 + 6 from 768px); on phones they become one row that scrolls sideways.
-// `counts` (optional, e.g. { character: 3 }, used by My Constellation) puts the number of entries
-// on each chip and leaves out the categories without any (except the pressed one); "All" gets
-// the total. Without it (the Lore Catalog) every category is shown, without numbers.
+// counts is optional, e.g. { character: 3 }: it adds numbers and hides empty categories.
 export default function CategoryChips({ value, onChange, counts, label = "Browse by category" }) {
   const scrollerRef = useRef(null);
   const labelId = useId();
@@ -37,10 +30,8 @@ export default function CategoryChips({ value, onChange, counts, label = "Browse
     : LORE_CATEGORIES;
   const totalCount = counts ? Object.values(counts).reduce((sum, count) => sum + count, 0) : undefined;
 
-  // On phones the pressed chip can sit outside the visible part of the row (after opening a
-  // link with ?category=event, or after "Clear all"), so the row scrolls to show it. The chip
-  // the user is on comes first: pressing the pressed chip again makes the far-away "All" the
-  // pressed one, and the chip that keeps focus must stay in view.
+  // Shows the pressed chip on phones (e.g. after ?category=event). The focused chip wins: pressing
+  // the pressed chip again presses the far-away "All", but focus stays on the chip.
   useEffect(() => {
     const scroller = scrollerRef.current;
     const focused = document.activeElement;
@@ -51,8 +42,7 @@ export default function CategoryChips({ value, onChange, counts, label = "Browse
     }
   }, [value]);
 
-  // Keyboard focus moves the row too: Tab doesn't scroll a chip that is already partly visible,
-  // so it could stay under the fade
+  // Tab doesn't scroll a chip that is already partly visible, so it could stay under the fade
   function handleFocus(event) {
     showChip(event.currentTarget, event.target);
   }

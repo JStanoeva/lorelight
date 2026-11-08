@@ -1,10 +1,3 @@
-/*
-  CreatorLink: a creator's avatar, name and @username, linking to their profile (Project Details,
-  Lore Details). .creator-avatar is also used by LoreCard's catalog footer (Lore Catalog) and
-  PinCard's author line (My Constellation).
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
 @layer components {
   /* The pill radius gives the keyboard focus ring a rounded shape */
   .creator-link {
@@ -34,7 +27,6 @@
     color: var(--color-parchment-100);
   }
 
-  /* A very long name or username wraps instead of widening the page on phones */
   .creator-name,
   .creator-handle {
     overflow-wrap: anywhere;

@@ -1,9 +1,6 @@
 import CatalogSearchForm from "./CatalogSearchForm.jsx";
 import CatalogSky from "./CatalogSky.jsx";
 
-// The top of the Lore Catalog: a short night-sky band with the eyebrow and the title (shared with
-// My Projects and My Constellation, see .page-hero) and the search bar. key={query} resets the
-// search form when the URL's q changes.
 export default function CatalogHero({ query, searchInputRef, onSearch }) {
   return (
     <section className="page-hero catalog-hero" aria-labelledby="catalog-title">

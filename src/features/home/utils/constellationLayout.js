@@ -1,15 +1,5 @@
-// Where each category star sits on the orrery's wheel. Pure and deterministic: the same count
-// always gives the same wheel, so a new category is simply one more star on the ring.
-//
-// getOrreryLayout(count) → { stars, lines }
-//   stars: [{ angle, radius, x, y }] in category order
-//     angle  – degrees clockwise from the top (the top is the reading position)
-//     radius – share of the ring radius (1 = on the ring)
-//     x, y   – the same point in a unit circle, y growing downwards like the screen
-//   lines: [[i, j], …] neighbours on the ring (each star to the next, the last back to the first)
-//
-// Up to `maxPerRing` stars share one ring. A larger set alternates between the ring and a
-// slightly smaller inner track, so the stars (and their names) never crowd each other.
+// Angles are degrees clockwise from the top, radius a share of the ring, x/y a unit circle with
+// y down. Past `maxPerRing`, every other star moves to an inner track so the names never crowd.
 export function getOrreryLayout(count, { maxPerRing = 16, innerTrack = 0.86 } = {}) {
   if (count <= 0) {
     return { stars: [], lines: [] };
@@ -36,9 +26,7 @@ export function getOrreryLayout(count, { maxPerRing = 16, innerTrack = 0.86 } = 
   return { stars, lines };
 }
 
-// The SVG path of one neighbour line: a gentle arc that bows outwards between two stars, so
-// the lines form a scalloped crown around the ring (like the tracery of an astrolabe)
-// instead of a plain polygon. ringRadius is in SVG units; bow > 1 pushes the arc outwards.
+// The arc between two neighbour stars; ringRadius is in SVG units, bow > 1 pushes it outwards
 export function getNeighbourArcPath(from, to, ringRadius, bow = 1.13) {
   const turn = (((to.angle - from.angle) % 360) + 360) % 360;
   const midAngle = ((from.angle + turn / 2) * Math.PI) / 180;
@@ -52,8 +40,6 @@ export function getNeighbourArcPath(from, to, ringRadius, bow = 1.13) {
   ].join(" ");
 }
 
-// Which star a key moves to: Right/Down = the next one clockwise, Left/Up = the previous one,
-// Home/End = the first/last. null = the key doesn't move between stars.
 export function getStarKeyTarget(key, index, count) {
   if (key === "ArrowRight" || key === "ArrowDown") {
     return (index + 1) % count;

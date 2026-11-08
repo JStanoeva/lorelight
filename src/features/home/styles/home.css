@@ -1,20 +1,15 @@
 @reference "../../../index.css";
 
-/*
-  Home page shell and the pieces shared by several Home sections.
-  Classes here never carry outer vertical margins: spacing between blocks is set with
-  utilities in the JSX (mt-*), which always win over this layer.
-*/
+/* No outer vertical margins here: spacing between blocks is set with mt-* utilities in the JSX */
 @layer components {
-  /* Page shell. clip (not hidden) stops oversized glows from causing horizontal scroll
-     without creating a scroll container, so the sticky header and the hero still work. */
+  /* clip, not hidden: wide glows can't cause sideways scroll, and no scroll container is made,
+     so the sticky header still works */
   .home-page {
     overflow-x: clip;
   }
 
-  /* "Pause animations" (HomeMotionProvider): a section with endless motion sets
-     data-motion="paused" on itself while the visitor has paused it. !important is needed
-     because every animation shorthand resets the play state to running. */
+  /* Pause (data-motion="paused"): !important, because every animation shorthand resets the
+     play state to running */
   [data-motion="paused"],
   [data-motion="paused"] *,
   [data-motion="paused"] *::before,
@@ -31,7 +26,6 @@
     @apply relative isolate py-20 sm:py-24 lg:py-28;
   }
 
-  /* Section hazes: soft violet light instead of boxes or hard borders */
   .about-section {
     background-image: radial-gradient(
       ellipse 50% 40% at 8% 0%,
@@ -40,7 +34,6 @@
     );
   }
 
-  /* The "sky band" */
   .categories-section {
     background-color: var(--color-night-950);
     background-image: radial-gradient(
@@ -58,7 +51,6 @@
     );
   }
 
-  /* Chapter headings (SectionHeading) */
   .section-heading {
     @apply mx-auto max-w-2xl text-center;
   }
@@ -81,7 +73,6 @@
     @apply text-base leading-[1.7] text-pretty text-parchment-300 sm:text-lg;
   }
 
-  /* StarRule: hairline, star, mirrored hairline */
   .star-rule {
     @apply flex items-center justify-center gap-3;
   }
@@ -104,9 +95,7 @@
     filter: drop-shadow(0 0 6px var(--color-lantern-500));
   }
 
-  /* Star field shared by the hero, Categories and the closing strip. Each gradient draws one
-     dot that repeats on its own coprime tile size, so the pattern never visibly repeats.
-     Positions are hand-written, so the output is the same on every render. */
+  /* Each dot repeats on its own coprime tile size, so the pattern never visibly repeats */
   .starfield,
   .starfield-twinkle {
     position: absolute;
@@ -136,27 +125,23 @@
     background-size: 347px 331px, 457px 443px;
   }
 
-  /* Categories: a faint, still field that fades out towards the edges */
   .categories-stars {
     opacity: 0.3;
     -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000, transparent);
     mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000, transparent);
   }
 
-  /* Closing strip: stars only in the top half */
   .closing-stars {
     opacity: 0.4;
     -webkit-mask-image: linear-gradient(to bottom, #000, transparent 50%);
     mask-image: linear-gradient(to bottom, #000, transparent 50%);
   }
 
-  /* Call-to-action pair (HomeCtas): stacked and full width on phones, one centred row from sm */
   .home-ctas {
     @apply mx-auto flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center;
   }
 
-  /* FAQ: a single column of questions separated by hairlines. The top hairline belongs to the
-     first question, so it fades in with that question (reveal.css). */
+  /* The top hairline belongs to the first question, so it fades in with it (reveal.css) */
   .faq-list {
     @apply mx-auto max-w-3xl;
   }
@@ -169,8 +154,7 @@
     @apply border-t;
   }
 
-  /* Resets the base Cinzel h3: Cinzel is too heavy at question length. text-pretty avoids a
-     single word on the last line. */
+  /* Resets the base Cinzel h3, which is too heavy at question length */
   .faq-question {
     @apply font-body text-[1.0625rem] leading-snug font-semibold text-pretty;
   }
@@ -179,8 +163,7 @@
     @apply flex min-h-14 w-full items-center justify-between gap-6 py-4 text-left text-parchment-100 transition-colors hover:text-gold-300;
   }
 
-  /* A plus made of two gold bars that turns into a cross when open. The bars are borders, not
-     backgrounds, so they stay visible in forced-colors mode. */
+  /* The bars are borders, not backgrounds, so they stay visible in forced-colors mode */
   .faq-icon {
     position: relative;
     flex: none;
@@ -212,7 +195,6 @@
     @apply max-w-prose pr-10 pb-6 leading-[1.7] text-parchment-300;
   }
 
-  /* Closing strip: the light returns, held by the lantern, and fades into the night-900 footer */
   .closing {
     @apply relative isolate overflow-hidden py-24 text-center sm:py-32;
     background-image:
@@ -224,15 +206,13 @@
     @apply relative mx-auto max-w-2xl px-4;
   }
 
-  /* The lantern drawing (ClosingLantern, closing-lantern.css) fills this box. Its star's arms
-     cross 50% across and 65.6% down (LIGHT in lanternShapes.js). */
+  /* The drawing's star sits 50% across and 65.6% down (LIGHT in lanternShapes.js) */
   .closing-lantern {
     @apply relative isolate mx-auto w-36 sm:w-44;
   }
 
-  /* Halo behind the lantern. closest-side makes the glow fade out before the nearest edge of its
-     box (the bottom one), so the box never shows as a hard line. Its 64% is measured in that
-     enlarged box (inset -70%), so the halo's centre sits below the star, not on it. */
+  /* closest-side fades the glow before the box's nearest (bottom) edge, so no hard line shows.
+     64% is of the enlarged box (inset -70%), which puts the halo's centre below the star. */
   .closing-lantern::before {
     content: "";
     position: absolute;
@@ -247,7 +227,6 @@
     );
   }
 
-  /* Bloom in front of the star: small and soft, because the drawing has a halo of its own */
   .closing-lantern::after {
     content: "";
     position: absolute;
@@ -271,7 +250,6 @@
     @apply mx-auto max-w-lg text-base leading-[1.7] text-pretty text-parchment-300 sm:text-lg;
   }
 
-  /* All Home motion is opt-in: with reduced motion the page is completely still */
   @media (prefers-reduced-motion: no-preference) {
     /* Smooth scrolling only while the Home page is mounted */
     html:has(.home-page) {
@@ -288,7 +266,7 @@
   }
 }
 
-/* Shared with hero.css (the hero's bright flares) */
+/* Also used by hero.css */
 @keyframes star-twinkle {
   from {
     opacity: 0.3;

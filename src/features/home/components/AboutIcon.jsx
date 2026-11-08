@@ -1,11 +1,8 @@
 import { STAR_PATH } from "../constants/starPath.js";
 import { useHomeMotion } from "../hooks/useHomeMotion.js";
 
-// The drawn shapes of each icon. Stroked shapes carry pathLength="1" and the about-icon-line
-// class, so CSS can trace them in with stroke-dashoffset (CSS selects them by the class, because
-// a selector for the camel-case pathLength attribute is unreliable); --i sets the order in which
-// the strokes are drawn. The stars are filled, never stroked: they light up once their lines are
-// drawn.
+// pathLength="1" lets CSS trace the lines in; CSS selects them by class, because a selector for
+// the camel-case pathLength attribute is unreliable. --i sets the drawing order.
 function getShapes(name) {
   switch (name) {
     case "create":
@@ -64,10 +61,8 @@ function getShapes(name) {
   }
 }
 
-// Line icon for an About card: name is "create", "share" or "explore". Decorative, because the
-// card's title already says what it is. data-motion lets "Pause animations" freeze its tracing
-// (the shared rule in home.css); it sits on the icon rather than on the whole grid, so the
-// panels' short opening animation is never held.
+// data-motion lets "Pause animations" freeze the tracing; it sits on the icon, not the grid,
+// so the panels' opening animation is never held.
 export default function AboutIcon({ name }) {
   const { isMotionPaused } = useHomeMotion();
 

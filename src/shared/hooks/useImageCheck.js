@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 
-// Whether an image link really shows a picture: "none" (no link), "checking", "loaded" or
-// "failed". The browser loads the picture in the background (new Image()), as an <img> would,
-// so a form can say before saving that a link doesn't work. Like the data hooks, "checking" is
-// derived from the last result, so the effect never sets state synchronously.
+// "none", "checking", "loaded" or "failed". "checking" is derived from the last result, so the
+// effect never sets state synchronously.
 export function useImageCheck(src) {
   const [result, setResult] = useState({ src: null, status: null });
 
@@ -24,7 +22,7 @@ export function useImageCheck(src) {
     };
     image.src = src;
 
-    // A newer link (or leaving the page): ignore this picture's late answer
+    // After a newer link (or leaving the page), this picture's late answer is ignored
     return () => {
       isStale = true;
     };

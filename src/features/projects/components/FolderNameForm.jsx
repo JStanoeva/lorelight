@@ -2,8 +2,7 @@ import { useId, useRef, useState } from "react";
 import Icon from "../../../shared/components/Icon.jsx";
 import { getFolderErrorMessage, validateFolderName } from "../utils/folderValidation.js";
 
-// The small inline form for a new folder's name, or a new name for an existing folder.
-// `onSave(name)` saves and closes the form; if it returns a message instead, the form shows it.
+// onSave(name) may return an error message to show; on success the parent closes the form
 export default function FolderNameForm({ label, initialName = "", folders, folderId = null, onSave, onCancel }) {
   const [name, setName] = useState(initialName);
   const [error, setError] = useState("");
@@ -17,8 +16,7 @@ export default function FolderNameForm({ label, initialName = "", folders, folde
     setError("");
   }
 
-  // Focus goes back to the field the message is about (the Save button may have had it).
-  // ?. because the form may be gone by then: a link was followed while the folder was saving.
+  // ?. because the form may be gone: a link was followed while the folder was saving
   function showError(message) {
     setError(message);
     setFailedAttempts((count) => count + 1);
@@ -43,7 +41,6 @@ export default function FolderNameForm({ label, initialName = "", folders, folde
 
     try {
       const saveMessage = await onSave(name.trim());
-      // On success the parent closes the form, so there is nothing more to do here
       if (saveMessage) {
         showError(saveMessage);
       }
@@ -54,9 +51,8 @@ export default function FolderNameForm({ label, initialName = "", folders, folde
 
   function handleKeyDown(event) {
     if (event.key === "Escape") {
-      // Stop here, so Escape closes only this form and not the whole Contents drawer
+      // Escape closes only this form, not the whole Contents drawer
       event.stopPropagation();
-      // Like the disabled Cancel button: a save that is already running can't be cancelled
       if (!isPending) {
         onCancel();
       }
@@ -83,11 +79,10 @@ export default function FolderNameForm({ label, initialName = "", folders, folde
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           autoComplete="off"
-          // Opened by a click on "New folder" or "Rename folder", so the typing can start right away
+          // Opened by a click on "New folder" or "Rename folder", so typing can start right away
           autoFocus
         />
-        {/* aria-disabled instead of disabled while the folder saves: a disabled button would drop
-            keyboard focus to the page. handleSubmit ignores a second press. */}
+        {/* aria-disabled, not disabled: a disabled button would drop keyboard focus to the page */}
         <button
           type="submit"
           className="ws-icon-button"
@@ -100,13 +95,11 @@ export default function FolderNameForm({ label, initialName = "", folders, folde
           <Icon name="close" />
         </button>
       </form>
-      {/* Focus may stay on Save while it waits, so this hidden line tells screen reader users what is
-          happening. Always rendered, so a change of its text is noticed. */}
+      {/* Always rendered, so screen readers notice when its text changes */}
       <p role="status" className="sr-only">
         {isPending ? "Saving the folder…" : ""}
       </p>
-      {/* role="alert" announces the message as soon as it appears. A new key on every failure
-          re-creates it, so it is announced again even when the message is the same as last time */}
+      {/* A new key per failure, so the same message is announced again */}
       {error && (
         <p key={failedAttempts} id={errorId} role="alert" className="ws-inline-error">
           {error}

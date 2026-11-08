@@ -11,8 +11,7 @@ import { PROJECT_GENRES } from "../constants/genres.js";
 import { PROJECT_FORMATS } from "../constants/projectFormats.js";
 import { PROJECT_DESCRIPTION_MAX, toProjectPayload, validateProject } from "../utils/projectValidation.js";
 
-// Shared by Create and Edit. `onSubmit(payload)` saves and navigates away; if it returns a
-// message instead (e.g. the project no longer exists), the form shows it above the fields.
+// onSubmit(payload) may return a message (e.g. project not found) to show above the fields
 export default function ProjectForm({ initialValues, submitLabel, pendingLabel, cancelTo, onSubmit }) {
   const { values, getShownError, handleChange, handleBlur, validateBeforeSubmit } = useForm(
     initialValues,
@@ -24,18 +23,16 @@ export default function ProjectForm({ initialValues, submitLabel, pendingLabel, 
   const publicId = useId();
   const publicHintId = useId();
 
-  // Like the submit button: leaving a field can show its error and push the checkbox, its label
-  // and the Cancel link down before the mouse is released, so the click would be lost. Only the
-  // left button, so a middle-click on Cancel still opens a new tab.
+  // A blur error could push this target down before mouseup and lose the click; left button
+  // only, so a middle-click on Cancel still opens a new tab
   function handleMouseDown(event) {
     if (event.button === 0) {
       event.preventDefault();
     }
   }
 
-  // The submit button was disabled, so focus goes back into the form, to the first field (the
-  // title). focus() doesn't scroll when that field already has focus, so the page scrolls to the
-  // alert itself; flushSync renders the alert first, so it's there to scroll to.
+  // The disabled submit lost focus, so it returns to the title; focus() won't scroll if the title
+  // already has it, so the alert (rendered first by flushSync) is scrolled into view
   function showServerError(form, message) {
     // The user left the page (e.g. through a header link) while the request was running
     if (!form.isConnected) {
@@ -76,8 +73,7 @@ export default function ProjectForm({ initialValues, submitLabel, pendingLabel, 
 
   return (
     <form className="card flex flex-col gap-5" noValidate onSubmit={handleSubmit}>
-      {/* A new key on every failure re-creates the alert, so it is announced again even
-          when the message is the same as last time */}
+      {/* A new key per failure, so the same message is announced again */}
       {serverError && <ErrorMessage key={failedAttempts} message={serverError} />}
 
       <FormField
@@ -177,7 +173,7 @@ export default function ProjectForm({ initialValues, submitLabel, pendingLabel, 
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 border-t border-night-700 pt-5">
-        {/* Leaving can't stop a request that's already running: the page would still open the saved project */}
+        {/* Leaving can't stop a running request: the page would still open the saved project */}
         {isPending ? (
           <button type="button" disabled className="btn btn-ghost">
             Cancel

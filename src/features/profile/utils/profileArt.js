@@ -1,10 +1,6 @@
-// The profile's decoration: the sky behind the header and the star-shaped frame around the
-// avatar. Seeded by the creator's id with the app's own seeded generator, so every creator gets
-// their own sky and crest, and keeps them on every visit. Pure: no React, no Supabase.
 import { createRandom, hashString } from "../../../shared/utils/seededRandom.js";
 
-// The seed for the sky and crest of a profile that isn't shown yet: the skeletons (loading) and
-// the error state share it, so nothing in the decoration jumps when one replaces the other
+// Shared by the skeletons and the error state, so the decoration doesn't jump between them
 export const PENDING_SEED = "pending";
 
 function round(value) {
@@ -15,8 +11,8 @@ function between(random, min, max) {
   return min + random() * (max - min);
 }
 
-// SVG path of a four-point star centred on x, y. `waist` (0–1) sets how slim the rays are:
-// 0.2 is the app's usual star, smaller values give sharper rays.
+// A four-point star centred on x, y. `waist` (0–1) sets how slim the rays are: 0.2 is the app's
+// usual star, smaller values give sharper rays.
 export function starPath(x, y, size, waist = 0.2) {
   const w = size * waist;
   return [
@@ -28,9 +24,7 @@ export function starPath(x, y, size, waist = 0.2) {
   ].join(" ");
 }
 
-// The sky's star field, in percentages of the sky: faint dust and a few four-point sparks.
-// About a quarter of the dust and half of the sparks take the creator's star colour (the CSS
-// decides which colour that is).
+// Positions in percent of the sky; tinted stars take the star colour from the CSS
 export function createSkyStars(seed) {
   const random = createRandom(hashString(`profile-sky-${seed}`));
 
@@ -61,8 +55,7 @@ export function createSkyStars(seed) {
   return { dust, sparks };
 }
 
-// The crest behind the avatar: slim cardinal rays and shorter diagonal ones (a little different
-// per creator), and where the two points of light start on their orbits.
+// Ray lengths per creator, and the start angles (degrees) of the two orbiting points of light
 export function createCrest(seed) {
   const random = createRandom(hashString(`profile-crest-${seed}`));
 
@@ -74,8 +67,7 @@ export function createCrest(seed) {
   };
 }
 
-// The planisphere ring of ticks around the avatar: 48 short ticks, every sixth one longer.
-// Drawn in the crest's 240-unit box centred on 0, 0.
+// 48 ticks, every sixth one longer, in the crest's 240-unit box centred on 0, 0
 export const CREST_TICKS = Array.from({ length: 48 }, (_, index) => {
   const angle = (index / 48) * Math.PI * 2;
   const isLong = index % 6 === 0;

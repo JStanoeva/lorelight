@@ -1,13 +1,7 @@
 import { useRef } from "react";
 import { PROFILE_TABS } from "../constants/profileTabs.js";
 
-// The four tabs, following the WAI-ARIA tabs pattern with automatic activation: only the chosen tab
-// is in the Tab order (roving tabindex); Left/Right move to the previous/next tab (wrapping),
-// Home/End to the first/last, and moving also chooses the tab.
-//   activeValue           the chosen tab's value
-//   counts                { projects: 5, lore: 14, … }: the number shown on each tab
-//   onSelect(value)       chooses a tab
-//   getTabId / getPanelId link each tab to its panel (aria-controls / aria-labelledby)
+// WAI-ARIA tabs pattern with automatic activation: roving tabindex, and moving chooses the tab
 export default function ProfileTabs({ activeValue, counts, onSelect, getTabId, getPanelId }) {
   const tabRefs = useRef([]);
 

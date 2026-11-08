@@ -1,6 +1,3 @@
-/* The profile avatar: the picture from its link or the generated "Nebula Wash". Both fill their
-   positioned parent, which sets the size and the shape (border-radius, clip-path). */
-
 .nebula-avatar {
   position: absolute;
   inset: 0;

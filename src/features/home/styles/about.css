@@ -1,11 +1,5 @@
 @reference "../../../index.css";
 
-/*
-  About section: the three cards and the panel they open.
-  Violet marks the selected card; gold stays reserved for the hint and the focus ring.
-  The previews inside the panels live in showcases.css.
-*/
-
 /* Registered, so the card glow can glide from one position to the next */
 @property --glow-x {
   syntax: "<length-percentage>";
@@ -26,13 +20,12 @@
 }
 
 @layer components {
-  /* isolate: the glow layer below (z-index -1) paints over the card's background but under its text */
+  /* isolate: the z-index -1 glow paints over the card's background but under its text */
   .about-card {
     @apply relative isolate flex h-full w-full flex-col gap-3 rounded-2xl border border-night-700 bg-night-900/70 p-6 text-left hover:border-lantern-500/60 motion-safe:hover:-translate-y-0.5;
   }
 
-  /* A soft violet glow, resting at the top of each card. AboutCard moves it after the pointer
-     through --glow-x / --glow-y; it brightens on hover. */
+  /* AboutCard moves the glow after the pointer through --glow-x / --glow-y */
   .about-card::before {
     content: "";
     position: absolute;
@@ -60,8 +53,7 @@
       0 12px 40px -12px color-mix(in oklab, var(--color-lantern-500) 50%, transparent);
   }
 
-  /* From md up the open panel sits under the row of cards, so the open card points down at it
-     with a small notch: a rotated square whose two lower edges continue the card's border. */
+  /* From md up, a notch points down at the panel: a rotated square continuing the border */
   @media (width >= 48rem) {
     .about-card[aria-expanded="true"]::after {
       content: "";
@@ -91,12 +83,12 @@
     @apply text-[0.9375rem] leading-relaxed text-parchment-300;
   }
 
-  /* mt-auto keeps the hint at the bottom, so it lines up across cards of different heights */
+  /* mt-auto lines the hints up across cards of different heights */
   .about-card-hint {
     @apply mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-gold-400;
   }
 
-  /* Only on devices that can hover, so a tap on a phone doesn't leave the hint highlighted */
+  /* Hover-capable devices only, so a tap never leaves the hint highlighted */
   @media (hover: hover) {
     .about-card:hover .about-card-hint {
       @apply text-gold-300;
@@ -111,8 +103,6 @@
     rotate: 180deg;
   }
 
-  /* The panel shell, with a violet hairline over the middle of its top border.
-     A little less padding on phones leaves the previews room to breathe. */
   .about-panel {
     @apply relative min-w-0 rounded-2xl border border-night-700 bg-night-900/85 p-4 sm:p-8 lg:p-10;
   }
@@ -133,7 +123,6 @@
     );
   }
 
-  /* Text first, preview second; side by side from md */
   .about-panel-inner {
     @apply grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center;
   }
@@ -154,7 +143,7 @@
     @apply flex items-start gap-3 text-[0.9375rem] leading-relaxed text-parchment-300;
   }
 
-  /* 9 × 13px star bullets, nudged down to sit on the first line of text */
+  /* mt-1.5 nudges the star down onto the first line of text */
   .bullet-star {
     @apply mt-1.5 h-[0.8125rem] w-[0.5625rem] flex-none text-lantern-300;
   }
@@ -164,10 +153,7 @@
     @apply inline-flex min-h-11 items-center gap-1 font-semibold underline-offset-4 hover:underline;
   }
 
-  /* Motion is opt-in: with reduced motion the cards, chevrons and panels change without moving,
-     and the icons are simply drawn */
   @media (prefers-reduced-motion: no-preference) {
-    /* The glow glides after the pointer and brightens on hover */
     .about-card {
       transition-property: border-color, background-color, box-shadow, translate, --glow-x, --glow-y, --glow-strength;
       transition-duration: 200ms, 200ms, 200ms, 200ms, 280ms, 280ms, 400ms;
@@ -182,9 +168,8 @@
       animation: panel-in 240ms ease-out;
     }
 
-    /* Card icons: their lines wait hidden until their card is first seen (data-icons on the
-       card's heading, set by AboutSection), then each is traced in once, line after line (--i).
-       The stars light up when their lines are drawn. */
+    /* data-icons (set by AboutSection) keeps the lines hidden until the card is first seen, then
+       traces them once, line after line (--i) */
     [data-icons="waiting"] .about-icon-line {
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
@@ -194,10 +179,8 @@
       opacity: 0;
     }
 
-    /* Stacked cards (phones) each start when they scroll into view; side by side, the three
-       come into view together and trace card after card (--card). An icon never starts before
-       its card's turn in the section's fade-in (--reveal-delay, written on the same heading by
-       useSectionReveal), so it is never traced while its card is still hidden. */
+    /* Side by side, the cards trace in turn (--card). No icon starts before its card's fade-in
+       (--reveal-delay from useSectionReveal), so none traces while still hidden. */
     [data-icons="tracing"] {
       --icon-stagger: var(--reveal-delay, 0ms);
     }
@@ -226,7 +209,7 @@
   }
 }
 
-/* Plays each time a panel is shown, because the element goes from display: none to visible */
+/* Replays on every open: the panel goes from display: none to visible */
 @keyframes panel-in {
   from {
     opacity: 0;

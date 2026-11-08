@@ -1,8 +1,7 @@
 import { Link } from "react-router";
 import "../styles/creator-link.css";
 
-// A link to a creator's profile: initial avatar, display name and @username.
-// `profile` is the joined profiles row ({ display_name, username }), or null when it couldn't be read.
+// `profile` is the joined profiles row, or null when it couldn't be read.
 export default function CreatorLink({ userId, profile }) {
   const name = profile?.display_name ?? "Unknown creator";
 

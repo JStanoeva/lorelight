@@ -3,10 +3,6 @@ import { isEffectivelyPublic } from "../../lore/utils/visibility.js";
 import { CREATOR_TITLES } from "../constants/creatorTitles.js";
 import { RECENT_COUNT } from "../constants/profileTabs.js";
 
-// Everything the profile shows besides the rows themselves, worked out from the rows useProfile
-// loaded. The rows are what the viewer may see (Row Level Security): the owner gets everything,
-// a visitor only public projects and public lore.
-
 // An unreadable or missing date counts as the oldest.
 function toTime(value) {
   const time = Date.parse(value ?? "");
@@ -22,20 +18,18 @@ function compareIds(a, b) {
   return a < b ? -1 : 1;
 }
 
-// A new array, newest first by `dateField` ("updated_at", "created_at", "saved_at",
-// "appreciated_at"). Items with the same date are ordered by id, so they never swap places
-// between loads (the services' .order("id") does the same).
+// Items with the same date are ordered by id, so they never swap places between loads (like the
+// services' .order("id"))
 export function sortByNewest(items, dateField) {
   return [...items].sort((a, b) => toTime(b[dateField]) - toTime(a[dateField]) || compareIds(a.id, b.id));
 }
 
-// The `count` newest items (three by default): what a profile tab shows.
 export function getRecent(items, dateField, count = RECENT_COUNT) {
   return sortByNewest(items, dateField).slice(0, count);
 }
 
-// The four figures under the bio. appreciationsReceived adds up the appreciations on the creator's
-// lore the viewer can see, so the owner also counts the ones kept on lore that turned private.
+// appreciationsReceived sums over the lore the viewer can see, so the owner also counts the
+// appreciations kept on lore that turned private
 export function getProfileStats({ projects, lore, constellation }) {
   return {
     projects: projects.length,
@@ -45,10 +39,8 @@ export function getProfileStats({ projects, lore, constellation }) {
   };
 }
 
-// The creator title comes from the category with the most PUBLIC lore. Private lore never counts,
-// not even for the owner, so the owner sees the same title as everyone else. A tie goes to the
-// category of the newest public entry among the tied categories. null without public lore.
-// Returns { category, title }, e.g. { category: "location", title: "Keeper of Locations" }.
+// Only PUBLIC lore counts, even for the owner, so everyone sees the same title. A tie goes to the
+// category of the newest tied entry.
 export function getCreatorTitle(lore) {
   const publicLore = lore.filter(isEffectivelyPublic);
 
@@ -70,7 +62,7 @@ export function getCreatorTitle(lore) {
   return { category, title: CREATOR_TITLES[category] };
 }
 
-// "Currently worldbuilding": the most recently updated PUBLIC project (also for the owner), or null.
+// "Currently worldbuilding": the most recently updated PUBLIC project, also for the owner
 export function getSpotlightProject(projects) {
   const publicProjects = projects.filter((project) => project.is_public === true);
   return sortByNewest(publicProjects, "updated_at")[0] ?? null;

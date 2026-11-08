@@ -3,11 +3,8 @@ import { Link } from "react-router";
 const REPOSITORY_URL = "https://github.com/JStanoeva/lorelight";
 
 export default function Footer() {
-  // Like the links under the Login and Register forms: while a form field has focus, pressing the
-  // mouse would blur it, its error would push the footer down before the mouse is released, and
-  // the click would be lost. So only then, and only for the main button, the press keeps the focus
-  // in the field. Otherwise focus moves as usual (it closes the open header menu, and the links can
-  // still be dragged).
+  // While a field has focus, its blur error would push the footer down mid-click and lose the
+  // click, so a main-button press keeps the focus in the field.
   function handleMouseDown(event) {
     if (event.button === 0 && document.activeElement?.matches("input, textarea, select")) {
       event.preventDefault();
@@ -23,8 +20,7 @@ export default function Footer() {
         </div>
 
         <nav aria-label="Footer">
-          {/* Each link is 28 px tall for easier tapping (its padding is invisible). The list's negative
-              margin and the missing row gap keep the footer exactly as tall as the text needs. */}
+          {/* py-1 gives 28px tap targets; -my-1 keeps the footer as tall as the text */}
           <ul className="-my-1 flex flex-wrap justify-center gap-x-6">
             <li>
               <Link

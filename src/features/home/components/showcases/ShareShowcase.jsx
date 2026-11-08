@@ -9,10 +9,8 @@ import Stardust from "./Stardust.jsx";
 import "../../styles/showcases.css";
 
 const CHARACTER = LORE_CATEGORIES.find((category) => category.value === "character");
-// The catalog's sky: more stars than the other stages, so it reads as a sky
 const SKY_STARS = createStardust(22, 41);
 
-// 14px status icons, created once at module level. Decorative: the chip text says the same.
 const LOCK_ICON = (
   <svg
     viewBox="0 0 16 16"
@@ -49,32 +47,27 @@ const GLOBE_ICON = (
 );
 
 const CUES = {
-  card: 300, // a dimmed, locked entry under the horizon
-  entrySwitch: 2700, // only the entry is made public
-  blocked: 3100, // its light rises but fades at the horizon: the Project is still private
-  projectSwitch: 5600, // the Project is made public too
-  open: 5900, // the horizon mist parts and the lock turns into a globe
-  glow: 6300, // the card glows with golden light
-  rise: 6900, // and its light floats up into the catalog's sky
-  star: 8300, // where it becomes a star
-  hold: 9000, // the finished picture (also the reduced-motion still)
+  card: 300,
+  entrySwitch: 2700,
+  blocked: 3100,
+  projectSwitch: 5600,
+  open: 5900,
+  glow: 6300,
+  rise: 6900,
+  star: 8300,
+  hold: 9000, // the finished picture, also the reduced-motion still
   fade: 12400,
 };
 const CUE_LIST = toCueList(CUES);
 const LOOP_MS = 13200;
 
-// When each step of the readable list below is the one being shown
+// When each step of the list below is highlighted
 const RULE_STEPS = [
   { from: CUES.card, to: CUES.entrySwitch },
   { from: CUES.entrySwitch, to: CUES.projectSwitch },
   { from: CUES.projectSwitch, to: Infinity },
 ];
 
-// Share: an entry under the horizon only reaches the catalog's sky when both switches are on.
-// The entry itself stays where it is (it is still in its Project); a golden copy of it rises
-// from it and becomes its star in the catalog.
-// The animated stage is decorative (aria-hidden); the ordered list under it is the real
-// information and stays readable for everyone. The animation only highlights the step it shows.
 export default function ShareShowcase() {
   const { setStageElement, time, isStill, runId, replay, canReplay, motionState } =
     useShowcasePlayback({ cues: CUE_LIST, finalCue: CUES.hold, loopMs: LOOP_MS });
@@ -109,7 +102,6 @@ export default function ShareShowcase() {
             data-open={time >= CUES.open}
           />
 
-          {/* The star the entry becomes, with faint lines to two neighbours */}
           <span className="share-star" data-on={time >= CUES.star}>
             <svg viewBox="0 0 120 40" fill="none" focusable="false" className="share-star-lines">
               <path pathLength="1" d="M60 20L22 10" />
@@ -123,7 +115,6 @@ export default function ShareShowcase() {
             <span className="share-star-label">Captain Ilsa Varn</span>
           </span>
 
-          {/* Light from the entry that tries to rise but fades out at the horizon */}
           <span className="share-blocked" data-on={time >= CUES.blocked}>
             {[0, 1, 2, 3, 4, 5].map((index) => (
               <span key={index} className="share-blocked-mote" style={{ "--i": index }} />
@@ -148,9 +139,7 @@ export default function ShareShowcase() {
             <p className="mock-entry-title mt-1.5">Captain Ilsa Varn</p>
           </div>
 
-          {/* The card's golden light: a copy of the card drawn in gold, laid exactly over it,
-              which lifts off, floats up and shrinks into the star. It is seen only while it
-              moves; the finished picture keeps just the card and its star. */}
+          {/* A gold copy laid over the card, which lifts off and shrinks into the star */}
           <span className="share-ascent" data-on={time >= CUES.rise}>
             <span className="flex items-center gap-2">
               {GLOBE_ICON}
@@ -161,7 +150,6 @@ export default function ShareShowcase() {
             <span className="mock-entry-title share-ascent-title mt-1.5">Captain Ilsa Varn</span>
           </span>
 
-          {/* Golden stardust that follows the light up into the sky */}
           <span className="share-trail" data-on={time >= CUES.rise}>
             {[0, 1, 2, 3, 4].map((index) => (
               <span key={index} className="share-trail-mote" style={{ "--i": index }} />
@@ -189,7 +177,7 @@ export default function ShareShowcase() {
         </div>
       </div>
 
-      {/* The rule itself, readable for everyone. The highlight follows the animation. */}
+      {/* The real information, readable for everyone; the highlight follows the animation */}
       <figure className="mt-5">
         <figcaption className="preview-caption">Who can see an entry</figcaption>
         <ol className="mt-3 flex flex-col gap-3">
@@ -221,7 +209,6 @@ export default function ShareShowcase() {
             </div>
           </li>
 
-          {/* The light comes on: gold appears only as light (the star and a glow) */}
           <li
             className="visibility-step share-rule share-rule-last"
             data-state={getStepState(time, RULE_STEPS[2].from, RULE_STEPS[2].to)}

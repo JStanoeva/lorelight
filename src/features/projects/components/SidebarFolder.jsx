@@ -15,8 +15,7 @@ function getDeleteFolderText(entryCount) {
   return `Its ${entryCount} lore entries stay in the project, outside any folder. No lore is deleted.`;
 }
 
-// A collapsible folder with its entries, plus the owner's rename and delete actions.
-// `entries` are the entries shown right now (the filter may hide some); `entryCount` counts them all.
+// `entries` are the ones shown now (the filter may hide some); `entryCount` counts them all
 export default function SidebarFolder({
   folder,
   folders,
@@ -38,7 +37,6 @@ export default function SidebarFolder({
   const toggleRef = useRef(null);
   const listId = `ws-folder-${folder.id}`;
 
-  // While filtering, every folder with a match stays open, so the matches are visible
   const isExpanded = isOpen || isFiltering;
 
   async function handleRename(name) {
@@ -52,8 +50,7 @@ export default function SidebarFolder({
     closeRename();
   }
 
-  // The rename form replaces the folder row, so after it closes focus goes back to the row.
-  // flushSync brings the row back first, so it can take focus.
+  // The row replaces the form again; flushSync renders it first, so it can take focus
   function closeRename() {
     flushSync(() => setIsRenaming(false));
     toggleRef.current.focus();

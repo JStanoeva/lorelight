@@ -1,11 +1,9 @@
 import { Link, NavLink, useLocation } from "react-router";
 
-// The account links for a guest. Header shows them after "Lore Catalog".
 export default function GuestNavLinks({ onNavigate }) {
   const location = useLocation();
-  // On /login and /register, the state remembers the page the guest wanted (state.from).
-  // Passing it on means switching between the two pages, or clicking the current one,
-  // doesn't lose it. GuestGuard checks it before using it.
+  // Pass on the page the guest wanted (state.from) between /login and /register so it isn't
+  // lost; GuestGuard validates it.
   const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
   const authState = isAuthPage ? location.state : undefined;
 

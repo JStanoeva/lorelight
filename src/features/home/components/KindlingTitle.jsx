@@ -6,12 +6,10 @@ const LETTERS = Array.from(TITLE);
 const TITLE_FONT = '700 1rem "Cinzel"';
 const FONT_WAIT_MS = 1500;
 
-// The wordmark, one span per letter so each can catch light on its own (hero.css). Screen
-// readers read the hidden plain word; the letter spans are hidden from them, so nobody hears
-// "L, o, r, e…". The title is a part of the hero's fade-in (useSectionReveal).
+// One span per letter so each can catch light; screen readers get the plain word instead, so
+// nobody hears "L, o, r, e…".
 export default function KindlingTitle() {
-  // The letters wait (dimly) for the display font, so they never kindle in the fallback font
-  // and then jump when Cinzel arrives
+  // The letters wait for the display font, so they never kindle in the fallback and then jump
   const [isFontReady, setIsFontReady] = useState(false);
 
   useEffect(() => {

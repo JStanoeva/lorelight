@@ -4,8 +4,8 @@ import { isValidUuid } from "../../../shared/utils/isValidUuid.js";
 const PROJECT_COLUMNS =
   "id, owner_id, title, description, cover_url, genre, format, is_public, created_at, updated_at";
 
-// Supabase returns the embedded count as lore_entries: [{ count: 3 }]; cards need lore_count: 3.
-// Row Level Security decides what is counted: the owner counts all their entries, visitors only public ones.
+// Supabase returns the count as lore_entries: [{ count: 3 }]; RLS counts only the entries the
+// viewer may see
 function withLoreCount({ lore_entries: loreEntries, ...project }) {
   return { ...project, lore_count: loreEntries?.[0]?.count ?? 0 };
 }
@@ -28,7 +28,7 @@ async function getProjectsByOwner(ownerId) {
   return data.map(withLoreCount);
 }
 
-// Returns null when the project doesn't exist or is someone else's private project.
+// Returns null when the project doesn't exist or is someone else's private project
 async function getProjectById(id) {
   if (!isValidUuid(id)) {
     return null;
@@ -61,9 +61,8 @@ async function createProject(payload, ownerId) {
   return data;
 }
 
-// `payload` may only contain the columns the database lets users update
-// (title, description, cover_url, genre, format, is_public): build it with toProjectPayload.
-// Returns null when no row was updated: the project doesn't exist or isn't the user's.
+// Build `payload` with toProjectPayload: users may update only its columns. Returns null when
+// no row was updated: the project doesn't exist or isn't the user's
 async function updateProject(id, payload) {
   if (!isValidUuid(id)) {
     return null;
@@ -83,8 +82,8 @@ async function updateProject(id, payload) {
   return data;
 }
 
-// The database also deletes the project's folders and lore (with their appreciations and saves).
-// Returns null when nothing was deleted: the project doesn't exist or isn't the user's.
+// The database also deletes its folders and lore. Returns null when nothing was deleted: the
+// project doesn't exist or isn't the user's
 async function deleteProject(id) {
   if (!isValidUuid(id)) {
     return null;
@@ -104,17 +103,15 @@ async function deleteProject(id) {
   return data;
 }
 
-// One database function (migration 006) moves the lore and deletes the project in a single
-// transaction, so an entry added to the project at the same moment can't be deleted with it,
-// and if anything fails nothing changes. Returns null when the project doesn't exist or isn't
-// the user's, like deleteProject.
+// One transaction (migration 006), so an entry added meanwhile can't be deleted with the project
+// and a failure changes nothing. Returns null like deleteProject
 async function moveLoreAndDeleteProject(id, targetProjectId) {
   if (!isValidUuid(id) || !isValidUuid(targetProjectId)) {
     return null;
   }
 
-  // Moving the lore into the project that is about to be deleted would delete it too.
-  // Lowercase first: the database treats "ABC…" and "abc…" as the same id.
+  // Moving the lore into the project being deleted would delete it too. Lowercase first: the
+  // database treats "ABC…" and "abc…" as the same id
   if (id.toLowerCase() === targetProjectId.toLowerCase()) {
     throw new Error("Choose a different project to move the lore to.");
   }

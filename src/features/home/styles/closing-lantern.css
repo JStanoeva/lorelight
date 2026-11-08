@@ -1,18 +1,5 @@
-/*
-  The closing strip's lantern (ClosingLantern): the drawing's own layers and its two kinds of
-  motion, kept apart on purpose. Plain CSS, no @apply.
-  - The intro is this part's fade-in (useSectionReveal writes data-reveal and --reveal-delay
-    onto the .closing-lantern wrapper; reveal.css fades the wrapper and the strip's halo). It
-    lives here, not in reveal.css, because it moves the drawing's own layers, which only this
-    component knows. It follows reveal.css's rules: transitions only (the shared pause rule in
-    home.css freezes keyframes, and a half-drawn lantern must never stay on screen), the
-    "fading" rules only set transitions (the lit look is the default look), and everything
-    ends 1.9 s after --reveal-delay, within the hook's 2.2 s.
-  - The idle loop (the star breathing, the sparkles, the ring's glint) is keyframes, frozen by
-    the shared pause rule while the svg has data-motion="paused".
-  With reduced motion none of the rules that move apply: the lantern is lit from the first
-  paint and the sparkles stay hidden.
-*/
+/* The intro uses transitions only, like reveal.css (the pause rule freezes keyframes), ending
+   1.9 s after --reveal-delay; the idle loop is keyframes, frozen by that pause rule. */
 @layer components {
   .lantern {
     display: block;
@@ -21,22 +8,19 @@
     overflow: visible;
   }
 
-  /* The star scales around the point where its arms cross: (256, 336) in the 512 viewBox */
+  /* Scales around where the star's arms cross: (256, 336) in the 512 viewBox */
   .lantern-star,
   .lantern-star-breath,
   .lantern-glow-breath {
     transform-origin: 256px 336px;
   }
 
-  /* Only seen while they move */
   .lantern-pen,
   .lantern-sparkle,
   .lantern-glint-arc,
   .lantern-glint-star {
     opacity: 0;
   }
-
-  /* ---------- Intro: a gold pen draws the lantern, then it lights up ---------- */
 
   @media screen and (prefers-reduced-motion: no-preference) {
     .lantern {
@@ -49,14 +33,12 @@
       stroke-dasharray: 1 2;
     }
 
-    /* The pen: a short bright dash at the front of the outline (its offset follows the
-       outline's, 0.02 behind) */
+    /* The pen: a short dash whose offset trails the outline's by 0.02 */
     .lantern-pen path {
       stroke-dasharray: 0.02 2;
       stroke-dashoffset: -0.98;
     }
 
-    /* Waiting: nothing drawn, nothing lit */
     .closing-lantern:not([data-reveal]) .lantern-ink {
       stroke-dashoffset: 1.05;
     }
@@ -78,14 +60,8 @@
       scale: 0.2;
     }
 
-    /* Lighting up (times after --reveal-delay):
-       0–1100 ms    the outline is drawn from the ring down both sides, the pen ahead of it
-       300–1200 ms  the inner lines (hips, rails, arches)
-       650–1350 ms  the metal fills in under the lines
-       950–1700 ms  the star ignites (a small overshoot, peaking near 1.04, so its top tip stays
-                    under the front window's arch even while it breathes)
-       1000–1900 ms the glass fills with light, the halo spreads, the engraving catches it
-       The strip's halo and bloom (reveal.css) follow the star at +1000 and +1150 ms. */
+    /* After --reveal-delay: outline 0–1100 ms, inner lines 300–1200, metal 650–1350, star
+       950–1700 (peaks near 1.04 to stay under the arch), glass 1000–1900. */
     .closing-lantern[data-reveal="fading"] .lantern-ink {
       transition: stroke-dashoffset var(--lantern-pen-time) var(--lantern-pen-ease) var(--reveal-delay, 0ms);
     }
@@ -125,8 +101,6 @@
     }
   }
 
-  /* ---------- Idle: the star breathes, sparkles travel the frame, the ring glints ---------- */
-
   @media (prefers-reduced-motion: no-preference) {
     .lantern-star-breath {
       animation: lantern-star-breathe 5.6s ease-in-out infinite alternate;
@@ -136,11 +110,8 @@
       animation: lantern-halo-breathe 5.6s ease-in-out infinite alternate;
     }
 
-    /* One 21 s cycle shared by all four, so they take turns (one at a time, with long rests).
-       The 3.5 s delay keeps them away from the intro (it ends at 1.9 s). The idle loop already
-       runs while the lantern waits just below the screen, so until the intro starts they're
-       left out (display: none drops their animations, and showing them starts the delay
-       again). */
+    /* One shared 21 s cycle, so the four take turns; the 3.5 s delay clears the intro (1.9 s).
+       display: none until the intro starts, so showing them restarts the delay. */
     .closing-lantern:not([data-reveal]) :is(.lantern-sparkle, .lantern-glint-arc, .lantern-glint-star) {
       display: none;
     }
@@ -189,9 +160,8 @@
   }
 }
 
-/* Down the left edge of the roof, from the collar to the eave's corner ball: points on the left
-   hip's curve (HIP_OUTER in lanternShapes.js). At 16% it reaches the ball (HIP_TO_BEAD.end,
-   mirrored to the left: 256 - 121.5 = 134.5), at 18% the ball's centre (EAVE_BEAD). */
+/* Points on the left hip's curve (HIP_OUTER in lanternShapes.js): at 16% the ball's edge
+   (HIP_TO_BEAD.end mirrored: 256 - 121.5 = 134.5), at 18% its centre (EAVE_BEAD). */
 @keyframes lantern-travel-roof {
   0% {
     opacity: 0;
@@ -227,7 +197,6 @@
   }
 }
 
-/* Down the right corner post */
 @keyframes lantern-travel-post {
   0%,
   30% {
@@ -256,7 +225,6 @@
   }
 }
 
-/* The ring catches the light: a brief highlight on its upper left and a turning glint */
 @keyframes lantern-glint-arc {
   0%,
   58% {
@@ -292,7 +260,6 @@
   }
 }
 
-/* Along the sill, left to right */
 @keyframes lantern-travel-sill {
   0%,
   74% {

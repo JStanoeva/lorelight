@@ -2,13 +2,10 @@ import { Link } from "react-router";
 import { useAuth } from "../../auth/hooks/useAuth.js";
 import CatalogNotice from "./CatalogNotice.jsx";
 
-// After sign-up, GuestGuard sends the new user straight to project creation (as on Home).
+// After sign-up, GuestGuard sends the new user straight to project creation.
 const CREATE_AFTER_SIGN_UP = { from: { pathname: "/projects/create" } };
 
-// The catalog has no public lore at all (not just none that matches the filters): an invitation
-// to write the first entry. Writing needs an account, so the buttons depend on who is looking:
-// users go straight to writing, guests can register or log in. While the session is still being
-// read there are no buttons, so nobody sees the wrong pair flash.
+// No buttons while the session is still being read, so the wrong pair never flashes.
 export default function EmptyCatalogNotice() {
   const { user, isAuthLoading } = useAuth();
 

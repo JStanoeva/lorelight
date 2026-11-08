@@ -1,18 +1,6 @@
-/*
-  Categories from 1024 px: the category orrery (CategoryOrrery). Plain CSS, no @apply.
-  - The wheel's angle arrives as --turn (useOrreryTurn sets it once per frame on .orrery-wheel).
-    Every star reads it to find its place on the ring with sin()/cos(), and the engraved layers
-    rotate with it, so only transforms change while the wheel turns (no layout, no repaint).
-  - The ring, lens and orbit sizes arrive as --star-ring, --lens-radius, --band-radius and
-    --limb-radius (shares of the wheel's width) from orreryGeometry.js, the same numbers the SVG
-    engraving is drawn with, so the two never drift apart.
-  - Everything inside the wheel is sized in em, and the wheel's font size follows its width, so
-    the whole instrument shrinks like a picture when the window is short.
-  - Pausing: the section sets data-motion="paused" and the shared rule in home.css freezes every
-    animation in it.
-*/
+/* --turn (from useOrreryTurn) places every star with sin()/cos(), so turning changes only
+   transforms. Everything inside is sized in em; the wheel's font size follows its width. */
 @layer components {
-  /* From lg the orrery replaces the list of categories; below lg the list stays */
   .orrery {
     display: none;
   }
@@ -26,8 +14,7 @@
   }
 
   .orrery-wheel {
-    /* As large as the window below the header allows, between 37rem (where the names are
-       still comfortably readable) and 42.5rem */
+    /* Fits the window below the header; below 37rem the names get hard to read */
     --orrery-size: clamp(37rem, 100svh - var(--header-height) - 2rem, 42.5rem);
     --turn: 0deg;
     position: relative;
@@ -38,7 +25,6 @@
     font-size: calc(var(--orrery-size) / 42.5);
   }
 
-  /* Soft violet light behind the whole instrument */
   .orrery-wheel::before {
     content: "";
     position: absolute;
@@ -53,7 +39,6 @@
     pointer-events: none;
   }
 
-  /* ---------- Engraving (SVG layers) ---------- */
   .orrery-layer {
     position: absolute;
     inset: 0;
@@ -138,7 +123,7 @@
     stroke-dasharray: 2 8;
   }
 
-  /* The neighbour lines (pathLength="1", so a dash of 1 is the whole line) */
+  /* pathLength="1", so a dash of 1 is the whole line */
   .orrery-thread {
     fill: none;
     stroke: color-mix(in oklab, var(--color-lantern-300) 38%, transparent);
@@ -152,7 +137,6 @@
     stroke-width: 2.4;
   }
 
-  /* ---------- Orbiting lights (the "planets" of the orrery) ---------- */
   .orrery-orbit {
     position: absolute;
     inset: 0;
@@ -189,7 +173,6 @@
     margin-left: -2px;
   }
 
-  /* ---------- The central light ---------- */
   .orrery-core {
     position: absolute;
     left: 50%;
@@ -229,7 +212,6 @@
     filter: drop-shadow(0 0 10px var(--color-gold-400));
   }
 
-  /* ---------- Category stars ---------- */
   .orrery-stars {
     position: absolute;
     inset: 0;
@@ -237,7 +219,6 @@
   }
 
   .orrery-star {
-    /* Where the star is now: its own place on the wheel plus the wheel's turn */
     --theta: calc(var(--angle) + var(--turn));
     --reach: calc(var(--orrery-size) * var(--star-ring) * var(--ring));
     position: absolute;
@@ -259,13 +240,13 @@
     will-change: transform;
   }
 
-  /* The focus ring is pulled inside the button: the ring is sized in px while the gap to the
-     name scales with the wheel, so outside the button it would touch the name */
+  /* The ring sits inside the button: it is sized in px while the gap to the name scales, so
+     outside it would touch the name */
   .orrery-star:focus-visible {
     outline-offset: -4px;
   }
 
-  /* Halo, flare and glyph are centred on the star's point (some are wider than the button) */
+  /* Centred on the star's point, since some are wider than the button */
   .orrery-star > :not(.orrery-star-label) {
     position: absolute;
     left: 50%;
@@ -280,8 +261,7 @@
     opacity: 0.75;
   }
 
-  /* The twinkle runs on the halo's ::before, so hover and selection can still set the halo's
-     own opacity and scale */
+  /* Twinkles on ::before, so hover and selection can still set the halo's own opacity and scale */
   .orrery-star-halo::before {
     content: "";
     position: absolute;
@@ -301,9 +281,8 @@
     filter: drop-shadow(0 0 4px currentColor);
   }
 
-  /* A four-ray lens flare in the star's hue, hidden until the star is chosen. It turns with the
-     star (rotate by --theta), so its long ray always runs along the ring and never across the
-     star's own name, which sits straight outwards; the short ray ends before the name begins. */
+  /* Rotates with --theta, so the long ray runs along the ring, never across the star's name;
+     the short ray ends before the name begins */
   .orrery-star-flare {
     width: 6.5em;
     height: 2em;
@@ -315,9 +294,8 @@
       linear-gradient(to bottom, transparent, currentColor 50%, transparent) center / 1.5px 100% no-repeat;
   }
 
-  /* The name stays upright on the outside of the ring: it is pushed outwards along the star's
-     direction, and anchored by its near edge (sin/cos of the same angle), so it never covers
-     its own star wherever the wheel has turned. The gap is 24 px on a full-size wheel. */
+  /* Pushed outwards along the star's direction and anchored by its near edge (sin/cos), so the
+     upright name never covers its star. The gap is 24 px on a full-size wheel. */
   .orrery-star-label {
     --gap: calc(var(--orrery-size) * 0.035);
     position: absolute;
@@ -382,8 +360,6 @@
     }
   }
 
-  /* ---------- The reading lens ---------- */
-  /* It sits inside the hatched band with a small gap, so the band frames it as a whole ring */
   .orrery-lens {
     --lens-size: calc(var(--orrery-size) * var(--lens-radius) * 2);
     position: absolute;
@@ -414,7 +390,6 @@
     display: none;
   }
 
-  /* Closing: the lens fades out with its last category in it (with motion, see below) */
   .orrery-lens[data-closing="true"] {
     opacity: 0;
     scale: 0.94;
@@ -459,15 +434,13 @@
     color: var(--color-gold-300);
   }
 
-  /* Forced colours (Windows High Contrast) drop the lens's gradient, so the engraved spokes
-     would show through its text: the lens gets a solid system background instead */
+  /* Forced colours drop the lens's gradient, so it gets a solid background over the spokes */
   @media (forced-colors: active) {
     .orrery-lens {
       background: Canvas;
     }
   }
 
-  /* ---------- Motion: opt-in only. With reduced motion the wheel is a complete still ---------- */
   @media (prefers-reduced-motion: no-preference) {
     .orrery-core {
       transition: opacity 400ms ease-out;
@@ -511,10 +484,8 @@
         translate 450ms ease-out;
     }
 
-    /* @starting-style gives the values a transition starts from when an element appears, so
-       the lens and its text fade in when they open. Only while the wheel is moving: a paused
-       wheel opens the lens at once. (Transitions, unlike animations, never replay when the
-       visitor presses play again.) */
+    /* @starting-style fades the lens in as it opens, only while the wheel moves (a paused wheel
+       opens at once; unlike animations, transitions never replay on Play) */
     @starting-style {
       .orrery[data-motion="running"] .orrery-lens {
         opacity: 0;
@@ -544,8 +515,7 @@
       animation: orrery-orbit-backward 84s linear infinite;
     }
 
-    /* Before the wheel is first seen, the lines wait undrawn; then they draw in once, one
-       after another around the ring, starting at the reading position */
+    /* data-lines comes from useLinePhase; the lines draw in once, starting at the top */
     .orrery-wheel[data-lines="waiting"] .orrery-thread {
       stroke-dashoffset: 1;
     }
@@ -554,7 +524,6 @@
       animation: orrery-draw 900ms cubic-bezier(0.4, 0, 0.2, 1) var(--draw-delay) backwards;
     }
 
-    /* The flare bursts once when the chosen star reaches the top, then breathes */
     .orrery-wheel[data-arrived="true"] .orrery-star[aria-expanded="true"] .orrery-star-flare {
       animation:
         orrery-flare-burst 1s cubic-bezier(0.2, 0.8, 0.3, 1),
@@ -615,8 +584,7 @@
   }
 }
 
-/* The burst peaks at 1.3 times the flare's size, so even then its short ray stays clear of the
-   star's name */
+/* Peaks at 1.3×, so even then the short ray stays clear of the star's name */
 @keyframes orrery-flare-burst {
   0% {
     opacity: 0;

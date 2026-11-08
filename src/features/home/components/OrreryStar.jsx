@@ -1,10 +1,7 @@
 import StarGlyph from "./StarGlyph.jsx";
 
-// One category star on the wheel: a real button (its name is the label inside it). orrery.css
-// places it on the ring from --angle (its place on the wheel) plus --turn (how far the wheel has
-// turned), and keeps the label upright on the outside of the ring. The twinkle timing comes
-// from the index alone, so it is the same on every render. While chosen, the star is described
-// by the lens's description text.
+// orrery.css places it on the ring from --angle plus --turn (how far the wheel has turned).
+// The twinkle timing comes from the index alone, so it is the same on every render.
 export default function OrreryStar({
   ref,
   category,

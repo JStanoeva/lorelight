@@ -3,14 +3,8 @@ export const RECENT_COUNT = 3;
 
 export const DEFAULT_PROFILE_TAB = "projects";
 
-// The four tabs of a Creator Profile, in order. `value` is the ?tab= value, the name of the
-// collection useProfile returns, and the last segment of the tab's "All …" page
-// (/profile/:userId/:collection). `dateField` decides which items are the most recent.
-// `listHeading` is the hidden h2 above the cards of an "All …" page (the cards' titles are h3s;
-// the Constellation's board brings its own).
-// The owner gets a note on who can see the tab and, when it's empty, a next step; a visitor gets
-// one calm sentence that starts with the creator's name (see getEmptyState in
-// utils/profileTabText.js).
+// `value` is the ?tab= value, useProfile's collection name and the "All …" page's URL segment.
+// `listHeading` is the hidden h2 of an "All …" page (the Constellation's board brings its own).
 export const PROFILE_TABS = [
   {
     value: "projects",
@@ -70,8 +64,7 @@ export const PROFILE_TABS = [
     panelTitle: "Recently appreciated",
     listHeading: "Appreciated entries",
     allTitlePrefix: "All lore appreciated by",
-    // "public": the owner's own appreciated entries that are no longer public stay in her list
-    // (marked on their cards), but visitors never see them
+    // "public": lore that is no longer public stays in the owner's list but is hidden from visitors
     ownerNote: "Everyone can see the public lore you appreciate.",
     allOwnerNote: "Visitors see only the public lore in this list.",
     ownerEmpty: {

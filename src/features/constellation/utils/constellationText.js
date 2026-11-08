@@ -1,13 +1,8 @@
-// Small text helpers for the Constellation board.
-
-// "18 saved entries", "1 saved entry"
 export function formatSavedCount(count) {
   return count === 1 ? "1 saved entry" : `${count} saved entries`;
 }
 
-// The line above the board: "18 saved entries", or with a category chosen
-// "Location · 3 of 18 saved entries". `categoryLabel` is "" for all categories. Only for a
-// Constellation with saved entries (an empty one says so in its notice).
+// "18 saved entries", or "Location · 3 of 18 saved entries"; `categoryLabel` is "" for all
 export function getBoardCountText(shownCount, totalCount, categoryLabel) {
   if (!categoryLabel) {
     return formatSavedCount(totalCount);
@@ -15,8 +10,6 @@ export function getBoardCountText(shownCount, totalCount, categoryLabel) {
   return `${categoryLabel} · ${shownCount} of ${formatSavedCount(totalCount)}`;
 }
 
-// Under a board without any thread yet (no two entries share a category), so it's clear what the
-// threads will be. `categoryLabel` is "" for all categories.
 export function getThreadHint(isOwner, categoryLabel) {
   if (categoryLabel && isOwner) {
     return `Save another ${categoryLabel} entry and a star-thread will join the two.`;

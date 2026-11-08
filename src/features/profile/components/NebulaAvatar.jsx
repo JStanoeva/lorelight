@@ -2,10 +2,6 @@ import { useId } from "react";
 import { buildAvatarNebula, VIEW_SIZE } from "../utils/nebulaPattern.js";
 import "../styles/nebula-avatar.css";
 
-// The generated "Nebula Wash" avatar: a soft nebula seeded by `seed` (the user id), led by
-// `colorHex` (the profile's star colour). It fills its parent, which sets the size and the frame
-// shape and must be `position: relative; overflow: hidden` (like CoverImage's parents).
-// Decorative (aria-hidden): the person's name is always written next to it.
 export default function NebulaAvatar({ seed, colorHex }) {
   // A page can show several avatars, so every gradient and filter id must be unique.
   const uid = `nebula-avatar-${useId()}`;
@@ -43,7 +39,6 @@ export default function NebulaAvatar({ seed, colorHex }) {
             <stop offset="1" stopColor={nebula.starColor} stopOpacity="0" />
           </radialGradient>
 
-          {/* Darkens the rim a little, evenly all round, so any frame shape sits on a calm edge */}
           <radialGradient id={`${uid}-vignette`} r="0.72">
             <stop offset="0.55" stopColor={nebula.dustColor} stopOpacity="0" />
             <stop offset="1" stopColor={nebula.dustColor} stopOpacity="0.6" />
@@ -98,7 +93,7 @@ export default function NebulaAvatar({ seed, colorHex }) {
         <rect width={VIEW_SIZE} height={VIEW_SIZE} fill={`url(#${uid}-vignette)`} />
       </svg>
 
-      {/* Film grain in its own SVG without a viewBox, so the grain stays the same size at every avatar size */}
+      {/* No viewBox, so the film grain stays the same size at every avatar size */}
       <svg className="nebula-avatar-layer nebula-avatar-grain" focusable="false">
         <filter id={`${uid}-grain`} x="0" y="0" width="100%" height="100%">
           <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed={nebula.grainSeed} />

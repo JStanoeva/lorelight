@@ -2,14 +2,9 @@ import LoreActions from "./LoreActions.jsx";
 import LoreHeader from "./LoreHeader.jsx";
 import "../styles/lore-details.css";
 
-// One lore entry on Lore Details: the banner with the title, the action row, the text and the tags.
-// `folderName` is null when the entry isn't in a folder. `onDeleted` runs after the author deletes it,
-// `onAppreciationChange(change)` after an appreciation was added (1) or removed (-1). `headingRef`
-// goes to the title (h1), where focus lands after Try again.
 export default function LoreArticle({ headingRef, entry, folderName, isOwner, onDeleted, onAppreciationChange }) {
   const tags = entry.tags ?? [];
-  // A drop cap only suits a letter (\p{L}: a letter in any alphabet). A text that starts with
-  // a quote mark or a digit starts plainly instead of with a large, odd-looking symbol.
+  // A drop cap only for a letter in any alphabet (\p{L}), not a quote mark or a digit
   const hasDropCap = /^\p{L}/u.test(entry.description);
 
   return (

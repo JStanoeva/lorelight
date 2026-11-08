@@ -2,8 +2,6 @@ import { Link } from "react-router";
 import { getCategory } from "../../lore/utils/getCategory.js";
 import Icon from "../../../shared/components/Icon.jsx";
 
-// One row in the contents tree: a star in the category's colour, the title, and (owner only)
-// a lock on private entries. The open entry gets the gold ribbon (see .ws-entry.is-active).
 export default function SidebarEntry({ entry, isOwner, isActive, onNavigate }) {
   const category = getCategory(entry.category);
   const isPrivate = isOwner && !entry.is_public;

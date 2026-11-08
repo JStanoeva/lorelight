@@ -1,5 +1,4 @@
-// Faint motes of light drifting behind a stage. `motes` comes from createStardust (computed once
-// at module level). Decorative only; the stage around it is already hidden from screen readers.
+// `motes` comes from createStardust; no aria-hidden here, because the stage is already hidden
 export default function Stardust({ motes }) {
   return (
     <span className="stardust">

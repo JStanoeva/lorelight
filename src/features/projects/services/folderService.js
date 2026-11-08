@@ -3,9 +3,8 @@ import { isValidUuid } from "../../../shared/utils/isValidUuid.js";
 
 const FOLDER_COLUMNS = "id, project_id, name, created_at, updated_at";
 
-// Row Level Security decides what comes back: the owner gets every folder, visitors only
-// folders that hold at least one public entry (so private folder names never leak).
-// The database sorts names alphabetically without caring about upper/lower case.
+// RLS gives visitors only folders holding public lore, so private folder names never leak;
+// the database sorts the names case-insensitively
 async function getFoldersByProject(projectId) {
   if (!isValidUuid(projectId)) {
     return [];
@@ -38,7 +37,7 @@ async function createFolder(projectId, name) {
   return data;
 }
 
-// Returns null when no row was renamed: the folder doesn't exist or isn't the user's.
+// Returns null when no row was renamed: the folder doesn't exist or isn't the user's
 async function renameFolder(id, name) {
   if (!isValidUuid(id)) {
     return null;
@@ -58,8 +57,8 @@ async function renameFolder(id, name) {
   return data;
 }
 
-// The folder's entries are kept: the database moves them to the top level of the project.
-// Returns null when nothing was deleted: the folder doesn't exist or isn't the user's.
+// The database moves the folder's entries to the top level. Returns null when nothing was
+// deleted: the folder doesn't exist or isn't the user's
 async function deleteFolder(id) {
   if (!isValidUuid(id)) {
     return null;

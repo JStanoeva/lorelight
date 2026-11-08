@@ -18,7 +18,6 @@ export default function EditLorePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { entry, isLoading, error, refetch } = useLoreEntry(entryId);
-  // The project select lists the user's own projects: changing it moves the entry
   const {
     projects,
     isLoading: isLoadingProjects,
@@ -42,7 +41,7 @@ export default function EditLorePage() {
     }
   }
 
-  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  // Try again disappears when pressed, so focus moves to the heading, which stays
   function handleRetry() {
     refetch();
     headingRef.current.focus();
@@ -95,7 +94,6 @@ export default function EditLorePage() {
     }
 
     content = (
-      // Only the author may edit; anyone else is sent to the entry's details page
       <OwnerGuard ownerId={entry.author_id} redirectTo={`/lore/${entry.id}`}>
         {formContent}
       </OwnerGuard>
@@ -106,7 +104,6 @@ export default function EditLorePage() {
     <section className="page">
       <PageTitle title="Edit Lore" />
       <div className="mx-auto max-w-2xl">
-        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
         <h1 ref={headingRef} tabIndex={-1} className="page-title">
           Edit Lore
         </h1>

@@ -1,11 +1,7 @@
 import { Link } from "react-router";
 import { fourPointStarPath } from "../utils/pinLayout.js";
 
-// The board with nothing to show: a lone pin over an empty card outline, with a loose thread.
-// Without `category` the Constellation is empty (the owner gets "Explore the catalog"). With a
-// category (an object from LORE_CATEGORIES), nothing saved is of that category right now, e.g.
-// after removing the last Location: "Show all" goes back to every category, and the owner can go
-// looking for that category in the catalog. The pin takes the category's colour then.
+// `category` (from LORE_CATEGORIES) is set when only the chosen category has no saved entries
 export default function EmptyBoardNotice({ category, isOwner, ownerName, onShowAll }) {
   let title;
   let text;

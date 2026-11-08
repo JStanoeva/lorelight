@@ -1,15 +1,4 @@
-/*
-  AppreciateButton: what only the Appreciate pill has. The pill itself (shape, pressed / checking /
-  pending states, the error lines, phones, High Contrast mode) comes from
-  shared/styles/pill-button.css, which Save uses too; this file adds the count segment
-  ("♡ Appreciate | 7") and the heart's pop.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
 @layer components {
-  /* The count: its own darker segment behind a divider, like a counter badge. tabular-nums keeps the
-     pill from changing width between 7 and 8. A grid, so the number and the pending "…" can share
-     one cell (see below). */
   .appreciate-count {
     display: inline-grid;
     place-items: center;
@@ -26,15 +15,14 @@
       border-color 150ms ease;
   }
 
-  /* Pressed: the number in gold on a gold segment */
   .appreciate-pill[aria-pressed="true"] .appreciate-count {
     border-left-color: rgb(232 193 112 / 0.5);
     background: rgb(232 193 112 / 0.14);
     color: var(--color-gold-400);
   }
 
-  /* The number and the "…" sit in the same grid cell. While pending, the number is invisible but
-     still takes its space, so a long count ("1,204") doesn't make the pill shrink under "…". */
+  /* One grid cell: while pending, the hidden number keeps its space, so a long count ("1,204")
+     doesn't let the pill shrink under "…" */
   .appreciate-count-number,
   .appreciate-count-pending {
     grid-area: 1 / 1;
@@ -44,17 +32,14 @@
     visibility: hidden;
   }
 
-  /* A small pop when the heart fills after the database has accepted the appreciation, only for
-     people who haven't asked for less motion. While a request is on its way, the shared breathing
-     animation (a stronger selector) replaces it. */
+  /* While pending, the shared breathing animation (a stronger selector) replaces the pop */
   @media (prefers-reduced-motion: no-preference) {
     .pill-button-glyph.is-popping {
       animation: appreciate-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
     }
   }
 
-  /* High Contrast mode drops the backgrounds: the count segment keeps its divider, and the system's
-     highlight colour marks it when pressed */
+  /* Forced colours drop backgrounds, so the divider and Highlight mark the count */
   @media (forced-colors: active) {
     .appreciate-count {
       border-color: ButtonText;

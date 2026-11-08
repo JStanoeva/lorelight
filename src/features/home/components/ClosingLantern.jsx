@@ -35,27 +35,18 @@ import {
 import { useHomeMotion } from "../hooks/useHomeMotion.js";
 import "../styles/closing-lantern.css";
 
-// The glass before the star lights it
 const UNLIT_GLASS = "#1b1045";
-// The sparkles that travel along the frame now and then (closing-lantern.css moves them)
 const SPARKLES = ["roof", "post", "sill"];
 
-// The Lorelight lantern in the closing strip: gold line work over violet enamel and glowing
-// glass, drawn from lanternShapes.js. When the strip fades in, it plays its intro: a gold pen
-// draws the outline, the metal fills in under the lines, the star ignites and the glass fills
-// with light. Afterwards the star breathes and small sparkles travel along the frame.
-// Everything that moves is in closing-lantern.css; the layers below carry the classes it
-// addresses. With reduced motion the lantern is simply lit. Decorative: ClosingCta hides it
-// from screen readers, because the heading next to it carries the meaning.
+// Every animation lives in closing-lantern.css and targets the layer classes below; with
+// reduced motion the lantern is simply lit.
 export default function ClosingLantern() {
   const { isMotionAllowed } = useHomeMotion();
   const [setRootElement, isInView] = useInView("120px");
   const isPageVisible = useIsPageVisible();
-  // One condition for every endless animation (the shared pause rule in home.css freezes them)
   const isMoving = isMotionAllowed && isInView && isPageVisible;
 
-  // Gradient ids must be unique on the page. React 19's ids (like _r_0_) can go straight into
-  // url(#…).
+  // Gradient ids must be unique on the page; React 19's useId values (like _r_0_) work in url(#…)
   const idPrefix = `lantern${useId()}`;
   const paint = (id) => `url(#${idPrefix}-${id})`;
 
@@ -81,7 +72,6 @@ export default function ClosingLantern() {
         })}
       </defs>
 
-      {/* Metal behind the glass, and the glass while it is still dark */}
       <g className="lantern-metal" stroke={INK} strokeWidth="3" strokeLinejoin="round" paintOrder="stroke">
         {METAL_BACK.map(([d, fill]) => (
           <path key={d} d={d} fill={paint(fill)} fillRule="evenodd" />
@@ -89,8 +79,6 @@ export default function ClosingLantern() {
         <path d={GLASS} fill={UNLIT_GLASS} stroke="none" />
       </g>
 
-      {/* The glass lit by the star: warm in the middle, lavender at the corners, cut into
-          lighter and darker facets */}
       <g className="lantern-glass">
         <path d={GLASS} fill={paint("glass")} />
         {SIDE_PANES.map(([d, fill]) => (
@@ -101,7 +89,6 @@ export default function ClosingLantern() {
         ))}
       </g>
 
-      {/* Shading on the glass, the window arches and the metal in front of the glass */}
       <g className="lantern-metal">
         <path d={GLASS} fill={paint("glassShade")} />
         <g fill={paint("frieze")} stroke={INK} strokeWidth="3" strokeLinejoin="round" paintOrder="stroke">
@@ -116,14 +103,12 @@ export default function ClosingLantern() {
         </g>
       </g>
 
-      {/* The star's light: warmth on the frame, and a soft halo that breathes */}
       <g className="lantern-glow">
         <path d={FRAME_GLOW} fill={paint("frameGlow")} />
         <circle className="lantern-glow-breath" cx={LIGHT.x} cy={LIGHT.y} r={HALO_RADIUS} fill={paint("halo")} />
       </g>
 
-      {/* Gold line work: an umber understroke, then the gold. pathLength="1" lets the CSS
-          draw every line in, whatever its real length. */}
+      {/* An umber understroke, then the gold; pathLength="1" lets the CSS draw each line in */}
       <g fill="none" strokeLinecap="round" strokeLinejoin="round">
         <g stroke={INK} strokeWidth="7">
           {OUTLINE.map((d) => (
@@ -173,8 +158,7 @@ export default function ClosingLantern() {
         </g>
       </g>
 
-      {/* The star, cut like a gem: it ignites in the intro (outer group), then breathes (inner
-          group). A thin deep-amber edge keeps it a star against the bright glass. */}
+      {/* The outer group ignites in the intro, the inner one breathes afterwards */}
       <g className="lantern-star">
         <g className="lantern-star-breath">
           <circle cx={LIGHT.x} cy={LIGHT.y} r={STAR_GLOW_RADIUS} fill={paint("starGlow")} />
@@ -186,7 +170,6 @@ export default function ClosingLantern() {
         </g>
       </g>
 
-      {/* The intro's pen: a bright point running ahead of the outline as it is drawn */}
       <g className="lantern-pen" fill="none" strokeLinecap="round">
         {OUTLINE.map((d) => (
           <g key={d}>
@@ -196,8 +179,6 @@ export default function ClosingLantern() {
         ))}
       </g>
 
-      {/* Idle: sparkles travelling along the frame, and the ring's glint (a highlight on the
-          ring and a turning star) */}
       {SPARKLES.map((name) => (
         <g key={name} className={`lantern-sparkle lantern-sparkle-${name}`}>
           <circle r="14" fill={paint("sparkle")} />

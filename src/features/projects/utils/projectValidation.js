@@ -2,12 +2,11 @@ import { countCharacters, isHttpUrl } from "../../../shared/utils/validators.js"
 import { PROJECT_GENRES } from "../constants/genres.js";
 import { PROJECT_FORMATS } from "../constants/projectFormats.js";
 
-// The same limits as the database check constraints (README §8).
+// The same limits as the database check constraints
 export const PROJECT_TITLE_MIN = 3;
 export const PROJECT_TITLE_MAX = 80;
 export const PROJECT_DESCRIPTION_MAX = 1000;
 
-// Create starts empty and private (README §7: new Projects are private until made public).
 export const EMPTY_PROJECT_VALUES = {
   title: "",
   description: "",
@@ -50,8 +49,7 @@ export function validateProject(values) {
   return errors;
 }
 
-// The clean database row: trimmed text, and null (never "") for empty optional fields,
-// because the database rejects "" as a cover link or genre.
+// Empty optional fields become null: the database rejects "" as a cover link or genre
 export function toProjectPayload(values) {
   return {
     title: values.title.trim(),
@@ -63,7 +61,7 @@ export function toProjectPayload(values) {
   };
 }
 
-// The other way round, to pre-fill the edit form: null becomes "" (inputs need strings).
+// null becomes "", since controlled inputs need strings
 export function toProjectFormValues(project) {
   return {
     title: project.title,

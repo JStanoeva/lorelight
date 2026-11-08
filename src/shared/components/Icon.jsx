@@ -1,6 +1,5 @@
 import { ICONS } from "../constants/icons.js";
 
-// A decorative icon: the text or aria-label next to it carries the meaning.
 export default function Icon({ name, size = 16, className = "" }) {
   const icon = ICONS[name];
 

@@ -12,20 +12,14 @@ import { getNeighbourArcPath } from "../utils/constellationLayout.js";
 const VIEW_BOX = "-500 -500 1000 1000";
 // Fine graduation on the fixed outer ring: a tick every 5°, a longer one every 30°
 const LIMB_TICKS = Array.from({ length: 72 }, (_, index) => index * 5);
-// The longer ticks reach only a little inside the ring, so the longest category name never
-// touches them, wherever the wheel has turned
+// The major ticks reach only a little inside the ring, so no category name ever touches them
 const MAJOR_TICK_INNER = LIMB_INNER - 6;
 const MAJOR_TICK_OUTER = LIMB_OUTER + 4;
 // Hatching on the geared band around the lens: a tick every 4°
 const BAND_HATCHES = Array.from({ length: 90 }, (_, index) => index * 4);
 const BAND_DIAMONDS = [0, 90, 180, 270];
 
-// The engraved metal of the orrery, all decorative (aria-hidden), in three layers:
-// 1. the fixed outer ring with its graduation and the gold reading mark at the top,
-// 2. a hatched band that is geared to the wheel and turns the other way, slower,
-// 3. the turning wheel itself: the dotted orbit, faint arms from the hub and the neighbour
-//    lines, which draw themselves in once and light up beside the chosen star.
-// orrery.css rotates layers 2 and 3 with the --turn variable, so nothing here re-renders.
+// orrery.css turns the band and the wheel (orrery-rete) with --turn, so nothing here re-renders
 export default function OrreryEngraving({ layout, selectedIndex }) {
   return (
     <>

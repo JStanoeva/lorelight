@@ -8,32 +8,28 @@ import Stardust from "./Stardust.jsx";
 import "../../styles/showcases.css";
 
 const CHARACTER = LORE_CATEGORIES.find((category) => category.value === "character");
-// Short sample text, so the empty form never reserves tall blank areas on a phone (the three
-// tags fit on one row from 360px up)
+// Short tags, so the empty form never reserves tall blank space on phones (one row from 360px)
 const TAGS = ["navigator", "reefs", "tides"];
 const MOTES = createStardust(14, 7);
 
-// The script, in ms: when each part of the picture appears
+// When each part of the picture appears, in ms
 const CUES = {
-  world: 300, // the Project card is drawn in light
-  worldText: 1100, // its words write themselves in
-  dust: 1900, // stardust drifts down to where the entry will be
-  entry: 2500, // an empty entry form is drawn
-  title: 3200, // the title writes itself in
-  badge: 4700, // the category badge appears
-  tags: 5200, // three tags, one after another
-  description: 6100, // the description
-  finish: 7000, // the form settles into a finished entry card
-  thread: 7800, // threads of light tie the entry to its world
-  hold: 8900, // the finished picture (also the reduced-motion still)
-  fade: 12400, // everything fades before the loop starts again
+  world: 300,
+  worldText: 1100,
+  dust: 1900,
+  entry: 2500,
+  title: 3200,
+  badge: 4700,
+  tags: 5200,
+  description: 6100,
+  finish: 7000,
+  thread: 7800,
+  hold: 8900, // the finished picture, also the reduced-motion still
+  fade: 12400,
 };
 const CUE_LIST = toCueList(CUES);
 const LOOP_MS = 13200;
 
-// Create: a Project card is drawn out of light, an entry form fills itself in, then it becomes a
-// finished Lore Entry tied to its world by threads of light. The mock is hidden from screen
-// readers; the visible caption says what it shows.
 export default function CreateShowcase() {
   const { setStageElement, time, isStill, runId, replay, canReplay, motionState } =
     useShowcasePlayback({ cues: CUE_LIST, finalCue: CUES.hold, loopMs: LOOP_MS });
@@ -71,7 +67,6 @@ export default function CreateShowcase() {
               </p>
             </div>
 
-            {/* Between the cards: stardust first, then the threads of light */}
             <div
               className="create-link"
               data-dust={time >= CUES.dust}

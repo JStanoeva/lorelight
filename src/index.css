@@ -2,7 +2,6 @@
 @import "./styles/components.css";
 
 @theme {
-  /* "Starlit archive": midnight surfaces, parchment text, a golden accent */
   --color-night-950: #0b1020;
   --color-night-900: #121a33;
   --color-night-800: #1b2447;
@@ -19,7 +18,7 @@
   --color-danger: #f4a3a3;
   --color-success: #86d9b4;
 
-  /* Sampled from the lantern logo. Decorative, plus lantern-300 for small labels on solid night surfaces (≥ 7.4:1). */
+  /* Decorative, except lantern-300 for small text on night surfaces (≥ 7.4:1 contrast) */
   --color-lantern-900: #1d0d43;
   --color-lantern-700: #392781;
   --color-lantern-500: #7a4faf;
@@ -29,10 +28,8 @@
   --font-body: "Inter", system-ui, sans-serif;
 }
 
-/* The site's centered 72rem column (as wide as max-w-6xl) for the header, footer and pages. It's
-   centered on the whole window (100vw includes the scrollbar), not on the space beside the
-   scrollbar, so it stays in place when the user moves between pages with and without a scrollbar.
-   clamp() keeps it inside the page: never past the left edge, never under the scrollbar. */
+/* Centered on 100vw (scrollbar included) so it doesn't shift between pages with and without a
+   scrollbar; clamp() keeps it off the left edge and out from under the scrollbar. */
 @utility site-column {
   width: min(72rem, 100%);
   margin-left: clamp(0px, (100vw - 72rem) / 2, 100% - 72rem);
@@ -45,7 +42,7 @@
 
   html {
     color-scheme: dark;
-    /* Fragment jumps and keyboard focus stop below the sticky header, on every page */
+    /* Fragment jumps and keyboard focus stop below the sticky header */
     scroll-padding-top: var(--header-height);
   }
 

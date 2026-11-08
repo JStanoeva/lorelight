@@ -1,7 +1,5 @@
 import { CATALOG_CONSTELLATIONS } from "../constants/catalogSky.js";
 
-// The hero's still night sky: planisphere rings and meridians, a star field and two faint
-// constellations. Purely decorative, so it's hidden from screen readers. Nothing moves.
 export default function CatalogSky() {
   return (
     <div className="catalog-sky" aria-hidden="true">

@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 
-// Where the cards' star-pins sit on the board, so the threads can be drawn between them:
-// { [entryId]: { x, y } }, each pin's centre in pixels from the board surface's top-left corner
-// (the threads' SVG covers the surface 1:1). null until measured.
-// The browser only knows where the cards ended up after layout, so they're measured in an effect.
-// A ResizeObserver measures once when it starts watching and again whenever the list changes size
-// (window resized, fonts loaded, an error line added). `layoutKey` changes when the list of cards
-// changes, so a removal or a new filter measures again even if the list keeps its size.
-// A card tilts around its own pin, so the pin's centre is the same whether the card is tilted or not.
+// Pin centres { [entryId]: { x, y } } in px from the surface's top-left, null until measured.
+// `layoutKey` re-measures when the cards change, even if the list keeps its size.
 export function usePinPositions(surfaceRef, listRef, layoutKey) {
   const [measured, setMeasured] = useState({ key: null, pins: null });
 
@@ -36,11 +30,9 @@ export function usePinPositions(surfaceRef, listRef, layoutKey) {
     const observer = new ResizeObserver(measure);
     observer.observe(list);
 
-    // Unmount, or before measuring a new list of cards: stop watching
     return () => observer.disconnect();
   }, [surfaceRef, listRef, layoutKey]);
 
-  // Positions measured for an earlier list of cards would put threads where no pin is any more
-  // (for one frame after a removal), so they're only used for the list they were measured for
+  // Positions of an earlier list would put threads where no pin is (for a frame after a removal)
   return measured.key === layoutKey ? measured.pins : null;
 }

@@ -1,4 +1,4 @@
-// The parts of one emblem or motif (see loreEmblems.js). The stroke width comes from the <use> that shows it.
+// The stroke width comes from the <use> that shows this shape.
 export default function EmblemShapes({ shape }) {
   return (
     <>

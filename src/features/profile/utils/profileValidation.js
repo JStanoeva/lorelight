@@ -2,7 +2,7 @@ import { countCharacters, isHttpUrl } from "../../../shared/utils/validators.js"
 import { STAR_COLORS } from "../constants/starColors.js";
 import { getStarColor } from "./getStarColor.js";
 
-// The same limits as the database check constraints (README §8).
+// The same limits as the database check constraints
 export const DISPLAY_NAME_MAX = 50;
 export const BIO_MAX = 500;
 
@@ -32,8 +32,7 @@ export function validateProfile(values) {
   return errors;
 }
 
-// The clean database row: trimmed text, and null (never "") for empty optional fields,
-// because the database rejects "" as an avatar link.
+// null (never "") for empty optional fields, because the database rejects "" as an avatar link
 export function toProfilePayload(values) {
   return {
     display_name: values.display_name.trim(),
@@ -43,9 +42,8 @@ export function toProfilePayload(values) {
   };
 }
 
-// The other way round, to pre-fill the form: null becomes "" (inputs need strings). The keys are
-// in the order the fields appear on screen (the avatar link first), so a failed submit focuses
-// the first invalid field from the top.
+// The keys follow the fields' order on screen, so a failed submit focuses the first invalid field
+// from the top
 export function toProfileFormValues(profile) {
   return {
     avatar_url: profile.avatar_url ?? "",

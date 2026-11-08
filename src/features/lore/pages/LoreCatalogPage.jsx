@@ -16,8 +16,6 @@ import { useLoreList } from "../hooks/useLoreList.js";
 import { getCatalogFilters, hasActiveFilters, toCatalogSearchParams } from "../utils/catalogFilters.js";
 import "../styles/catalog.css";
 
-// The public Lore Catalog. The filters live in the URL (/lore?q=bell&category=location&sort=oldest),
-// so a filtered view survives a refresh, can be shared, and Back/Forward step through the filters.
 export default function LoreCatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filters = getCatalogFilters(searchParams);
@@ -26,14 +24,13 @@ export default function LoreCatalogPage() {
   const countRef = useRef(null);
 
   const isLoaded = !isLoading && !error;
-  // No public lore at all (not just none that matches): the call to action for writers
   const isCatalogEmpty = isLoaded && !hasActiveFilters(filters) && entries.length === 0;
 
   // Every change is a new history entry, so Back and Forward step through the filters
   function changeFilters(changes) {
     const nextParams = toCatalogSearchParams({ ...filters, ...changes });
 
-    // The same filters again (e.g. pressing the pressed "All") would only add a duplicate history entry
+    // The same filters again (e.g. the pressed "All") would only add a duplicate history entry
     if (nextParams.toString() === toCatalogSearchParams(filters).toString()) {
       return;
     }
@@ -44,7 +41,6 @@ export default function LoreCatalogPage() {
   function handleSearch(text) {
     const q = text.trim();
 
-    // The same search again changes nothing, so it doesn't add a history entry either
     if (q === filters.q) {
       return;
     }
@@ -55,9 +51,8 @@ export default function LoreCatalogPage() {
     searchInputRef.current?.focus();
   }
 
-  // The clicked button disappears with its filter, so focus moves to the result count, which
-  // stays in place and soon reads the new number. flushSync renders the change first (the count
-  // is empty while the new results load), so the old number isn't read out on focus.
+  // The clicked button disappears, so focus moves to the result count. flushSync empties the
+  // count first, so the old number isn't read out on focus.
   function removeFilters(changes) {
     flushSync(() => changeFilters(changes));
     countRef.current?.focus();
@@ -68,7 +63,7 @@ export default function LoreCatalogPage() {
     removeFilters({ q: "", category: "" });
   }
 
-  // "Try again" disappears with the error message, so focus moves to the result count, as above
+  // Try again disappears with the error message, so focus moves to the result count
   function handleRetry() {
     refetch();
     countRef.current?.focus();

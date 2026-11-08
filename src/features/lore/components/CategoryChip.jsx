@@ -1,9 +1,6 @@
 import StarGlyph from "../../home/components/StarGlyph.jsx";
 
-// One category toggle: a star in the category's colour plus its name. `starClassName` sets the
-// button's text colour, which the CSS turns into the star, the border, the tint and the glow
-// of the pressed chip (currentColor). `count` (optional) adds how many entries it holds
-// ("Character 3"); the Lore Catalog leaves it out.
+// starClassName sets the text colour; the CSS derives the star, border and glow from currentColor.
 export default function CategoryChip({ label, starClassName, count, isPressed, onClick }) {
   return (
     <button

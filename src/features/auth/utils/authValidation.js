@@ -4,8 +4,8 @@ import { countCharacters, isEmail } from "../../../shared/utils/validators.js";
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 30;
 const PASSWORD_MIN_LENGTH = 8;
-// Supabase refuses passwords longer than 72 bytes. A password may only use Latin letters, numbers
-// and symbols (see hasOnlyAllowedCharacters), which take 1 byte each, so 72 bytes = 72 characters.
+// Supabase's limit is 72 bytes; every allowed character (hasOnlyAllowedCharacters) is 1 byte,
+// so 72 bytes = 72 characters.
 export const PASSWORD_MAX_LENGTH = 72;
 export const PASSWORD_RULE_COUNT = 5;
 
@@ -16,11 +16,9 @@ export const NO_SESSION_MESSAGE =
 
 const USERNAME_PATTERN = /^[A-Za-z0-9]+$/;
 
-// The exact set Supabase Auth counts as symbols (backslash and colon included, space not),
-// so this checklist and the server's password policy agree on what a "special character" is.
+// The exact set Supabase Auth's password policy counts as symbols (backslash and colon, no space)
 const SPECIAL_CHARACTERS = "!@#$%^&*()_+-=[]{};'\\:\"|<>?,./`~";
 
-// Only Latin letters (A–Z, a–z), numbers and the symbols above: no spaces, other alphabets or emoji
 function hasOnlyAllowedCharacters(password) {
   return Array.from(password).every(
     (character) => /[A-Za-z0-9]/.test(character) || SPECIAL_CHARACTERS.includes(character),
@@ -35,7 +33,7 @@ export function getPasswordChecks(password) {
     {
       id: "length",
       label: `At least ${PASSWORD_MIN_LENGTH} characters`,
-      // Like every other length rule: an emoji counts as one character (.length would say two)
+      // An emoji counts as one character (.length would say two)
       isMet: countCharacters(password) >= PASSWORD_MIN_LENGTH,
     },
     { id: "uppercase", label: "One uppercase letter", isMet: /[A-Z]/.test(password) },
@@ -49,7 +47,6 @@ export function getPasswordChecks(password) {
   ];
 }
 
-// Strength = how many of the 5 rules are met (0 to 5).
 export function getPasswordStrength(password) {
   return getPasswordChecks(password).filter((check) => check.isMet).length;
 }
@@ -62,8 +59,6 @@ export function getStrengthLabel(password, strength) {
   return STRENGTH_LABELS[Math.max(strength, 1) - 1];
 }
 
-// The text of the polite live region. It only changes when the number of met rules changes,
-// so a screen reader hears one short sentence per step instead of the whole list.
 export function getStrengthSummary(password, strength) {
   if (password === "") {
     return "";
@@ -77,8 +72,7 @@ export function getStrengthSummary(password, strength) {
   return `${label}. ${strength} of ${PASSWORD_RULE_COUNT} password rules met.`;
 }
 
-// "match", "mismatch", or "" when there is nothing to say yet. While the repeat is still
-// the start of the password, the user is typing it correctly, so the hint stays quiet.
+// Stays quiet ("") while the repeat is still the start of the password: it's being typed.
 export function getMatchState(password, repeatPassword) {
   if (repeatPassword === "") {
     return "";
@@ -107,9 +101,6 @@ function getEmailError(email) {
   return "";
 }
 
-// Both validators return an errors object, e.g. { email: "Enter your email address." }.
-// An empty object means the form is valid.
-
 // Login only checks that a password was entered: the password rules belong to registration.
 export function validateLogin({ email, password }) {
   const errors = {};
@@ -126,7 +117,7 @@ export function validateLogin({ email, password }) {
   return errors;
 }
 
-// Passwords are never trimmed: spaces are allowed and count as characters.
+// Passwords are never trimmed, so a space is rejected instead of silently removed.
 export function validateRegister({ username, email, password, repeatPassword }) {
   const errors = {};
   const trimmedUsername = username.trim();
@@ -166,7 +157,6 @@ export function validateRegister({ username, email, password, repeatPassword }) 
   return errors;
 }
 
-// Readable explanations for the reasons Supabase sends with a weak_password error.
 const WEAK_PASSWORD_REASONS = {
   length: "It is too short.",
   characters: "It needs an uppercase letter, a lowercase letter, a number and a special character.",
@@ -189,9 +179,8 @@ export function getAuthErrorMessage(error) {
   const { code, status } = error;
   const message = String(error.message ?? "");
 
-  // Checked first on purpose: Supabase reports every HTTP 500 as an AuthRetryableFetchError,
-  // which the shared helper would show as "Can't reach the server". This one means the
-  // database refused the new profile, usually because the username was taken a moment ago.
+  // Checked first: Supabase reports every HTTP 500 as a retryable fetch error ("Can't reach the
+  // server"), but this one usually means the username was taken a moment ago.
   if (message.includes("Database error saving new user")) {
     return "That username is no longer available. Please choose another.";
   }
@@ -208,8 +197,7 @@ export function getAuthErrorMessage(error) {
     return getWeakPasswordMessage(error.reasons);
   }
 
-  // Supabase refuses passwords over 72 bytes. validateRegister checks this before sending,
-  // so this message is only a fallback (e.g. if Supabase's limit ever changes).
+  // Only a fallback: validateRegister already checks the 72-byte limit
   if (code === "validation_failed" && /password/i.test(message)) {
     return `Your password is too long. Please use at most ${PASSWORD_MAX_LENGTH} characters.`;
   }
@@ -226,8 +214,6 @@ export function getAuthErrorMessage(error) {
   return getErrorMessage(error);
 }
 
-// The form field a failed request is about, so the page can move focus there:
-// "username", "email", "password", or "" when the error isn't about one field.
 export function getAuthErrorField(error) {
   const code = error?.code;
   const message = String(error?.message ?? "");

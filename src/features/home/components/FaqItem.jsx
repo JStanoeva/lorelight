@@ -1,9 +1,7 @@
 import { useState } from "react";
 
-// Each question keeps its own open state, so answers open independently: closing one answer
-// never shifts the question the user is clicking. The answer stays in the DOM (only hidden),
-// so aria-controls always points at an existing element. Each question is a row of the FAQ
-// section's fade-in (useSectionReveal), so the questions follow each other quickly.
+// Each item keeps its own open state, so closing one answer never shifts the question being
+// clicked. The answer is only hidden, so aria-controls always has a target.
 export default function FaqItem({ item }) {
   const [isOpen, setIsOpen] = useState(false);
 

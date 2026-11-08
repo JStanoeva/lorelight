@@ -9,8 +9,6 @@ function formatLoreCount(count) {
   return `${count} lore entries`;
 }
 
-// `showVisibility` is for the owner's own lists: visitors only ever see public projects.
-// `headingLevel` keeps the page outline right: 2 on its own page, 3 under a section heading.
 export default function ProjectCard({ project, showVisibility = false, headingLevel = 2 }) {
   const Title = headingLevel === 3 ? "h3" : "h2";
   const formatLabel = getFormatLabel(project.format);
@@ -25,9 +23,9 @@ export default function ProjectCard({ project, showVisibility = false, headingLe
 
       <div className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-start justify-between gap-3">
-          {/* min-w-0 + wrap-anywhere: a very long word wraps instead of pushing the badge off the card */}
+          {/* min-w-0 + wrap-anywhere: a long word wraps instead of pushing the badge off */}
           <Title className="min-w-0 text-xl wrap-anywhere">
-            {/* The link stretches over the whole card (see .card-link), so the card is one big target. */}
+            {/* .card-link stretches the link over the whole card */}
             <Link to={`/projects/${project.id}`} className="card-link">
               {project.title}
             </Link>

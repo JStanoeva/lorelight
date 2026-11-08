@@ -1,4 +1,3 @@
-// Home page copy for each category, keyed by the category value.
 export const CATEGORY_DETAILS = {
   character: {
     description:
@@ -110,7 +109,6 @@ export const CATEGORY_DETAILS = {
   },
 };
 
-// Used for a category that has no copy of its own yet (for example one added later).
 export const DEFAULT_CATEGORY_DETAILS = {
   description: "Lore that creators have filed under this category.",
   examples: [],

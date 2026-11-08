@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useViewerKey } from "../../auth/hooks/useViewerKey.js";
 import { constellationService } from "../services/constellationService.js";
 
-// The entries one user saved to their Constellation, most recently saved first. Without a valid
-// user id the service returns an empty list without sending a request.
 export function useConstellation(userId) {
   const viewerKey = useViewerKey();
   const [reloadCount, setReloadCount] = useState(0);
@@ -18,7 +16,6 @@ export function useConstellation(userId) {
       return;
     }
 
-    // Mount / update: fetch whenever the key changes.
     let isStale = false;
 
     constellationService.getConstellation(userId).then(
@@ -30,7 +27,6 @@ export function useConstellation(userId) {
       },
     );
 
-    // Unmount / before the next fetch: ignore this request's late response.
     return () => {
       isStale = true;
     };
@@ -38,10 +34,8 @@ export function useConstellation(userId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
-  // For the page, after the database removed a save: takes that entry off the list it already
-  // has, so the screen updates without reloading. Only the list of this request key is changed:
-  // a removal that finishes after the user or the viewer changed (e.g. a logout in another tab)
-  // can't change the newly loaded list.
+  // Drops a removed entry without reloading. Only this request key's list changes, so a removal
+  // that finishes after the user or viewer changed can't touch the newly loaded list.
   const removeEntry = useCallback(
     (loreId) =>
       setResult((current) =>

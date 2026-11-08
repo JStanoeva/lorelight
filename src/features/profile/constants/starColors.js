@@ -1,5 +1,4 @@
-// Mirrors the profiles_star_color_valid check constraint
-// (supabase/migrations/007_profile_avatar_and_star_color.sql), same order. A creator's accent colour.
+// Mirrors the profiles_star_color_valid check constraint (migration 007), in the same order
 export const STAR_COLORS = [
   { value: "gold", label: "Lantern Gold", hex: "#e8c170" },
   { value: "violet", label: "Nebula Violet", hex: "#d3a3ec" },

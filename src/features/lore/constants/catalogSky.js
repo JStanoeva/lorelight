@@ -1,6 +1,4 @@
-// The two faint constellations at the sides of the Lore Catalog's hero (wide screens only).
-// Hand-placed, so every visit shows the same sky. `stars` are [x, y, radius] points in a
-// 200 × 124 box; `lines` join two stars by their index in `stars`.
+// `stars` are [x, y, radius] in a 200 × 124 box; `lines` join two stars by their index in `stars`.
 export const CATALOG_CONSTELLATIONS = [
   {
     id: "left",

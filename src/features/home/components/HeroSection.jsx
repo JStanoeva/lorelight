@@ -13,12 +13,7 @@ import PauseAnimationsButton from "./PauseAnimationsButton.jsx";
 import StarGlyph from "./StarGlyph.jsx";
 import "../styles/hero.css";
 
-// The full-screen opening of the Home page. It slides under the sticky header (hero.css).
-// No z-index is needed: positioned children paint in DOM order, so the CSS painting comes
-// first (the first paint and the fallback), then the animated sky, then the readability scrim,
-// then the text. Everything that moves endlessly (the sky and the CSS twinkling) only runs
-// while motion is allowed, the hero is on screen and the tab is visible. The text fades in
-// when the page opens (useSectionReveal, data-reveal-item).
+// No z-index needed: positioned children paint in DOM order (CSS sky, animated sky, scrim, text)
 export default function HeroSection({ isLoggedIn = false, isAuthLoading = false }) {
   const { prefersReducedMotion, isMotionAllowed } = useHomeMotion();
   const [setHeroElement, isHeroInView] = useInView();
@@ -26,8 +21,7 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
   const isPageVisible = useIsPageVisible();
   const isHeroMoving = isMotionAllowed && isHeroInView && isPageVisible;
 
-  // Both hooks watch the same element. Both setters are state setters, so this ref function
-  // stays the same between renders.
+  // Both hooks watch the same element; their setters are stable, so this ref function is too
   const setSectionElement = useCallback(
     (element) => {
       setHeroElement(element);
@@ -36,8 +30,7 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
     [setHeroElement, setRevealElement],
   );
 
-  // Until the session is known, the actions keep their space but stay hidden ("invisible" also
-  // takes them out of the tab order), so nobody sees the wrong buttons flash
+  // "invisible" keeps the space and leaves the tab order, so the wrong buttons never flash
   const ctaVisibility = isAuthLoading ? "invisible" : "";
   const isGuest = !isAuthLoading && !isLoggedIn;
 
@@ -46,8 +39,6 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
       ref={setSectionElement}
       id={SECTION_IDS.hero}
       aria-labelledby="hero-title"
-      // One condition for the sky and the CSS motion: when the hero stops (paused, off screen,
-      // hidden tab), its CSS animations freeze where they are too (home.css)
       data-motion={isHeroMoving ? "running" : "paused"}
       className="hero flex flex-col items-center px-4 text-center sm:px-6"
     >
@@ -77,8 +68,7 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
         <div className={`mt-9 flex w-full justify-center ${ctaVisibility}`} data-reveal-item>
           <HomeCtas isLoggedIn={isLoggedIn} />
         </div>
-        {/* Always rendered, so the hero never shifts when the session arrives,
-            but only guests can see it */}
+        {/* Always rendered so nothing shifts when the session arrives; only guests can see it */}
         <p
           className={`mt-5 text-sm text-parchment-300 ${isGuest ? "" : "invisible"}`}
           data-sky-guard
@@ -91,8 +81,7 @@ export default function HeroSection({ isLoggedIn = false, isAuthLoading = false 
         </p>
       </div>
 
-      {/* Placed in the bottom-left corner; in the tab order it comes after the hero's actions
-          and before the scroll cue beside it */}
+      {/* Sits bottom-left; placed here so it tabs after the actions and before the scroll cue */}
       <PauseAnimationsButton />
 
       <a

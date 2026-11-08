@@ -1,5 +1,4 @@
-// The hero's hand-placed bright stars, kept away from the text column and below the header
-// strip. Fixed positions (never random) keep every render identical.
+// Hand-placed to stay clear of the text column and the header strip.
 export const HERO_FLARES = [
   { left: "11%", top: "22%", size: "0.875rem" },
   { left: "87%", top: "18%", size: "0.75rem" },

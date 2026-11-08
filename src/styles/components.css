@@ -1,5 +1,4 @@
 @layer components {
-  /* Page layout */
   .page {
     @apply site-column px-4 py-10 sm:px-6;
   }
@@ -8,17 +7,13 @@
     @apply text-3xl text-parchment-100 sm:text-4xl;
   }
 
-  /* The top of the Lore Catalog, My Projects and My Constellation: a small purple eyebrow over a
-     large centred title, with the page's own tool under it (the search bar, the New Project button,
-     the category chips). The three share these rules, so their titles sit at exactly the same height
-     and nothing jumps when switching between them in the header. Each page adds its own class for
-     its sky and the space under its tool. */
+  /* Shared by the Lore Catalog, My Projects and My Constellation, so their titles sit at the same
+     height and nothing jumps when switching between them. */
   .page-hero {
     padding-top: 3rem;
     text-align: center;
   }
 
-  /* lantern-300 is only used as text on solid night surfaces, where it stays above 7.4:1 */
   .page-hero-eyebrow {
     margin: 0;
     font-size: 0.75rem;
@@ -38,7 +33,6 @@
     text-wrap: balance;
   }
 
-  /* Phones: a little less room above, and the wide Cinzel letters a little closer together */
   @media (width < 40rem) {
     .page-hero {
       padding-top: 2.25rem;
@@ -49,13 +43,11 @@
     }
   }
 
-  /* Buttons. aria-disabled looks like disabled: ConfirmDialog's confirm button uses it while its
-     request runs, so it keeps keyboard focus */
+  /* aria-disabled looks like disabled: a waiting button uses it to keep keyboard focus */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-colors disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60;
   }
 
-  /* not-disabled: keeps hover effects off disabled buttons (links are never disabled) */
   .btn-primary {
     @apply bg-gold-400 text-night-950 not-disabled:hover:bg-gold-300;
   }
@@ -68,8 +60,7 @@
     @apply border border-danger/60 text-danger not-disabled:not-aria-disabled:hover:bg-danger/10;
   }
 
-  /* High Contrast mode draws a disabled button in grey; an aria-disabled one gets the same grey, so
-     ConfirmDialog's waiting confirm button matches the disabled Cancel beside it */
+  /* Forced colours draw a disabled button in grey; an aria-disabled one gets the same grey */
   @media (forced-colors: active) {
     .btn[aria-disabled="true"] {
       color: GrayText;
@@ -77,20 +68,17 @@
     }
   }
 
-  /* Larger call-to-action size (48px tall). Defined after .btn so its padding and size win. */
+  /* Defined after .btn so its padding and size win */
   .btn-lg {
     @apply px-6 py-3 text-base;
   }
 
-  /* Surfaces */
   .card {
     @apply rounded-xl border border-night-700 bg-night-800 p-5 shadow-lg shadow-black/20;
   }
 
-  /* Cards that open a page (ProjectCard, later LoreCard). The title's .card-link stretches over the
-     whole card, so the card is one click target while the link's name stays just the title.
-     outline-hidden: invisible normally (the gold ring shows focus), but High Contrast mode draws it,
-     because that mode removes the ring's box-shadow. */
+  /* .card-link stretches over the whole card, so the card is one click target named by its title.
+     outline-hidden shows only in forced colours, which remove the ring's box-shadow. */
   .card-interactive {
     @apply relative overflow-hidden rounded-xl border border-night-700 bg-night-800 shadow-lg shadow-black/20 transition-colors hover:border-night-500 has-[.card-link:focus-visible]:border-gold-400 has-[.card-link:focus-visible]:ring-2 has-[.card-link:focus-visible]:ring-gold-400 has-[.card-link:focus-visible]:outline-hidden;
   }
@@ -108,7 +96,6 @@
     backdrop-filter: blur(2px);
   }
 
-  /* Forms */
   .label {
     @apply text-sm font-medium text-parchment-100;
   }
@@ -125,24 +112,19 @@
     @apply text-sm text-danger;
   }
 
-  /* Messages */
   .alert-error {
     @apply rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-danger;
   }
 
-  /* Small labels such as categories and visibility */
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1;
   }
 
-  /* Header navigation (NavLink adds the "active" class). The Logout button uses it too
-     and is disabled while logging out. */
   .nav-link {
     @apply rounded-md px-3 py-2 text-sm font-medium text-parchment-300 no-underline transition-colors not-disabled:hover:text-parchment-100 disabled:opacity-60;
   }
 
-  /* The current page (NavLink adds "active") or the Home section in view: colour plus underline,
-     so colour is never the only signal */
+  /* NavLink adds "active". Underlined too, so colour is never the only signal. */
   .nav-link.active,
   .nav-link[aria-current="true"] {
     @apply text-gold-400 underline decoration-gold-400/60 decoration-1 underline-offset-8;

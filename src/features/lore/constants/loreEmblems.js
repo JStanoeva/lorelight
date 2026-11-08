@@ -1,9 +1,5 @@
-// One line-art emblem per lore category, keyed by the category value (see categories.js).
-// They are drawn in a box from -50 to 50 (centre 0, 0) and stay inside about -42..42.
-// lines: outlines · rings: outlined circles [cx, cy, r] · fills: solid shapes · dots: solid circles
-// tints: soft see-through fills behind the outlines.
-// `ink` evens out the brightness: light colours (yellow, amber) and busy emblems would outshine
-// the darker violet and slate ones, so they print a little fainter (1 = full strength).
+// Drawn in a -50..50 box (centre 0, 0), inside about -42..42. `ink` (1 = full strength) prints
+// light colours and busy emblems fainter, so they don't outshine the darker ones.
 export const LORE_EMBLEMS = {
   // A cameo: a classical bust in profile, with its hair tied in a knot, inside an oval frame
   character: {

@@ -1,5 +1,4 @@
-// Mirrors the projects_format_valid check constraint (supabase/migrations/005_genres_folders_images.sql), same order.
-// A Project's format is required.
+// Mirrors the projects_format_valid check constraint (migration 005), in the same order
 export const PROJECT_FORMATS = [
   { value: "novel", label: "Novel / Novel Series" },
   { value: "novella", label: "Novella" },

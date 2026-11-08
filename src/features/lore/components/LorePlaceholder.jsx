@@ -4,10 +4,7 @@ import { getCategory } from "../utils/getCategory.js";
 import EmblemShapes from "./EmblemShapes.jsx";
 import "../styles/lore-placeholder.css";
 
-// The "Emblem Print": a pattern of the lore category's emblem (a cameo for characters, a crown for
-// politics…), generated from `seed` (the entry id), so the same entry always gets the same print.
-// Shown when an entry has no image or the image fails to load. The CSS picks what to draw from the
-// placeholder's own size: the print, plus a large framed emblem on wide banners.
+// Generated from seed (the entry id), so an entry always gets the same print.
 // The parent sets the size and must be `relative overflow-hidden`.
 export default function LorePlaceholder({ seed, category }) {
   // Many placeholders share a page, so every symbol and pattern id must be unique.
@@ -16,14 +13,13 @@ export default function LorePlaceholder({ seed, category }) {
   const motifId = `${idBase}-motif`;
   const patternId = `${idBase}-pattern`;
 
-  // getCategory falls back to "Other" for an unknown value, so the emblem and the colour always match.
+  // getCategory falls back to "Other", so the emblem and the colour always match
   const { value, starClassName } = getCategory(category);
   const print = createEmblemPrint(seed, value);
 
   // Every line is drawn with currentColor, so the category's text colour paints the whole print.
   return (
     <div className={`emblem-print ${starClassName}`} aria-hidden="true">
-      {/* The emblem and the motif, defined once and reused (<use>) by every layer below */}
       <svg className="emblem-print-defs" focusable="false">
         <defs>
           <symbol id={emblemId} viewBox="-50 -50 100 100" overflow="visible">
@@ -35,7 +31,6 @@ export default function LorePlaceholder({ seed, category }) {
         </defs>
       </svg>
 
-      {/* Layer 1: the print. One tile in screen pixels, repeated edge to edge by the pattern */}
       <svg className="emblem-print-layer emblem-print-field" focusable="false">
         <defs>
           <pattern
@@ -87,8 +82,7 @@ export default function LorePlaceholder({ seed, category }) {
             </g>
           </pattern>
         </defs>
-        {/* The emblem's `ink` (loreEmblems.js) tones the bright colours down; the CSS scales the print
-            up a little on large banners */}
+        {/* The emblem's `ink` (loreEmblems.js) tones the bright colours down */}
         <g className="emblem-print-scale" opacity={print.emblem.ink}>
           <rect width="100%" height="100%" fill={`url(#${patternId})`} />
         </g>
@@ -96,8 +90,7 @@ export default function LorePlaceholder({ seed, category }) {
 
       <div className="emblem-print-vignette" style={{ background: print.vignette }} />
 
-      {/* Layer 2 (wide banners only): one large emblem on a cartouche that interrupts the print.
-          The 120-unit viewBox matches FEATURE_VIEWBOX in emblemPrint.js */}
+      {/* Wide banners only. The 120-unit viewBox matches FEATURE_VIEWBOX in emblemPrint.js */}
       <div className="emblem-print-feature" style={{ left: print.feature.left }}>
         <svg viewBox="-60 -60 120 120" focusable="false">
           <path d={print.feature.shape.outer} className="emblem-print-feature-halo" />

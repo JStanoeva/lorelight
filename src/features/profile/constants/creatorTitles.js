@@ -1,5 +1,4 @@
-// A creator's title on their profile, by the category they wrote the most public lore in.
-// One per lore category (features/lore/constants/categories.js).
+// One per lore category: the title for the category a creator wrote the most public lore in
 export const CREATOR_TITLES = {
   character: "Weaver of Characters",
   location: "Keeper of Locations",

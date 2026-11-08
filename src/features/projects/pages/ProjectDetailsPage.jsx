@@ -10,14 +10,12 @@ import DeleteProjectDialog from "../components/DeleteProjectDialog.jsx";
 import ProjectHeader from "../components/ProjectHeader.jsx";
 import ProjectLoreSection from "../components/ProjectLoreSection.jsx";
 
-// The project's overview. ProjectWorkspaceLayout loads the project (useProject with the URL's
-// projectId) and shows its sidebar beside this page.
+// ProjectWorkspaceLayout loads the project and shows the sidebar beside this page
 export default function ProjectDetailsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { projectState, retryFocus } = useOutletContext();
   const { project, entries, folders, isLoading, error } = projectState;
-  // Try again moves focus to the page's heading (see ProjectWorkspaceLayout)
   const { headingRef, retry } = retryFocus;
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -25,8 +23,7 @@ export default function ProjectDetailsPage() {
     return <Loader label="Loading the project…" />;
   }
 
-  // Without a project there's no title to show, so the page's h1 is visually hidden. Focus lands on
-  // it after another failed Try again.
+  // No title to show, so the h1 is visually hidden; focus lands on it after a failed Try again
   if (error) {
     return (
       <>
@@ -39,8 +36,7 @@ export default function ProjectDetailsPage() {
     );
   }
 
-  // Invalid id, a deleted project, or someone else's private project.
-  // tabIndex -1: focus can land here after Try again.
+  // Invalid id, a deleted project, or someone else's private project; tabIndex -1 is for Try again
   if (!project) {
     return (
       <div ref={headingRef} tabIndex={-1}>
@@ -63,7 +59,7 @@ export default function ProjectDetailsPage() {
       />
       <ProjectLoreSection projectId={project.id} entries={entries} folders={folders} isOwner={isOwner} />
 
-      {/* isOwner too: if the user logs out (e.g. in another tab) while it's open, it disappears */}
+      {/* isOwner too, so it disappears if the user logs out (e.g. in another tab) */}
       {isOwner && isDeleteOpen && (
         <DeleteProjectDialog
           project={project}

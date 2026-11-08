@@ -9,31 +9,22 @@ import { constellationService } from "../services/constellationService.js";
 import { getConstellationErrorMessage } from "../utils/constellationErrors.js";
 import "../../../shared/styles/pill-button.css";
 
-// The Save button on Lore Details: one pill ("☆ Save") that adds the entry to the user's
-// Constellation or takes it out again. It works like the Appreciate pill next to it: its name is
-// always "Save to Constellation" (the last words only for screen readers) and aria-pressed says
-// whether the entry is saved. Only for entries others can see (the database accepts saves of public
-// lore only), the author's own included. Nothing claims success before the database has accepted
-// it: while the request is on its way the pill shows that it's being processed, and only then does
-// the star fill (or empty).
+// Only for public entries: the database accepts saves of public lore only. Nothing claims
+// success before the database has answered; meanwhile the pill shows the request is pending.
 export default function SaveToConstellationButton({ loreId }) {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();
   const { isSaved, isLoading, error: statusError, refetch, setIsSaved } = useSaveStatus(loreId);
   const descriptionId = useId();
-  // isPending is true from the click until the request (the async function given to
-  // startTransition) has finished and its result is on screen
   const [isPending, startTransition] = useTransition();
   const [requestError, setRequestError] = useState("");
-  // Counts the failed requests: a new key per failure, so the same message is announced again
+  // A new key per failure, so the same message is announced again
   const [failedAttempts, setFailedAttempts] = useState(0);
-  // True from a click until its request has finished. Two clicks in the same moment both still see
-  // the old isPending value, but a ref changes at once, so the second click is ignored.
+  // Two clicks in the same moment both still see the old isPending; a ref changes at once
   const isRequestingRef = useRef(false);
   const pillRef = useRef(null);
 
-  // Guests go to Login, which sends them back to this entry afterwards (GuestGuard reads state.from).
-  // A link, because it leads to another page; it isn't a toggle for them, so there's no aria-pressed.
+  // Guests get a link to Login, which sends them back here afterwards (GuestGuard reads state.from)
   if (!isAuthLoading && !user) {
     return (
       <div className="save-to-constellation">
@@ -53,11 +44,8 @@ export default function SaveToConstellationButton({ loreId }) {
     );
   }
 
-  // Until the session and the user's save are loaded, the button can't be "pressed" or "not
-  // pressed" yet. While a request is on its way, the current state stays until the answer comes.
   const isStatusKnown = !isAuthLoading && !isLoading && !statusError;
-  // A click does nothing then. aria-disabled instead of disabled: a disabled button would drop
-  // keyboard focus to the page, so the user would lose their place.
+  // aria-disabled, not disabled: a disabled button would drop keyboard focus to the page
   const isWaiting = !isStatusKnown || isPending;
   const isPressed = isStatusKnown && isSaved;
 
@@ -68,7 +56,7 @@ export default function SaveToConstellationButton({ loreId }) {
     statusNote = "Checking whether you've saved it…";
   }
 
-  // Until the answer comes, the old state is still the true one
+  // isSaved still holds the old state until the answer comes
   let pendingNote = "";
   if (isPending) {
     pendingNote = isSaved ? "Removing from your Constellation…" : "Saving to your Constellation…";
@@ -83,8 +71,7 @@ export default function SaveToConstellationButton({ loreId }) {
     isRequestingRef.current = true;
     setRequestError("");
 
-    // An async Action: isPending stays true until this function has finished, so the pill shows
-    // that the request is being processed. Nothing else changes before the database has answered.
+    // An async Action: isPending stays true until this function has finished
     startTransition(async () => {
       try {
         if (isSaving) {
@@ -93,13 +80,12 @@ export default function SaveToConstellationButton({ loreId }) {
           await constellationService.unsaveLore(loreId, user.id);
         }
 
-        // State updates after an await only belong to the transition when they're wrapped in
-        // startTransition again. Then they reach the screen together with the end of isPending.
+        // Updates after an await need startTransition again to join the transition, so they
+        // show up together with the end of isPending
         startTransition(() => {
           setIsSaved(isSaving);
         });
       } catch (error) {
-        // Nothing was changed, so there's nothing to undo: only say what went wrong
         const message = isSaving
           ? `This entry couldn't be saved to your Constellation. ${getConstellationErrorMessage(error, "save")}`
           : `This entry couldn't be removed from your Constellation. ${getConstellationErrorMessage(error, "remove")}`;
@@ -133,8 +119,6 @@ export default function SaveToConstellationButton({ loreId }) {
         onClick={handleClick}
       >
         <span className="pill-button-action">
-          {/* While the request is on its way, the star breathes (or, without motion, dims: see
-              pill-button.css); the word stays the same, so the pill never changes width */}
           <Icon name={isPressed ? "star" : "starOutline"} className="pill-button-glyph" />
           <span>
             Save<span className="sr-only"> to Constellation</span>
@@ -144,9 +128,8 @@ export default function SaveToConstellationButton({ loreId }) {
       <span id={descriptionId} hidden>
         {statusNote}
       </span>
-      {/* Focus stays on the pill, and a changed description isn't announced, so this hidden status
-          line tells screen reader users that the request is being processed. It's always rendered,
-          so a screen reader notices when its text changes. */}
+      {/* Focus stays on the pill and a changed description isn't announced, so this
+          always-rendered status line announces the pending request */}
       <span role="status" className="sr-only">
         {pendingNote}
       </span>

@@ -1,4 +1,4 @@
-// Mirrors the lore_entries_category_valid check constraint (supabase/migrations/001_tables.sql), same order.
+// Mirrors the lore_entries_category_valid check in supabase/migrations/001_tables.sql, same order.
 // Class names are written out in full so Tailwind's scanner can find them.
 export const LORE_CATEGORIES = [
   {

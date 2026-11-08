@@ -3,7 +3,6 @@ import { Link } from "react-router";
 import Icon from "../../../shared/components/Icon.jsx";
 import { useOutsideClick } from "../../../shared/hooks/useOutsideClick.js";
 
-// Owner only: the "⋯" button on a folder row (new entry here, rename, delete).
 export default function FolderMenu({ folderId, folderName, newEntryPath, onRename, onDelete }) {
   const [isOpen, setIsOpen] = useState(false);
   const anchorRef = useRef(null);

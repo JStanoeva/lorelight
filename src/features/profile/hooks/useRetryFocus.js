@@ -1,17 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
 
-// Keeps keyboard focus on the page after Try again. The button disappears as soon as it's pressed
-// (the loading view replaces the error, then the profile or the error again), and focus would fall
-// back to the start of the document. Instead it moves to the heading of whatever the page shows
-// now: give that heading `headingRef` and tabIndex={-1}.
-//   isLoading  the data hook's isLoading      refetch  the data hook's refetch
-// Returns { headingRef, retry }: pass `retry` to the Try again button.
+// Try again disappears once pressed, so focus would fall back to the document's start. Instead it
+// moves to the heading the page shows now: give that heading `headingRef` and tabIndex={-1}.
 export function useRetryFocus(isLoading, refetch) {
   const headingRef = useRef(null);
   const isRetryingRef = useRef(false);
 
-  // Runs after each switch between loading and loaded (or failed). Only after a Try again, not
-  // when the page is first opened.
+  // After a Try again only: focuses the heading when loading starts and again when it ends
   useEffect(() => {
     if (!isRetryingRef.current) {
       return;

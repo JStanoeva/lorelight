@@ -5,11 +5,8 @@ import { DEFAULT_SORT } from "../constants/sortOptions.js";
 import { LORE_COLUMNS, withAppreciationCount } from "../utils/loreRows.js";
 import { toSearchTerm } from "../utils/searchTerm.js";
 
-// The Lore Catalog: public entries of public projects, each with its project, author and
-// appreciation count. Row Level Security would also return the user's own private entries,
-// so both rules are explicit filters here; `!inner` drops entries whose project is filtered out.
-// q: title or description contains it (any letter case), or one tag equals it exactly.
-// category: one of the 12 values, else ignored. sort: "oldest" or newest first. limit: optional.
+// Row Level Security would also return the user's own private entries, so both public rules are
+// explicit filters; `!inner` drops entries whose project is filtered out.
 async function getPublicLore({ q = "", category = "", sort = DEFAULT_SORT, limit } = {}) {
   let query = supabase
     .from("lore_entries")
@@ -29,8 +26,8 @@ async function getPublicLore({ q = "", category = "", sort = DEFAULT_SORT, limit
   // toSearchTerm replaces the characters that would break the filter, so it's safe to insert here.
   const term = toSearchTerm(q);
 
-  // A search made only of those characters (e.g. "%", now "_") has nothing left to look for: no
-  // results, rather than a wildcard that matches the whole catalog.
+  // A search made only of those characters (e.g. "%", now "_") returns nothing, rather than a
+  // wildcard that matches the whole catalog.
   if (q.trim() && !term.replace(/_/g, "").trim()) {
     return [];
   }
@@ -41,8 +38,8 @@ async function getPublicLore({ q = "", category = "", sort = DEFAULT_SORT, limit
     query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%${tagFilter}`);
   }
 
-  // Entries saved in one statement (e.g. by a script) share the same created_at; ordering by id
-  // after it keeps them in the same order on every request instead of swapping places.
+  // Entries saved in one statement share the same created_at; ordering by id after it keeps
+  // them in the same order on every request.
   query = query.order("created_at", { ascending: sort === "oldest" }).order("id");
 
   if (limit) {
@@ -58,8 +55,7 @@ async function getPublicLore({ q = "", category = "", sort = DEFAULT_SORT, limit
   return data.map(withAppreciationCount);
 }
 
-// Row Level Security decides what comes back: the owner gets every entry,
-// visitors only the public entries of a public project.
+// Row Level Security decides what comes back: everything for the owner, public lore for visitors.
 async function getLoreByProject(projectId) {
   if (!isValidUuid(projectId)) {
     return [];
@@ -78,9 +74,8 @@ async function getLoreByProject(projectId) {
   return data.map(withAppreciationCount);
 }
 
-// A creator's lore for their profile, newest first, each with its project and author. Row Level
-// Security decides what comes back, as above. The project's is_public lets the owner's cards tell
-// "private" from "hidden" (a public entry in a private project).
+// Row Level Security decides what comes back, as above. The project's is_public lets the owner's
+// cards tell "private" from "hidden" (a public entry in a private project).
 async function getLoreByAuthor(authorId) {
   if (!isValidUuid(authorId)) {
     return [];
@@ -95,8 +90,6 @@ async function getLoreByAuthor(authorId) {
       appreciations(count)`,
     )
     .eq("author_id", authorId)
-    // Entries saved in one statement (e.g. by a script) share the same created_at; ordering by id
-    // after it keeps them in the same order on every request.
     .order("created_at", { ascending: false })
     .order("id");
 
@@ -107,9 +100,7 @@ async function getLoreByAuthor(authorId) {
   return data.map(withAppreciationCount);
 }
 
-// One entry with its author, project, folder and appreciation count (Lore Details, Edit Lore).
-// Returns null when the entry doesn't exist or the user may not see it: a private entry,
-// or an entry inside a private project, unless it is the user's own.
+// Returns null when the entry doesn't exist or Row Level Security hides it from the user.
 async function getLoreById(id) {
   if (!isValidUuid(id)) {
     return null;
@@ -149,8 +140,7 @@ async function createLore(payload, authorId) {
   return data;
 }
 
-// `payload` may only contain the columns the database lets users update (project_id, folder_id,
-// title, category, description, image_url, tags, is_public): build it with toLorePayload.
+// Build `payload` with toLorePayload: it may only hold the columns users are allowed to update.
 // Returns null when no row was updated: the entry doesn't exist or isn't the user's.
 async function updateLore(id, payload) {
   if (!isValidUuid(id)) {

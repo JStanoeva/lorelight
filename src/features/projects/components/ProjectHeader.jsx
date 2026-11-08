@@ -7,8 +7,6 @@ import { formatDate } from "../../../shared/utils/formatDate.js";
 import { formatEntryCount } from "../utils/projectContents.js";
 import { getFormatLabel, getGenreLabel } from "../utils/projectLabels.js";
 
-// The top of Project Details: banner, title, owner, dates, owner actions and the description.
-// `headingRef` goes to the title (h1), where focus lands after Try again.
 export default function ProjectHeader({ headingRef, project, entryCount, isOwner, onDelete }) {
   const details = [getFormatLabel(project.format), getGenreLabel(project.genre)].filter(Boolean).join(" · ");
 

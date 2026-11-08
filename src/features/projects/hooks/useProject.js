@@ -11,8 +11,7 @@ export function useProject(projectId) {
   const [reloadCount, setReloadCount] = useState(0);
   const [result, setResult] = useState({ key: null, data: EMPTY_RESULT, error: null });
 
-  // A new key means "a new request is needed": a different project, a different viewer or a
-  // refetch(). No key while the session is still being read, so nothing loads for the wrong viewer.
+  // A new key means a new request; no key while the session is still being read
   const requestKey = viewerKey && `${projectId}|${viewerKey}|${reloadCount}`;
 
   useEffect(() => {
@@ -20,7 +19,6 @@ export function useProject(projectId) {
       return;
     }
 
-    // Mount / update: load the project, its lore and its folders at the same time.
     let isStale = false;
 
     Promise.all([
@@ -29,7 +27,7 @@ export function useProject(projectId) {
       folderService.getFoldersByProject(projectId),
     ]).then(
       ([project, entries, folders]) => {
-        // A missing or hidden project means "not found", whatever the other requests returned.
+        // A missing or hidden project means "not found", whatever the other requests returned
         const data = project ? { project, entries, folders } : EMPTY_RESULT;
         if (!isStale) setResult({ key: requestKey, data, error: null });
       },
@@ -38,7 +36,6 @@ export function useProject(projectId) {
       },
     );
 
-    // Unmount / before the next fetch: ignore this request's late response.
     return () => {
       isStale = true;
     };
@@ -46,10 +43,8 @@ export function useProject(projectId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
-  // Applies a change the page has just saved (e.g. a renamed folder) to the data it already has,
-  // so the screen updates at once instead of reloading everything. `updater(data)` returns new data.
-  // Only the data of this request key is changed: a save that finishes after the viewer or the
-  // project changed (e.g. a logout in another tab) can't add to the newly loaded data.
+  // Applies a just-saved change without reloading, only for the current key, so a save that
+  // finishes after the viewer or project changed can't touch the newly loaded data
   const updateData = useCallback(
     (updater) =>
       setResult((current) => (current.key === requestKey ? { ...current, data: updater(current.data) } : current)),

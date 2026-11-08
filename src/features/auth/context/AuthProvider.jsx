@@ -7,14 +7,13 @@ export default function AuthProvider({ children }) {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
-    // Mount: subscribe. The first event delivers the session stored in localStorage (or null).
-    // The callback only sets state: awaiting other Supabase calls in it can block the client.
+    // The first event delivers the stored session (or null). The callback only sets state:
+    // awaiting other Supabase calls in it can block the client.
     const unsubscribe = authService.onAuthChange((session) => {
       setUser(session?.user ?? null);
       setIsAuthLoading(false);
     });
 
-    // Unmount: stop listening.
     return unsubscribe;
   }, []);
 

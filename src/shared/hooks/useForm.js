@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { flushSync } from "react-dom";
 
-// Form state for every form (Login, Register, Project, Lore, Profile): the field values
-// (controlled inputs), the fields the user has left at least once (touched), and whether
-// a submit was tried. `validate(values)` returns an errors object. It runs on every render,
-// so the errors always match the current values and are never stored in state.
+// `validate(values)` returns an errors object. It runs on every render, so the errors always
+// match the current values and are never stored in state.
 export function useForm(initialValues, validate) {
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
@@ -12,15 +10,13 @@ export function useForm(initialValues, validate) {
 
   const errors = validate(values);
 
-  // A field's error shows only after the field was left once, or after a submit attempt,
-  // so typing the first characters doesn't paint the field red
+  // Shown only after the field was left once or a submit was tried, so typing doesn't paint it red
   function getShownError(name) {
     return touched[name] || hasSubmitted ? errors[name] : undefined;
   }
 
   function handleChange(event) {
     const { name, type, value, checked } = event.target;
-    // A checkbox reports its state in `checked`, every other control in `value`
     setValues((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
   }
 
@@ -29,14 +25,10 @@ export function useForm(initialValues, validate) {
     setTouched((current) => ({ ...current, [name]: true }));
   }
 
-  // Changes one field from code instead of from an input event, e.g. the Lore form clears
-  // the folder when another project is chosen
   function setValue(name, value) {
     setValues((current) => ({ ...current, [name]: value }));
   }
 
-  // Called at the start of a submit. Returns true when every field is valid. Otherwise it shows
-  // all the errors and moves focus to the first invalid field (fields in initialValues order).
   function validateBeforeSubmit(form) {
     const firstInvalidField = Object.keys(initialValues).find((name) => errors[name]);
 
@@ -51,9 +43,8 @@ export function useForm(initialValues, validate) {
     const field = form.elements.namedItem(firstInvalidField);
     // A radio group comes back as a RadioNodeList, which has no focus(): focus its first radio
     const target = field instanceof RadioNodeList ? field[0] : field;
-    // The submit button keeps focus in the last field, and focus() does nothing (not even scroll
-    // to it) on a field that already has focus. Blurring it first makes focus() work as usual: the
-    // page scrolls to the field, and a screen reader reads it again with its error.
+    // The submit button leaves focus in the last field, where focus() would do nothing (not even
+    // scroll), so blur it first; a screen reader then reads it again with its error.
     if (target === document.activeElement) {
       target.blur();
     }

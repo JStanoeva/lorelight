@@ -1,11 +1,7 @@
 import { useHomeMotion } from "../hooks/useHomeMotion.js";
 
-// The Home page's "Pause animations" switch (WCAG 2.2.2: endless motion needs a way to stop
-// it). It pauses every Home animation, not only the hero's sky (HomeMotionProvider). A toggle
-// button with a fixed name: aria-pressed tells screen readers whether it is on. On phones only
-// the icon shows; the words stay for screen readers. With reduced motion nothing moves, so
-// there is nothing to pause and the button isn't shown. It is a part of the hero's fade-in
-// (useSectionReveal).
+// WCAG 2.2.2: endless motion needs a way to stop it. With reduced motion nothing moves, so the
+// button isn't shown.
 export default function PauseAnimationsButton() {
   const { isMotionPaused, setIsMotionPaused, prefersReducedMotion } = useHomeMotion();
 

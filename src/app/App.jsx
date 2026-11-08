@@ -28,10 +28,9 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
-          {/* Public */}
           <Route index element={<HomePage />} />
           <Route path="lore" element={<LoreCatalogPage />} />
-          {/* One workspace layout for both, so the project sidebar stays mounted between them */}
+          {/* One shared layout, so the project sidebar stays mounted between these pages */}
           <Route element={<ProjectWorkspaceLayout />}>
             <Route path="lore/:entryId" element={<LoreDetailsPage />} />
             <Route path="projects/:projectId" element={<ProjectDetailsPage />} />
@@ -39,7 +38,6 @@ export default function App() {
           <Route path="profile/:userId" element={<ProfilePage />} />
           <Route path="profile/:userId/:collection" element={<ProfileCollectionPage />} />
 
-          {/* Logged-in users only */}
           <Route element={<AuthGuard />}>
             <Route path="lore/create" element={<CreateLorePage />} />
             <Route path="lore/:entryId/edit" element={<EditLorePage />} />
@@ -50,7 +48,6 @@ export default function App() {
             <Route path="profile/edit" element={<EditProfilePage />} />
           </Route>
 
-          {/* Guests only */}
           <Route element={<GuestGuard />}>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />

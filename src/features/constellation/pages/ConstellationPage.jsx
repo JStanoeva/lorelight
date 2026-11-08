@@ -7,9 +7,7 @@ import ConstellationHero from "../components/ConstellationHero.jsx";
 import { useConstellation } from "../hooks/useConstellation.js";
 import { constellationService } from "../services/constellationService.js";
 
-// My Constellation: the logged-in user's saved lore as a pin board (AuthGuard lets only users in).
-// The chosen category lives in the URL (/constellation?category=location), like the catalog's
-// filters, so it survives a refresh and Back/Forward step through the categories.
+// AuthGuard lets only logged-in users in, so `user` is always set here
 export default function ConstellationPage() {
   const { user } = useAuth();
   const { entries, isLoading, error, refetch, removeEntry } = useConstellation(user.id);
@@ -31,9 +29,6 @@ export default function ConstellationPage() {
     setSearchParams(nextParams);
   }
 
-  // The card's Remove button waits for this Promise (its pending state). Once the database has
-  // confirmed the removal, the card calls onRemoved (removeEntry) inside its own transition, so
-  // the entry leaves the list in the same moment the card's pending state ends.
   function handleRemove(loreId) {
     return constellationService.unsaveLore(loreId, user.id);
   }

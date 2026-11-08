@@ -1,5 +1,4 @@
-// Seeded randomness for generated art: the same seed (e.g. a record id) always gives the same
-// sequence of numbers, so a picture looks the same on every visit. Math.random() can't do that.
+// Unlike Math.random(), the same seed (e.g. a record id) always gives the same numbers.
 
 // FNV-1a (32-bit): turns a text seed into a whole number.
 export function hashString(text) {
@@ -11,9 +10,7 @@ export function hashString(text) {
   return hash >>> 0;
 }
 
-// mulberry32: a tiny random number generator. Each call to random() returns the next number in [0, 1).
-// It moves a counter forward and scrambles its bits, so similar seeds still give unrelated numbers;
-// `>>> 0` makes the result a positive 32-bit number, and dividing by 2^32 turns it into a fraction.
+// mulberry32: each call to random() returns the next number in [0, 1) (4294967296 is 2^32).
 export function createRandom(seedNumber) {
   let state = seedNumber;
   return function random() {
@@ -24,12 +21,10 @@ export function createRandom(seedNumber) {
   };
 }
 
-// One random item of the list.
 export function pick(random, items) {
   return items[Math.floor(random() * items.length)];
 }
 
-// true with the given probability, e.g. chance(random, 0.25) is true about once in four calls.
 export function chance(random, probability) {
   return random() < probability;
 }

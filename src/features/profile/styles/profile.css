@@ -1,20 +1,6 @@
-/*
-  Creator Profile and its "All …" pages: the creator's own night sky behind the top of the page,
-  one framed, frosted card for the header (the avatar in its star crest, the creator title, the
-  name, bio and a ledger strip with the figures), a classic underlined tab bar with counts, and a
-  grid of the app's own cards (ProjectCard, LoreCard, PinCard: their own CSS files).
-  The star colour arrives as --star (set inline on .profile-page from the profile's star_color).
-  It tints the sky, the crest, the card's corners, the title ribbon (its edge, its star and a light
-  tint of its words), the chosen tab and small marks, never body text, so the contrast of the
-  body text doesn't depend on it.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element still wins.
-  Motion (the crest's orbiting lights, the twinkling sky, the loading pulse) only runs without
-  reduced motion.
-*/
+/* --star (set inline on .profile-page) never tints body text, so its contrast doesn't depend on it.
+   In the components layer, so Tailwind utilities still win. */
 @layer components {
-  /* ---------- Page ---------- */
-
   /* clip (not hidden): cuts off the strip of the 100vw sky that lies under the scrollbar without
      making the page a scroll container */
   .profile-page {
@@ -31,8 +17,6 @@
     --star: var(--color-night-500);
   }
 
-  /* ---------- The creator's sky behind the header ---------- */
-
   .profile-hero {
     position: relative;
     isolation: isolate;
@@ -43,9 +27,8 @@
     padding-inline: 1rem;
   }
 
-  /* As wide as the whole window (100vw includes the scrollbar), like the catalog's sky: the stars,
-     placed in percentages, stay put when a scrollbar appears. It reaches a little below the
-     header card and fades out before the tab bar. */
+  /* 100vw (it includes the scrollbar), like the catalog's sky: the stars, placed in percentages,
+     stay put when a scrollbar appears */
   .profile-sky {
     position: absolute;
     inset: 0 auto -1.25rem 0;
@@ -95,8 +78,6 @@
     filter: drop-shadow(0 0 4px var(--star));
   }
 
-  /* ---------- The header card ---------- */
-
   /* Frosted: the sky's colour shows through, while the blur and the dark tint keep every star off
      the text (even the card's dimmest text, parchment-500, stays above 4.5:1 for every star colour) */
   .profile-card {
@@ -115,8 +96,7 @@
       inset 0 1px 0 rgb(243 234 215 / 0.06);
   }
 
-  /* Corner mounts: a thin inner border in the star colour, masked so only the four corners show,
-     like the paper corners that hold a card in an archive drawer */
+  /* Corner mounts: an inner border in the star colour, masked so only the four corners show */
   .profile-card::before {
     content: "";
     position: absolute;
@@ -137,9 +117,6 @@
       linear-gradient(#000 0 0) 100% 100% / 1.375rem 1.375rem no-repeat;
   }
 
-  /* Phones: the avatar with Edit profile beside it, then the text across the full width.
-     From 768px: avatar | text (the owner's Edit profile under the avatar, so the text keeps a wide
-     column); from 1024px: avatar | text | Edit profile. */
   .profile-card-main {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -176,9 +153,8 @@
     white-space: nowrap;
   }
 
-  /* The creator title: a small banner with a swallowtail end, its edge and star in the star colour.
-     The words are parchment tinted toward the star colour (all six colours are light, so they stay
-     above 5:1 on the ribbon for every star colour) */
+  /* The words are parchment tinted toward the star colour (all six are light, so the text stays
+     above 5:1 on the ribbon) */
   .profile-title-ribbon {
     display: inline-flex;
     align-items: center;
@@ -223,9 +199,8 @@
     outline-offset: 4px;
   }
 
-  /* Username and "Member since" on their own lines, until the text column is 480px wide (a wrapped
-     "·" would dangle at a line end); from there one line with the dot between them (480px leaves
-     room for a long username too). */
+  /* Username and "Member since" stack until the column is 480px wide, so a wrapped "·" never
+     dangles at a line end */
   .profile-meta {
     display: flex;
     flex-direction: column;
@@ -278,8 +253,6 @@
     color: var(--color-parchment-500);
   }
 
-  /* ---------- The ledger strip ---------- */
-
   .profile-ledger {
     display: flex;
     flex-wrap: wrap;
@@ -291,7 +264,6 @@
     background: rgb(11 16 32 / 0.45);
   }
 
-  /* Phones: two by two. From 640px: one row with thin dividers. */
   .profile-stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -370,8 +342,6 @@
     text-decoration-color: currentColor;
   }
 
-  /* ---------- The star crest around the avatar ---------- */
-
   .profile-crest {
     position: relative;
     flex: none;
@@ -427,8 +397,7 @@
     stroke-dasharray: 1.5 4.5;
   }
 
-  /* Each point of light starts at a seeded angle; it travels round only without reduced motion.
-     SVG elements turn around the viewBox's 0, 0, which is the crest's centre. */
+  /* SVG elements turn around the viewBox's 0, 0, which is the crest's centre */
   .profile-crest-orbit {
     transform: rotate(var(--orbit-start, 0deg));
   }
@@ -441,8 +410,6 @@
     fill: color-mix(in srgb, var(--star) 40%, transparent);
   }
 
-  /* The round portrait: the picture or the Nebula fills it (both need a positioned parent that
-     hides what overflows). A ring in the star colour, a dark gap, a faint outer ring and a glow. */
   .profile-portrait {
     position: absolute;
     inset: 18.33%;
@@ -471,7 +438,6 @@
     fill: #fffaf0;
   }
 
-  /* The "All …" pages: a smaller crest (no tick ring, one orbit) and thinner rings */
   .profile-crest.profile-crest-small {
     width: 5.5rem;
   }
@@ -483,8 +449,6 @@
       0 0 0 5px color-mix(in srgb, var(--star) 45%, transparent),
       0 0 24px 4px color-mix(in srgb, var(--star) 30%, transparent);
   }
-
-  /* ---------- Tabs ---------- */
 
   .profile-collections {
     padding-inline: 1rem;
@@ -500,7 +464,6 @@
     border-bottom: 1px solid var(--color-night-700);
   }
 
-  /* Phones: two by two, each tab with its own baseline. From 640px: one row. */
   .profile-tablist {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -528,7 +491,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* The underline: faint on hover, the star colour (with a little glow) on the chosen tab */
   .profile-tab::after {
     content: "";
     position: absolute;
@@ -586,10 +548,8 @@
     color: var(--color-parchment-100);
   }
 
-  /* The owner's sentence on who can see the chosen tab: on its own row under the tabs (beside them
-     from 1152px, where even the longest sentence fits), with room for two lines on phones and one
-     from 640px. Its place and height never depend on which tab is chosen, so the cards don't jump
-     when another tab is picked. */
+  /* Its place and height never depend on the chosen tab, so the cards don't jump on a tab switch
+     (room for two lines on phones, one from 640px; beside the tabs from 1152px) */
   .profile-owner-note {
     display: flex;
     flex-basis: 100%;
@@ -606,8 +566,6 @@
   .profile-owner-note-icon {
     color: var(--star);
   }
-
-  /* ---------- Panels ---------- */
 
   .profile-panel {
     padding-top: 1.25rem;
@@ -669,8 +627,6 @@
     color: var(--star);
   }
 
-  /* ---------- Card grid ---------- */
-
   .profile-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -702,8 +658,6 @@
     background: rgb(27 36 71 / 0.55);
   }
 
-  /* ---------- "All …" pages ---------- */
-
   .profile-hero-compact {
     padding-top: 1.25rem;
   }
@@ -734,9 +688,8 @@
     margin-top: 0.25rem;
   }
 
-  /* Narrow phones: the crest goes above the title (like the profile's own card on phones), so a
-     long one-word name (a display name starts as the username) has the full width and doesn't
-     break in the middle */
+  /* Narrow phones: the crest goes above the title, so a long one-word name (display names start
+     as the username) gets the full width instead of breaking in the middle */
   @media (width < 30rem) {
     .profile-all-head {
       flex-direction: column;
@@ -785,8 +738,7 @@
     padding: 1.75rem 1rem 0;
   }
 
-  /* The All Constellation page: the shared board, read-only (it brings its own column and the
-     space under it) */
+  /* The shared Constellation board brings its own column and the space under it */
   .profile-page-board {
     padding-bottom: 0;
   }
@@ -800,8 +752,6 @@
   .profile-board .catalog-index {
     padding-top: 1rem;
   }
-
-  /* ---------- Loading and error ---------- */
 
   .profile-skeleton-bar {
     display: block;
@@ -851,7 +801,6 @@
     height: 0.625rem;
   }
 
-  /* The skeleton's figures: the bar for the number above the bar for the label */
   .profile-skeleton-stat {
     display: flex;
     flex-direction: column;
@@ -875,14 +824,12 @@
     height: 1.125rem;
   }
 
-  /* Where the owner's Edit profile button will be */
   .profile-skeleton-button {
     width: 8.125rem;
     height: 2.75rem;
     border-radius: 0.5rem;
   }
 
-  /* In the owner's note under the tabs, which keeps the loaded note's height */
   .profile-skeleton-note {
     width: 20rem;
     max-width: 100%;
@@ -937,8 +884,6 @@
     width: 100%;
     margin-top: 0.75rem;
   }
-
-  /* ---------- Wider screens ---------- */
 
   @media (width >= 40rem) {
     .profile-hero-inner,
@@ -1054,7 +999,7 @@
   }
 
   /* Tablets, the owner's card: Edit profile under the avatar, so the text column stays as wide as
-     a visitor's (with it beside the text, the name and the meta line were squeezed) */
+     a visitor's */
   @media (width >= 48rem) and (width < 64rem) {
     .profile-card-main-owner {
       grid-template-columns: auto minmax(0, 1fr);
@@ -1086,8 +1031,6 @@
       flex-basis: auto;
     }
   }
-
-  /* ---------- Motion (only without reduced motion) ---------- */
 
   @media (prefers-reduced-motion: no-preference) {
     .profile-crest-orbit {
@@ -1123,7 +1066,7 @@
       translate: 0.1875rem 0;
     }
 
-    /* While loading the bars breathe and the crest's lights stay still; after an error nothing moves */
+    /* Loading: the bars breathe and the crest's lights stay still. After an error nothing moves. */
     .profile-page-loading .profile-skeleton-bar,
     .profile-page-loading .profile-ghost-card {
       animation: profile-pulse 1.6s ease-in-out infinite;
@@ -1160,10 +1103,8 @@
     }
   }
 
-  /* ---------- Forced colours (Windows High Contrast) ---------- */
-
-  /* The browser drops the card's gradient there, so the sky would show behind the text: hide the
-     sky, give the card a solid background and keep the chosen tab's underline visible */
+  /* Forced colours drop the card's gradient, so the sky would show behind the text: hide the sky,
+     give the card a solid background and keep the chosen tab's underline visible */
   @media (forced-colors: active) {
     .profile-sky {
       display: none;

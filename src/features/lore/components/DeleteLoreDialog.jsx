@@ -3,8 +3,7 @@ import ConfirmDialog from "../../../shared/components/ConfirmDialog.jsx";
 import { getErrorMessage } from "../../../shared/utils/getErrorMessage.js";
 import { loreService } from "../services/loreService.js";
 
-// Rendered only while open, and only for the author. `onDeleted` runs after a successful delete
-// (the details page then returns to the entry's project).
+// Rendered only while open, so isOpen is always true.
 export default function DeleteLoreDialog({ entry, onCancel, onDeleted }) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");

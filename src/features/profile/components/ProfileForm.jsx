@@ -11,8 +11,7 @@ import { BIO_MAX, DISPLAY_NAME_MAX, toProfilePayload, validateProfile } from "..
 import AvatarLinkField from "./AvatarLinkField.jsx";
 import StarColorField from "./StarColorField.jsx";
 
-// `profileId` seeds the generated nebula of the avatar preview. `onSubmit(payload)` saves and
-// navigates away; if it returns a message instead, the form shows it above the fields.
+// `onSubmit(payload)` saves and navigates away; if it returns a message, the form shows it
 export default function ProfileForm({ profileId, initialValues, cancelTo, onSubmit }) {
   const { values, getShownError, handleChange, handleBlur, setValue, validateBeforeSubmit } = useForm(
     initialValues,
@@ -22,18 +21,16 @@ export default function ProfileForm({ profileId, initialValues, cancelTo, onSubm
   const [serverError, setServerError] = useState("");
   const [failedAttempts, setFailedAttempts] = useState(0);
 
-  // Leaving a field can show its error and push the controls below it (the colour tiles, Cancel)
-  // down before the mouse is released, so the click would be lost. Only the left button, so a
-  // middle-click on Cancel still opens a new tab.
+  // Leaving a field can show its error and push the controls below it down before mouseup, losing
+  // the click. Left button only, so a middle-click on Cancel still opens a new tab.
   function handleMouseDown(event) {
     if (event.button === 0) {
       event.preventDefault();
     }
   }
 
-  // The submit button was disabled, so focus goes back into the form, to the first field (the
-  // avatar link). focus() doesn't scroll when that field already had focus, so the page scrolls
-  // to the alert itself; flushSync renders the alert first, so it's there to scroll to.
+  // The submit button was disabled, so focus returns to the first field. flushSync renders the
+  // alert first, so it can be scrolled to (focus() doesn't scroll if the field already had focus).
   function showServerError(form, message) {
     // The user left the page (e.g. through a header link) while the request was running
     if (!form.isConnected) {
@@ -90,7 +87,7 @@ export default function ProfileForm({ profileId, initialValues, cancelTo, onSubm
         onMouseDown={handleMouseDown}
       />
 
-      {/* "nickname" (a screen name) tells browsers and assistive tools what this field is for */}
+      {/* "nickname" is the autocomplete token for a screen name */}
       <FormField
         label="Display name"
         name="display_name"
@@ -123,7 +120,7 @@ export default function ProfileForm({ profileId, initialValues, cancelTo, onSubm
       />
 
       <div className="flex flex-wrap justify-end gap-3 border-t border-night-700 pt-5">
-        {/* Leaving can't stop a request that's already running: the page would still open the profile */}
+        {/* Leaving can't stop a running request: the page would still open the profile */}
         {isPending ? (
           <button type="button" disabled className="btn btn-ghost">
             Cancel

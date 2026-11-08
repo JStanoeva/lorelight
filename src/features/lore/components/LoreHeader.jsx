@@ -6,9 +6,6 @@ import { formatDate } from "../../../shared/utils/formatDate.js";
 import { getCategory } from "../utils/getCategory.js";
 import LorePlaceholder from "./LorePlaceholder.jsx";
 
-// The top of Lore Details: the entry's picture (or its emblem print) as a banner, with the category,
-// the title and the byline (author, project, folder and dates) on a dark gradient over it.
-// `folderName` is null when the entry isn't in a folder. `headingRef` goes to the title (h1).
 export default function LoreHeader({ headingRef, entry, folderName }) {
   const category = getCategory(entry.category);
   const created = formatDate(entry.created_at);
@@ -35,7 +32,6 @@ export default function LoreHeader({ headingRef, entry, folderName }) {
           </span>
         </span>
 
-        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
         <h1 ref={headingRef} tabIndex={-1} className="page-title lore-title">
           {entry.title}
         </h1>

@@ -3,9 +3,6 @@ import { PENDING_SEED } from "../utils/profileArt.js";
 import ProfileAvatar from "./ProfileAvatar.jsx";
 import ProfileHero from "./ProfileHero.jsx";
 
-// While an "All …" page loads: its compact card in a quiet night blue with faint bars, then the
-// Loader with `label` (e.g. "Loading lore entries…"). `headingRef` lets the page move focus to the
-// (visually hidden) h1 after Try again.
 export default function AllCollectionSkeleton({ label, headingRef }) {
   return (
     <div className="profile-page profile-page-pending profile-page-loading">

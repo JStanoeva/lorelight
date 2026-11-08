@@ -14,12 +14,11 @@ export default function MyProjectsPage() {
   const { user } = useAuth();
   const { projects, isLoading, error, refetch } = useProjects(user.id);
   const headingRef = useRef(null);
-  // The hero's New Project button appears together with the projects, never before them: while the
-  // list loads, nobody knows yet whether there are any, and with none the empty state below has its
-  // own "Create your first project" button. So the button never shows up just to vanish again.
+  // The New Project button appears only with the projects, so it never shows up just to vanish;
+  // the empty state has its own button
   const hasProjects = !isLoading && !error && projects.length > 0;
 
-  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  // Try again disappears when pressed, so focus moves to the heading, which stays
   function handleRetry() {
     refetch();
     headingRef.current.focus();
@@ -54,8 +53,7 @@ export default function MyProjectsPage() {
     );
   }
 
-  // The top matches the Lore Catalog's and My Constellation's (.page-hero), so the title stays in
-  // place when switching between the three pages in the header
+  // .page-hero, like the Lore Catalog and My Constellation, so the title stays put between them
   return (
     <div className="my-projects-page">
       <PageTitle title="My Projects" />

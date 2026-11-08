@@ -6,18 +6,12 @@ import ProfileAvatar from "./ProfileAvatar.jsx";
 import ProfileAvatarImage from "./ProfileAvatarImage.jsx";
 import ProfileStats from "./ProfileStats.jsx";
 
-// The top of a Creator Profile: one framed card. Top: the avatar in its star crest, the creator
-// title, the name (the page's h1), @username and "Member since", the bio and, for the owner,
-// Edit profile. Bottom: a ledger strip with the four figures and the world they're building now.
-// The star colour arrives as var(--star) from the page. `headingRef` lets the page move focus
-// to the name (after Try again).
 export default function ProfileHeader({ profile, starColor, stats, creatorTitle, spotlight, isOwner, headingRef }) {
   const memberSince = formatShortMonthYear(profile.created_at);
   const bio = profile.bio?.trim() ?? "";
 
   return (
     <header className="profile-card">
-      {/* The owner's card has a third part (Edit profile), which the tablet layout places differently */}
       <div className={isOwner ? "profile-card-main profile-card-main-owner" : "profile-card-main"}>
         <div className="profile-card-avatar">
           <ProfileAvatar seed={profile.id}>

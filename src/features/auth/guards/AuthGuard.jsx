@@ -2,7 +2,6 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import Loader from "../../../shared/components/Loader.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 
-// Layout route for the pages that need a logged-in user.
 export default function AuthGuard() {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();

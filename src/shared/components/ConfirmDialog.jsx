@@ -1,7 +1,5 @@
 import { useEffect, useId, useRef } from "react";
 
-// `isConfirmDisabled` blocks only the confirm button (e.g. while the dialog is still loading
-// something it needs); `isPending` blocks both buttons while the request runs.
 export default function ConfirmDialog({
   isOpen,
   title,
@@ -19,8 +17,7 @@ export default function ConfirmDialog({
   const titleId = useId();
   const descriptionId = useId();
 
-  // The native <dialog> is opened and closed through its own methods,
-  // so the effect keeps it in sync with the isOpen prop.
+  // A native <dialog> opens and closes through its own methods, so this keeps it in sync
   useEffect(() => {
     const dialog = dialogRef.current;
 
@@ -45,13 +42,12 @@ export default function ConfirmDialog({
     }
   }
 
-  // Closing through the dialog itself (like Escape does) lets the browser give focus back to the
-  // button that opened it; the "close" event then tells the parent through onCancel.
+  // Closing through the dialog itself lets the browser give focus back to the button that
+  // opened it; the "close" event then calls onCancel.
   function handleCancelClick() {
     dialogRef.current.close();
   }
 
-  // While the request runs, a click does nothing
   function handleConfirmClick() {
     if (isPending) {
       return;
@@ -72,7 +68,6 @@ export default function ConfirmDialog({
       <h2 id={titleId} className="text-xl">
         {title}
       </h2>
-      {/* aria-describedby makes screen readers read this (e.g. "can't be undone") when the dialog opens */}
       <div id={descriptionId} className="mt-3 text-parchment-300">
         {children}
       </div>
@@ -85,8 +80,8 @@ export default function ConfirmDialog({
         <button type="button" onClick={handleCancelClick} disabled={isPending} className="btn btn-ghost">
           {cancelLabel}
         </button>
-        {/* aria-disabled instead of disabled while the request runs: a disabled button would drop
-            keyboard focus to the page, and after a failure the next Tab would leave the dialog */}
+        {/* aria-disabled while pending: a disabled button would drop focus to the page, and after
+            a failure the next Tab would leave the dialog */}
         <button
           type="button"
           onClick={handleConfirmClick}
@@ -97,8 +92,8 @@ export default function ConfirmDialog({
           {isPending ? pendingLabel : confirmLabel}
         </button>
       </div>
-      {/* Focus stays on the button while it waits, so this hidden line tells screen reader users
-          what is happening. Always rendered, so a change of its text is noticed. */}
+      {/* Focus stays on the button while it waits, so this tells screen readers what's happening.
+          Always rendered, so a change of its text is noticed. */}
       <p role="status" className="sr-only">
         {isPending ? pendingLabel : ""}
       </p>

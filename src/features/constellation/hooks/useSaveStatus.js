@@ -3,12 +3,9 @@ import { useAuth } from "../../auth/hooks/useAuth.js";
 import { useViewerKey } from "../../auth/hooks/useViewerKey.js";
 import { constellationService } from "../services/constellationService.js";
 
-// Whether the logged-in user has saved one lore entry to their Constellation. For guests the
-// service answers false without sending a request.
 export function useSaveStatus(loreId) {
   const viewerKey = useViewerKey();
-  // Only the id (a string): the user object may be replaced (e.g. after a token refresh) while
-  // the id stays the same, and that mustn't cause a new request.
+  // Only the id: the user object is replaced on a token refresh, which mustn't cause a new request
   const userId = useAuth().user?.id ?? null;
   const [reloadCount, setReloadCount] = useState(0);
   const [result, setResult] = useState({ key: null, data: false, error: null });
@@ -22,7 +19,6 @@ export function useSaveStatus(loreId) {
       return;
     }
 
-    // Mount / update: fetch whenever the key changes.
     let isStale = false;
 
     constellationService.isSaved(loreId, userId).then(
@@ -34,7 +30,6 @@ export function useSaveStatus(loreId) {
       },
     );
 
-    // Unmount / before the next fetch: ignore this request's late response.
     return () => {
       isStale = true;
     };
@@ -42,9 +37,8 @@ export function useSaveStatus(loreId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
-  // For the button: applies the answer of a request the database has just accepted, without asking
-  // again. Only the answer of this request key is changed: a click that finishes after the entry or
-  // the viewer changed (e.g. a logout in another tab) can't leak into the new answer.
+  // Applies an answer the database just accepted. Only this request key's answer changes, so a
+  // click that finishes after the entry or viewer changed can't leak into the new answer.
   const setIsSaved = useCallback(
     (value) => setResult((current) => (current.key === requestKey ? { ...current, data: value } : current)),
     [requestKey],

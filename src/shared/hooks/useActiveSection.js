@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-// Scroll-spy: returns the id of the section sitting just below the sticky header.
-// `sectionIds` must be a constant array defined outside any component, in page order.
+// Scroll-spy. `sectionIds` must be a constant array defined outside any component, in page order.
 export function useActiveSection(sectionIds, isEnabled = true) {
   const [activeId, setActiveId] = useState(sectionIds[0]);
 
@@ -10,8 +9,8 @@ export function useActiveSection(sectionIds, isEnabled = true) {
       return;
     }
 
-    // rootMargin accepts only px or %, so the band's top edge (1rem below the 4rem sticky header)
-    // is converted from rem here. That keeps it right when the browser's default font size is larger.
+    // rootMargin accepts only px or %, so rem is converted here, which keeps the band right when
+    // the browser's default font size is larger.
     const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const visibleIds = new Set();
     const observer = new IntersectionObserver(
@@ -24,8 +23,7 @@ export function useActiveSection(sectionIds, isEnabled = true) {
           }
         });
 
-        // The first visible section in page order is the one under the header.
-        // When nothing is in the band, the last match is kept.
+        // The first visible section in page order wins; with none in the band, the last one stays
         const firstVisibleId = sectionIds.find((id) => visibleIds.has(id));
         if (firstVisibleId) {
           setActiveId(firstVisibleId);

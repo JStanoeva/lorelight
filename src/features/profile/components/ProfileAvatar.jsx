@@ -3,14 +3,7 @@ import { createCrest, CREST_TICKS, starPath } from "../utils/profileArt.js";
 
 const JEWEL_PATH = starPath(0, -78, 9, 0.22);
 
-// The avatar framed as a star: an eight-point crest (slim cardinal rays, shorter diagonal ones)
-// behind the round portrait, a planisphere ring of ticks, and two thin orbits, each with a point
-// of light that travels slowly round (only without reduced motion). A small star "jewel" sits on
-// the portrait's rim. Everything takes the creator's star colour from the CSS variable --star.
-// Decorative: the name is written next to it.
-//   seed      profile.id (the crest's rays and the orbits' starting points differ per creator)
-//   size      "large" (the profile) or "small" (the "All …" pages: no tick ring, one orbit)
-//   children  the picture (ProfileAvatarImage); without it the portrait stays empty (loading)
+// Coloured by the CSS variable --star. Without `children` (the picture) the portrait stays empty.
 export default function ProfileAvatar({ seed, size = "large", children }) {
   // A page can show several crests, so the gradient ids must be unique
   const idBase = `profile-crest-${useId()}`;

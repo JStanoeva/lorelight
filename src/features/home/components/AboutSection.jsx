@@ -11,29 +11,22 @@ import ExploreShowcase from "./showcases/ExploreShowcase.jsx";
 import ShareShowcase from "./showcases/ShareShowcase.jsx";
 import "../styles/about.css";
 
-// Module-level elements (not component definitions), looked up by card id.
 const SHOWCASES = {
   create: <CreateShowcase />,
   share: <ShareShowcase />,
   explore: <ExploreShowcase />,
 };
 
-// "How Lorelight works": three cards, and at most one open panel at a time (all closed at first).
 export default function AboutSection() {
   const [openId, setOpenId] = useState(null);
-  // How each card's icon appeared the first time that card was on screen, by card id:
-  // "tracing" (drawn in with light) or "drawn" (shown complete, because motion was off then).
-  // A card is missing until it has been seen.
+  // By card id, set when the card is first seen: "tracing", or "drawn" if motion was off then
   const [iconEntrances, setIconEntrances] = useState({});
   const { isMotionAllowed } = useHomeMotion();
-  // The section fades in the first time it comes into view: its heading, then the cards
   const setSectionElement = useSectionReveal();
 
-  // Watch each card that hasn't been seen yet, so on phones (cards stacked) every icon traces
-  // in when its own card scrolls into view. A decision is kept afterwards, so icons that were
-  // shown complete never vanish to be traced again when the animations are resumed.
+  // Each icon traces in when its own card scrolls into view (the cards stack on phones). A
+  // decision is kept, so drawn icons never vanish to trace again when animations resume.
   useEffect(() => {
-    // The cards still waiting, as button element → card id
     const waitingCards = new Map();
     ABOUT_ITEMS.forEach((item) => {
       const card = document.getElementById(`about-card-${item.id}`);
@@ -72,11 +65,8 @@ export default function AboutSection() {
     return () => observer.disconnect();
   }, [iconEntrances, isMotionAllowed]);
 
-  // Bring a newly opened panel into view. Only the DOM is touched here, no state is set.
-  // If the panel runs past the bottom of the screen, its card scrolls to just under the header:
-  // the focused card stays visible and as much of the panel as fits shows below it. Nothing
-  // moves when the panel already fits. The scroll is smooth only when the user allows motion
-  // (the scoped rule in home.css).
+  // If a newly opened panel runs off screen, scroll its card to the top, so the focused card
+  // stays visible above as much panel as fits (smooth only when motion is allowed, home.css)
   useEffect(() => {
     if (openId) {
       const panel = document.getElementById(`about-panel-${openId}`);
@@ -90,14 +80,13 @@ export default function AboutSection() {
     setOpenId((currentId) => (currentId === id ? null : id));
   }
 
-  // Escape inside a panel: close it and move focus back to its card, so focus isn't lost
-  // when the panel's content disappears.
+  // Focus returns to the card, so it isn't lost when the panel's content unmounts
   function handleClose(id) {
     setOpenId(null);
     document.getElementById(`about-card-${id}`)?.focus();
   }
 
-  // Before a card is first seen, its icon's lines wait hidden ("waiting") so they can be traced in
+  // "waiting": the lines stay hidden until the card is first seen, so they can be traced in
   function getIconState(id) {
     return iconEntrances[id] ?? (isMotionAllowed ? "waiting" : "drawn");
   }

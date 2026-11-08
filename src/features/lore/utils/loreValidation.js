@@ -3,22 +3,19 @@ import { countCharacters, isHttpUrl } from "../../../shared/utils/validators.js"
 import { LORE_CATEGORIES } from "../constants/categories.js";
 import { formatTags, getTagsError, parseTags } from "./tags.js";
 
-// The same limits as the database check constraints (README §8).
+// The same limits as the database check constraints
 export const LORE_TITLE_MIN = 3;
 export const LORE_TITLE_MAX = 100;
 export const LORE_DESCRIPTION_MIN = 20;
 export const LORE_DESCRIPTION_MAX = 5000;
 
-// Shown when the chosen folder was deleted after the form loaded it (Postgres 23503)
 export const FOLDER_GONE_MESSAGE = 'The chosen folder no longer exists. Choose another folder, or "No folder".';
 
 const PROJECT_GONE_MESSAGE = "The chosen project no longer exists. Choose another project and try again.";
 
-// Readable messages for the errors saving an entry (Create and Edit) can run into,
-// everything else as usual
 export function getLoreSaveErrorMessage(error) {
   // 23503 on the project's key: the project was deleted while this save waited for it
-  // (deleting a project after moving its lore locks it until it's gone, migration 006)
+  // (moving its lore before deleting it locks the project, migration 006)
   if (error?.code === "23503" && error.message?.includes("lore_entries_project_id_fkey")) {
     return PROJECT_GONE_MESSAGE;
   }
@@ -34,7 +31,6 @@ export function getLoreSaveErrorMessage(error) {
   return getErrorMessage(error);
 }
 
-// Create starts empty and private (README §7: new Lore Entries are private until made public).
 // The keys follow the form's field order: after a failed submit, useForm focuses the first
 // invalid field in this order.
 export const EMPTY_LORE_VALUES = {
@@ -48,8 +44,7 @@ export const EMPTY_LORE_VALUES = {
   is_public: false,
 };
 
-// `projectIds` are the ids of the user's own projects, the options of the project select.
-// There is no folder rule: the form only lists the folders of the chosen project.
+// No folder rule: the form only lists the folders of the chosen project.
 export function validateLore(values, projectIds) {
   const errors = {};
 
@@ -94,15 +89,14 @@ export function validateLore(values, projectIds) {
   return errors;
 }
 
-// The clean database row: trimmed text, the parsed tags, and null (never "") for an empty folder
-// or image link. It holds only columns the owner may also update, so Edit can send it as well.
+// null (never "") for an empty folder or image link. It holds only columns the owner may also
+// update, so Edit can send it as well.
 export function toLorePayload(values) {
   return {
     project_id: values.project_id,
     folder_id: values.folder_id || null,
     title: values.title.trim(),
     category: values.category,
-    // trim() only touches the ends, so the line breaks between paragraphs stay
     description: values.description.trim(),
     tags: parseTags(values.tagsText),
     image_url: values.image_url.trim() || null,
@@ -110,8 +104,8 @@ export function toLorePayload(values) {
   };
 }
 
-// The other way round, to pre-fill the edit form: the tags become one comma-separated text,
-// and null becomes "" (inputs need strings). The keys follow EMPTY_LORE_VALUES.
+// Pre-fills the edit form: null becomes "" because inputs need strings. The keys keep the
+// EMPTY_LORE_VALUES order, which useForm's focus relies on.
 export function toLoreFormValues(entry) {
   return {
     project_id: entry.project_id,

@@ -13,8 +13,8 @@ export default function MainLayout() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const isHome = pathname === "/";
 
-  // Logout lives here, not in Header: going to Home gives Header a new key (see below),
-  // so state set in the old Header after the await would be lost.
+  // Logout lives here, not in Header: going to Home gives Header a new key, so state set in
+  // the old Header after the await would be lost.
   async function handleLogout() {
     if (isLoggingOut) {
       return;
@@ -23,8 +23,7 @@ export default function MainLayout() {
     setIsLoggingOut(true);
     setLogoutError("");
 
-    // Home first, then clear the session. In the other order, AuthGuard would see a guest
-    // on a private page and send them to /login.
+    // Home first, then clear the session, or AuthGuard would send the guest to /login.
     if (!isHome) {
       navigate("/");
     }
@@ -44,7 +43,7 @@ export default function MainLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* A new key on entering or leaving Home gives a fresh header: scroll-spy reset, menu closed */}
+      {/* A new key on entering or leaving Home resets the scroll-spy and closes the menu */}
       <Header
         key={isHome ? "home" : "app"}
         isHome={isHome}
@@ -52,8 +51,7 @@ export default function MainLayout() {
         onLogout={handleLogout}
       />
 
-      {/* Fixed just below the header, so it never moves the page (the Home hero slides up under
-          the header). The outer box is solid; alert-error on top of it adds the red tint. */}
+      {/* Fixed, so it never moves the page. The solid outer box sits under alert-error's tint. */}
       {logoutError && (
         <div className="fixed inset-x-4 top-(--header-height) z-30 mx-auto mt-3 max-w-xl rounded-lg bg-night-900 shadow-lg shadow-black/40">
           <div
@@ -72,8 +70,7 @@ export default function MainLayout() {
         </div>
       )}
 
-      {/* A column, so a page can stretch to fill the space above the footer (the Login and
-          Register sky does) */}
+      {/* A column, so a page can stretch to fill the space above the footer */}
       <main className="flex flex-1 flex-col">
         <Outlet />
       </main>

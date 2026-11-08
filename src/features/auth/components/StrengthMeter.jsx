@@ -2,9 +2,6 @@ import { STAR_PATH } from "../../home/constants/starPath.js";
 import { METER_STARS } from "../constants/strengthMeter.js";
 import { PASSWORD_RULE_COUNT } from "../utils/authValidation.js";
 
-// Five stars joined like a constellation. Star n, and the line leading to it, lights up once
-// n password rules are met; with all of them met, the whole constellation turns green.
-// Decorative only: the strength label and the live summary next to it carry the meaning.
 export default function StrengthMeter({ strength }) {
   const isComplete = strength === PASSWORD_RULE_COUNT;
 
@@ -13,8 +10,7 @@ export default function StrengthMeter({ strength }) {
       className={isComplete ? "pw-meter-sky pw-meter-sky-complete" : "pw-meter-sky"}
       aria-hidden="true"
     >
-      {/* This SVG stretches to fill the meter (preserveAspectRatio="none"), so its 0–100
-          coordinates are percentages, the same numbers that place the stars below */}
+      {/* Stretched to fill the meter, so its 0–100 coordinates match the stars' percentages */}
       <svg
         className="pw-meter-lines"
         viewBox="0 0 100 100"
@@ -22,7 +18,6 @@ export default function StrengthMeter({ strength }) {
         focusable="false"
       >
         {METER_STARS.map((star, index) => {
-          // Every star after the first is joined to the one before it
           if (index === 0) {
             return null;
           }
@@ -42,8 +37,8 @@ export default function StrengthMeter({ strength }) {
         })}
       </svg>
 
-      {/* Each star is a small SVG of its own, so stretching the lines never squashes a star.
-          The viewBox adds 2 units around the logo star's 24 × 34 box, so the outline isn't cut off. */}
+      {/* One SVG per star, so the stretched lines never squash it. The viewBox pads the
+          24 × 34 star by 2 units, so its outline isn't cut off. */}
       {METER_STARS.map((star, index) => (
         <svg
           key={index}

@@ -1,6 +1,3 @@
-// "Nebula Wash", the generated avatar of a profile without a picture: a soft nebula on a square
-// canvas, tinted by the profile's star colour and seeded by the user id with the app's own seeded
-// generator. Pure: the same seed and colour always build the same nebula.
 import { createRandom, hashString, pick } from "../../../shared/utils/seededRandom.js";
 
 // A square canvas, so circles, hexagons and rounded squares all crop it evenly
@@ -8,7 +5,7 @@ export const VIEW_SIZE = 200;
 
 const CENTER = VIEW_SIZE / 2;
 
-// "Starlit archive" tokens as hex values, so the art doesn't depend on which CSS variables are emitted
+// Theme tokens as hex values, so the art doesn't depend on which CSS variables are emitted
 const NIGHT_950 = "#0b1020";
 const NIGHT_900 = "#121a33";
 const NIGHT_800 = "#1b2447";
@@ -25,8 +22,7 @@ const PARCHMENT_100 = "#f3ead7";
 const DEFAULT_TINT = "#e8c170";
 const HEX_PATTERN = /^#[0-9a-f]{6}$/i;
 
-// How opaque each colour may get at a cloud's centre. The six star colours are all light, so the
-// tint shares one strength.
+// Opacity at a cloud's centre per colour; the star colours are all light and share TINT_STRENGTH
 const STRENGTH = {
   [NIGHT_700]: 0.9,
   [NIGHT_500]: 0.62,
@@ -36,8 +32,7 @@ const STRENGTH = {
 };
 const TINT_STRENGTH = 0.76;
 
-// The star colour always leads; the companion clouds differ per seed, so two creators who chose the
-// same colour still get clearly different avatars.
+// Companion clouds differ per seed, so creators with the same star colour get different avatars
 const MOODS = [
   { base: [NIGHT_950, NIGHT_900], others: [LANTERN_700, NIGHT_700, NIGHT_500] },
   { base: [NIGHT_950, LANTERN_900], others: [LANTERN_500, LANTERN_700, NIGHT_700] },
@@ -166,7 +161,6 @@ export function buildAvatarNebula(seed, colorHex) {
     });
   }
 
-  // Sometimes one brighter star with a soft halo
   const brightStar =
     random() < 0.5
       ? {

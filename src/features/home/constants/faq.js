@@ -1,5 +1,4 @@
-// Home page FAQ. Answers are plain text (no links) and must stay true to what the README
-// describes, so update them together with the README.
+// Answers are plain text (no links) and must stay true to the README: update them together.
 export const FAQ_ITEMS = [
   {
     id: "account",

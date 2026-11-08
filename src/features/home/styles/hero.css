@@ -1,15 +1,7 @@
-/*
-  Home hero: a CSS-painted night sky with the lantern's star rising low on the right, the
-  kindling title and the "Pause animations" switch. The animated sky layer has its own file
-  (nebula.css). Plain CSS (no @apply), so it needs no @reference. The rules sit in the
-  components layer, so a Tailwind utility on the same element always wins. In a background
-  list the first layer paints on top. Colours are theme tokens mixed in oklab, which keeps the
-  gold-into-violet blends peach rather than khaki.
-*/
+/* Colours mix in oklab, which keeps gold-into-violet blends peach rather than khaki */
 @layer components {
   .hero {
-    /* Where the lantern's star sits. The animated sky (nebulaRenderer.js) reads these too, so
-       its light and embers rise from the same point. */
+    /* nebulaRenderer.js reads these too, so the sky's light rises from the same point */
     --bloom-x: 76%;
     --bloom-y: 84%;
     --star-size: 3.5rem;
@@ -20,7 +12,7 @@
     --read-size: 56% 40%;
     --read-strength: 55%;
     --fade-start: 88%;
-    /* How dark the pool behind the scroll cue's label is halfway out and near its edge */
+    /* Darkness of the pool behind the scroll cue's label, halfway out and near its edge */
     --cue-pool-mid: 30%;
     --cue-pool-edge: 10%;
     --peach: color-mix(in oklab, var(--color-lantern-300) 55%, var(--color-gold-400));
@@ -35,9 +27,7 @@
     padding-top: var(--header-height);
   }
 
-  /* Phones and landscape phones: the light moves to the bottom-right corner, beside the scroll
-     cue, and the reading vignette grows to cover the full-width text column. The light sits
-     far enough right that its hot core stays clear of the cue's label on a 360px screen. */
+  /* Phones: the light moves bottom right, its core just clear of the cue's label at 360px */
   @media (width < 48rem), (height <= 500px) {
     .hero {
       --bloom-x: 91%;
@@ -72,21 +62,14 @@
     position: absolute;
   }
 
-  /* 1. Sky: nebula clouds over a midnight-to-violet wash */
   .hero-sky {
     inset: 0;
     background:
-      /* lavender rim */
       radial-gradient(26% 16% at 24% 28%, color-mix(in oklab, var(--color-lantern-300) 26%, transparent), transparent 70%),
-      /* violet cloud, upper left */
       radial-gradient(50% 42% at 18% 26%, color-mix(in oklab, var(--color-lantern-500) 55%, transparent), transparent 70%),
-      /* violet cloud, right */
       radial-gradient(34% 44% at 92% 38%, color-mix(in oklab, var(--color-lantern-500) 38%, transparent), transparent 70%),
-      /* peach haze around the light */
       radial-gradient(var(--haze-size) at var(--bloom-x) var(--bloom-y), color-mix(in oklab, var(--peach) 32%, transparent), transparent 72%),
-      /* deep mass behind the title */
       radial-gradient(70% 55% at 50% 45%, color-mix(in oklab, var(--color-lantern-700) 50%, transparent), transparent 78%),
-      /* base sky */
       linear-gradient(
         180deg,
         var(--color-night-950) 0%,
@@ -96,13 +79,11 @@
       );
   }
 
-  /* 2. Brush strokes: long thin ellipses on one oversized, rotated layer (the backdrop's
-     overflow hides its edges) */
+  /* An oversized, rotated layer; the backdrop's overflow hides its edges */
   .hero-strokes {
     inset: -25% -35%;
     transform: rotate(-16deg);
     background:
-      /* dark dust lane behind the title: depth and contrast */
       radial-gradient(50% 8% at 46% 50%, color-mix(in oklab, var(--color-night-950) 55%, transparent), transparent 72%),
       radial-gradient(42% 6% at 32% 40%, color-mix(in oklab, var(--color-lantern-300) 30%, transparent), transparent 72%),
       radial-gradient(38% 4.5% at 64% 33%, color-mix(in oklab, var(--color-lantern-500) 55%, transparent), transparent 72%),
@@ -110,8 +91,7 @@
       radial-gradient(30% 5% at 26% 66%, color-mix(in oklab, var(--color-lantern-300) 18%, transparent), transparent 72%);
   }
 
-  /* 3. Stars: the shared .starfield tiles (home.css), kept out of the header strip and the
-     bottom fade */
+  /* Kept out of the header strip and the bottom fade (nebulaRenderer.js uses the same mask) */
   .hero-stars {
     inset: 0;
     -webkit-mask-image: linear-gradient(to bottom, transparent 4.5rem, #000 9rem, #000 62%, transparent 90%);
@@ -133,18 +113,15 @@
     }
   }
 
-  /* 4. The light: the lantern's star rising low on the right */
   .hero-light {
     inset: 0;
     background:
-      /* hot core */
       radial-gradient(
         circle at var(--bloom-x) var(--bloom-y),
         color-mix(in oklab, var(--color-gold-300) 85%, transparent) 0,
         color-mix(in oklab, var(--color-gold-400) 40%, transparent) var(--core),
         transparent var(--core-fade)
       ),
-      /* halo melting into violet */
       radial-gradient(
         var(--halo-size) at var(--bloom-x) var(--bloom-y),
         color-mix(in oklab, var(--color-gold-400) 34%, transparent),
@@ -162,7 +139,7 @@
     filter: drop-shadow(0 0 10px var(--color-gold-300)) drop-shadow(0 0 28px var(--color-gold-400));
   }
 
-  /* 5. Paper grain: static SVG noise. Keep it barely visible (opacity 0.06 to 0.12). */
+  /* Keep the grain barely visible: opacity 0.06 to 0.12 */
   .hero-grain {
     inset: 0;
     opacity: 0.1;
@@ -171,25 +148,22 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   }
 
-  /* 6. Readability scrim: a sibling of the backdrop rather than a part of it, so it also sits
-     above anything layered over the painting. All the hero's contrast comes from here. */
+  /* All the hero's contrast comes from here. A sibling of the backdrop, so it also sits above
+     anything layered over the painting. */
   .hero-scrim {
     position: absolute;
     inset: 0;
     pointer-events: none;
     background:
-      /* header strip */
       linear-gradient(to bottom, color-mix(in oklab, var(--color-night-950) 70%, transparent), transparent 8rem),
-      /* text vignette */
       radial-gradient(
         var(--read-size) at 50% 48%,
         color-mix(in oklab, var(--color-night-950) var(--read-strength), transparent),
         color-mix(in oklab, var(--color-night-950) 18%, transparent) 70%,
         transparent 90%
       ),
-      /* scroll cue: its label (about 5.5rem above the hero's bottom) sits below the text
-         vignette and near the light, so a soft dark pool keeps the moving sky dark behind it.
-         8rem and 3rem are radii: the pool is 16rem wide and 6rem tall. */
+      /* A dark pool behind the scroll cue's label (about 5.5rem up), which sits near the light;
+         8rem and 3rem are its radii */
       radial-gradient(
         8rem 3rem at 50% calc(100% - 5.5rem),
         color-mix(in oklab, var(--color-night-950) 48%, transparent),
@@ -197,11 +171,9 @@
         color-mix(in oklab, var(--color-night-950) var(--cue-pool-edge), transparent) 80%,
         transparent
       ),
-      /* seamless hand-off into the next section */
       linear-gradient(to bottom, transparent var(--fade-start), var(--color-night-950));
   }
 
-  /* Text */
   .hero-eyebrow {
     display: flex;
     align-items: center;
@@ -227,8 +199,7 @@
     color: var(--color-lantern-300);
   }
 
-  /* The wordmark carries both logo colours: a gold glow and a violet halo. drop-shadow is used
-     instead of text-shadow, which would show through the transparent, gradient-filled glyphs. */
+  /* drop-shadow, not text-shadow: a text-shadow would show through the transparent glyphs */
   .hero-title {
     font-family: var(--font-display);
     font-weight: 700;
@@ -237,9 +208,8 @@
     letter-spacing: 0.06em;
     /* Optical centring: cancels the space after the last letter */
     margin-right: -0.06em;
-    /* Room for descenders in the fallback serif: background-clip: text only paints inside the
-       box, so with line-height 1 a fallback "g" would lose its tail. The negative margin cancels
-       the padding, so the layout doesn't move. */
+    /* background-clip: text only paints inside the box, so this room keeps a fallback "g" its
+       tail; the negative margin cancels it in the layout */
     padding-bottom: 0.15em;
     margin-bottom: -0.15em;
     color: var(--color-parchment-100);
@@ -257,9 +227,6 @@
     }
   }
 
-  /* --- The kindling title (KindlingTitle): each letter carries the wordmark's gradient --- */
-
-  /* The letters can't break onto two lines */
   .kindling-word {
     white-space: nowrap;
   }
@@ -270,10 +237,8 @@
       background-image: none;
     }
 
-    /* inline-block + the h1's own line height and padding give every letter the same box as
-       the h1, so the vertical gradient looks exactly as it did on the whole word. The top
-       layer is the gleam: a gold band with a hot pale centre, parked just left of the letter
-       until it sweeps. */
+    /* inline-block with the h1's line height and padding gives each letter the h1's box, so the
+       gradient matches the whole word. The top layer is the gleam, parked left until it sweeps. */
     .kindling-letter {
       display: inline-block;
       padding-bottom: 0.15em;
@@ -306,10 +271,8 @@
     color: var(--color-parchment-100);
   }
 
-  /* Buttons over the painted sky: the ghost button gets its own dark fill and a lighter border
-     (at least 3:1 against the sky), and the primary button a dark shadow so that it never
-     melts into the glow. The hover colours in components.css are more specific, so they
-     still apply. */
+  /* Over the painted sky: a dark fill and lighter border keep the ghost button at 3:1, and a
+     shadow keeps the primary from melting into the glow. */
   .hero .btn-ghost {
     background-color: color-mix(in oklab, var(--color-night-950) 55%, transparent);
     border-color: color-mix(in oklab, var(--color-parchment-300) 70%, transparent);
@@ -321,7 +284,6 @@
       0 0 0 1px color-mix(in oklab, var(--color-gold-300) 40%, transparent);
   }
 
-  /* Scroll cue. It is a link, so its line is gold ("action"). */
   .hero-cue {
     display: inline-flex;
     flex-direction: column;
@@ -347,8 +309,6 @@
     background: linear-gradient(to bottom, var(--color-gold-400), transparent);
   }
 
-  /* "Pause animations" (PauseAnimationsButton): a small glassy pill in the bottom-left corner,
-     level with the scroll cue's label, away from the light (bottom right) and the buttons */
   .motion-pause {
     position: absolute;
     left: 1rem;
@@ -379,7 +339,6 @@
     border-color: color-mix(in oklab, var(--color-gold-400) 70%, transparent);
   }
 
-  /* Pressed: lit in gold, like a lantern that has been shuttered */
   .motion-pause[aria-pressed="true"] {
     color: var(--color-gold-300);
     border-color: var(--color-gold-400);
@@ -419,8 +378,7 @@
     }
   }
 
-  /* Forced colours remove gradients: the title would turn invisible (its glyphs are
-     transparent) and the cue line would vanish, so both get solid system colours instead */
+  /* Forced colours drop gradients, hiding the transparent title glyphs and the cue line */
   @media (forced-colors: active) {
     .hero-title,
     .kindling-letter {
@@ -442,18 +400,14 @@
       border-width: 3px;
     }
 
-    /* The icon keeps its own colour in forced colours, and gold is unreadable on a light
-       system theme */
+    /* Icons keep their own colour in forced colours, and gold is unreadable on a light theme */
     .motion-pause-icon,
     .motion-pause[aria-pressed="true"] .motion-pause-icon {
       color: ButtonText;
     }
   }
 
-  /* The hero's CSS motion, all opt-in: with reduced motion the hero is a still. Nothing
-     scales and nothing moves the text. The endless parts freeze through the section's
-     data-motion="paused" (home.css) whenever the hero stops: paused, off screen or on a
-     hidden tab. */
+  /* Endless parts freeze through data-motion="paused" (home.css) whenever the hero stops */
   @media (prefers-reduced-motion: no-preference) {
     /* star-twinkle is defined in home.css */
     .hero-flare {
@@ -468,8 +422,7 @@
       animation: light-breathe 9s ease-in-out infinite alternate;
     }
 
-    /* A brighter segment travels down the cue line once. A single short run keeps it
-       under five seconds, so it never needs a pause control. */
+    /* Runs once and stays under five seconds, so it needs no pause control (WCAG 2.2.2) */
     .hero-cue-line {
       background:
         linear-gradient(to bottom, transparent, var(--color-gold-300), transparent) 0 -2.75rem / 100% 100% no-repeat,
@@ -477,9 +430,8 @@
       animation: cue-travel 2.8s ease-in-out 0.8s 1;
     }
 
-    /* Each letter kindles in turn like an ember catching (a warm gold glow that settles into
-       the normal gradient), then a single gleam sweeps across the word. Both run once and are
-       over in under four seconds. Until the display font has arrived they wait, unlit. */
+    /* Each letter kindles in turn, then one gleam sweeps the word; both run once, under 4 s.
+       Until the display font arrives they wait, unlit. */
     .kindling-title[data-kindle="waiting"] .kindling-letter {
       opacity: 0.12;
       filter: brightness(0.55);
@@ -491,9 +443,8 @@
         letter-gleam 0.26s linear calc(2.3s + var(--letter-index) * 0.13s) both;
     }
 
-    /* The two one-time runs always finish, even while the hero is stopped: frozen halfway, the
-       title would stay half-lit. They are over within four seconds of the font arriving, so
-       they need no pause. This beats the home.css rule (same layer, more specific). */
+    /* The one-time runs always finish, even while stopped, or the title would stay half-lit.
+       This beats the home.css pause rule (same layer, more specific). */
     .hero[data-motion="paused"] .kindling-letter,
     .hero[data-motion="paused"] .hero-cue-line {
       animation-play-state: running !important;
@@ -524,15 +475,13 @@
     filter: brightness(0.55) sepia(0) saturate(1) drop-shadow(0 0 0 transparent);
   }
 
-  /* The ember catches fast: bright, warm gold with a glow around the letter (brightness rises
-     with the warmth, so the half-lit letter never turns olive) */
+  /* Brightness rises with the warmth, so a half-lit letter never turns olive */
   14% {
     opacity: 1;
     filter: brightness(1.45) sepia(0.6) saturate(1.7)
       drop-shadow(0 0 0.2em color-mix(in oklab, var(--color-gold-400) 90%, transparent));
   }
 
-  /* …and glows on a moment before it settles */
   40% {
     opacity: 1;
     filter: brightness(1.2) sepia(0.45) saturate(1.5)

@@ -1,7 +1,6 @@
 import { chance, createRandom, hashString, pick } from "./seededRandom.js";
 
-// Geometry for the "Archive Sigil" image placeholder: a seal drawn in an emblem coordinate system
-// from -100 to 100, with (0, 0) at the centre. Every choice comes from the seeded random generator.
+// The seal is drawn in coordinates from -100 to 100, with (0, 0) at the centre.
 
 const OUTER_RADIUS = 82;
 const TICK_RADIUS = 74;
@@ -17,7 +16,7 @@ const PROJECT_GLOWS = [
 ];
 const GOLD_ACCENT = "#f2d38f";
 
-// Fine background patterns, in screen pixels so they look the same at every size.
+// In screen pixels, so they look the same at every size.
 const TEXTURES = [
   { size: 18, path: "M9 0L18 9L9 18L0 9Z", strokeWidth: 0.7 },
   { size: 14, path: "M0 0H14M0 0V14", strokeWidth: 0.7 },
@@ -76,7 +75,7 @@ function radialLinesPath(angles, innerRadius, outerRadius) {
     .join("");
 }
 
-// A zero-length segment with round caps draws a dot, so a whole ring of beads is a single path element.
+// A zero-length segment with round caps draws a dot, so a whole ring of beads is one path.
 function beadsPath(angles, radius) {
   return angles
     .map((angle) => {
@@ -86,7 +85,6 @@ function beadsPath(angles, radius) {
     .join("");
 }
 
-// The four-point star from the Lorelight logo.
 function fourPointStarPath(outerRadius, innerRadius) {
   const corners = evenAngles(8, -90).map((angle, index) => {
     const [x, y] = polar(index % 2 === 0 ? outerRadius : innerRadius, angle);
@@ -95,7 +93,7 @@ function fourPointStarPath(outerRadius, innerRadius) {
   return `${corners.join("")}Z`;
 }
 
-// A horizontal rule through the seal that reaches the edges of wide banners, with a small lozenge on each side.
+// A horizontal rule out to the edges of wide banners, with a small lozenge on each side.
 function meridianPaths(lozengeX) {
   const lozenges = [lozengeX, -lozengeX].map((x) => `M${x - 4} 0L${x} -2.6L${x + 4} 0L${x} 2.6Z`).join("");
   const lineStart = lozengeX + 7;
@@ -132,7 +130,6 @@ function buildFigure(random, figureType, points, step, rotation) {
   return { paths, circles: [], innerRadius: round(innerRadius) };
 }
 
-// Everything ImagePlaceholder needs to draw one sigil, decided by the seed alone.
 export function createSigil(seed) {
   const random = createRandom(hashString(String(seed)));
 

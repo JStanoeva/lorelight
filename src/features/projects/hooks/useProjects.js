@@ -5,11 +5,10 @@ export function useProjects(ownerId) {
   const [reloadCount, setReloadCount] = useState(0);
   const [result, setResult] = useState({ key: null, data: [], error: null });
 
-  // A new key means "a new request is needed": a different owner or a refetch().
+  // A new key (another owner or a refetch) means a new request
   const requestKey = `${ownerId}|${reloadCount}`;
 
   useEffect(() => {
-    // Mount / update: fetch whenever the key changes.
     let isStale = false;
 
     projectService.getProjectsByOwner(ownerId).then(
@@ -21,7 +20,6 @@ export function useProjects(ownerId) {
       },
     );
 
-    // Unmount / before the next fetch: ignore this request's late response.
     return () => {
       isStale = true;
     };

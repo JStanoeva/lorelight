@@ -13,11 +13,6 @@ import { getStarColor } from "../utils/getStarColor.js";
 import { getCreatorTitle, getProfileStats, getSpotlightProject } from "../utils/profileStats.js";
 import "../styles/profile.css";
 
-// A Creator Profile (/profile/:userId): the header card under the creator's own sky, then four
-// tabs with the three most recent items each. useProfile loads the profile and all four lists at
-// once; everything else (the figures, the creator title, the world they're building now) is
-// worked out here from those lists. Row Level Security decides what the lists hold: the owner gets
-// everything, visitors only public items.
 export default function ProfilePage() {
   const { userId } = useParams();
   const { user } = useAuth();
@@ -25,8 +20,7 @@ export default function ProfilePage() {
   const { headingRef, retry } = useRetryFocus(isLoading, refetch);
 
   if (isLoading) {
-    // Known before the profile arrives (ids are lowercase in the database, the URL may not be), so
-    // the skeleton can keep room for the owner's Edit profile button and note
+    // From the URL, since the profile hasn't arrived yet (ids are lowercase in the database)
     const isOwnProfile = Boolean(user) && user.id === userId.toLowerCase();
     return <ProfileSkeleton isOwnProfile={isOwnProfile} headingRef={headingRef} />;
   }
@@ -35,7 +29,7 @@ export default function ProfilePage() {
     return <ProfileErrorState error={error} onRetry={retry} headingRef={headingRef} />;
   }
 
-  // An invalid id or a creator who doesn't exist. tabIndex -1: focus can land here after Try again.
+  // An invalid id or an unknown creator; tabIndex -1 because focus can land here after Try again
   if (!profile) {
     return (
       <section ref={headingRef} tabIndex={-1} className="page">

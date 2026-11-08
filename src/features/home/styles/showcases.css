@@ -1,22 +1,6 @@
-/*
-  The About panels' previews (Create, Share, Explore): little films drawn out of light.
-
-  How they work: useShowcasePlayback moves a clock from cue to cue, and each part of a picture
-  carries data-* attributes saying whether its cue has passed (data-on="true" …).
-  The rules OUTSIDE the motion media query describe the finished picture (that is also the
-  reduced-motion still) and hide the parts whose cue hasn't come yet. The rules INSIDE
-  @media (prefers-reduced-motion: no-preference) only add the animations that lead there, so an
-  animation without a "to" keyframe simply ends on the finished look.
-  Paused, off screen or tab hidden: the showcase sets data-motion="paused", and the shared rule
-  in home.css holds every animation on the frame it is on.
-  Colours: lavender for drawn light, gold only for light that means "public / saved" and for
-  the Replay control (gold = action).
-  Plain CSS that reads only the project's own tokens; spacing between blocks comes from
-  utilities in the JSX.
-*/
+/* Rules outside the motion query draw the finished picture (also the reduced-motion still);
+   inside, they only add animations, so one without a "to" keyframe ends on that look. */
 @layer components {
-  /* ---------- Frame and sample content ---------- */
-
   .preview-frame {
     border: 1px solid var(--color-night-700);
     border-radius: 0.75rem;
@@ -30,7 +14,6 @@
     }
   }
 
-  /* Marks sample content, so it is never mistaken for real lore */
   .preview-tag {
     display: inline-block;
     border-radius: 0.375rem;
@@ -44,7 +27,6 @@
     color: var(--color-parchment-500);
   }
 
-  /* Title of the Share preview's list */
   .preview-caption {
     font-size: 0.75rem;
     line-height: 1rem;
@@ -78,8 +60,7 @@
     color: var(--color-parchment-100);
   }
 
-  /* Visibility chips. They are status labels, deliberately not drawn as switches.
-     A border (not a box-shadow ring) keeps the outline visible in forced-colors mode. */
+  /* A border, not a box-shadow ring, so the outline stays visible in forced-colors mode */
   .status-chip {
     display: inline-flex;
     align-items: center;
@@ -117,7 +98,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* Share: the three visibility steps */
   .visibility-step {
     display: flex;
     align-items: flex-start;
@@ -128,7 +108,6 @@
     padding: 0.75rem;
   }
 
-  /* Unlit star, lined up with the row of chips */
   .visibility-star {
     flex: none;
     width: 0.75rem;
@@ -144,8 +123,6 @@
     color: var(--color-parchment-500);
   }
 
-  /* ---------- Shared showcase pieces ---------- */
-
   .showcase-head {
     display: flex;
     align-items: center;
@@ -154,7 +131,6 @@
     min-height: 2rem;
   }
 
-  /* An action, so it is gold like the card hints */
   .replay-button {
     position: relative;
     display: inline-flex;
@@ -171,8 +147,7 @@
     color: var(--color-gold-400);
   }
 
-  /* A 44px tall touch target (32px pill + 6px above and below), without making the pill or
-     the row it sits in any taller */
+  /* A 44px touch target (32px pill + 6px above and below) that adds no height to the row */
   .replay-button::before {
     content: "";
     position: absolute;
@@ -190,7 +165,6 @@
     flex: none;
   }
 
-  /* The stage: a patch of night sky the pictures are drawn on */
   .showcase-stage {
     position: relative;
     isolation: isolate;
@@ -238,7 +212,7 @@
     opacity: 0;
   }
 
-  /* Every card-like part: invisible until its cue (it still takes its place, so nothing jumps) */
+  /* Invisible until its cue, but it keeps its place, so nothing jumps */
   .light-card {
     position: relative;
   }
@@ -256,7 +230,6 @@
     padding: 0.875rem 1rem;
   }
 
-  /* The line of light along a card's edge, resting as a faint lavender rim */
   .light-outline {
     position: absolute;
     inset: -1px;
@@ -274,14 +247,11 @@
     opacity: 0.28;
   }
 
-  /* Letters written by light, and words written in: hidden until their cue */
   [data-filled="false"] .light-letter,
   [data-typed="false"] .light-letter,
   [data-written="false"] .light-write {
     opacity: 0;
   }
-
-  /* ---------- Create ---------- */
 
   .create-link {
     position: relative;
@@ -319,7 +289,6 @@
     fill: var(--color-lantern-300);
   }
 
-  /* A bead of light that runs down the thread (only while motion plays) */
   .create-pulse {
     stroke: var(--color-parchment-100);
     stroke-width: 2.5;
@@ -358,7 +327,6 @@
     opacity: 0;
   }
 
-  /* The finished entry keeps a soft violet halo; indented under its world */
   .create-entry {
     margin-left: 1.5rem;
     box-shadow: 0 0 26px -12px color-mix(in oklab, var(--color-lantern-500) 70%, transparent);
@@ -370,7 +338,6 @@
     }
   }
 
-  /* While it is still a form: see-through, its edge drawn only by the line of light */
   .create-entry[data-finished="false"] {
     border-color: transparent;
     background-color: color-mix(in oklab, var(--color-night-900) 60%, transparent);
@@ -381,7 +348,6 @@
     opacity: 0.75;
   }
 
-  /* A soft band of light that sweeps across the entry as it is finished */
   .create-sweep {
     position: absolute;
     inset: 0;
@@ -417,7 +383,6 @@
     display: inline-flex;
   }
 
-  /* Field hints such as "Title": they show only while the entry is a form */
   .create-placeholder {
     position: absolute;
     left: 0;
@@ -436,7 +401,6 @@
     opacity: 1;
   }
 
-  /* A dashed guide line under each field of the form */
   .create-field::after {
     content: "";
     position: absolute;
@@ -464,19 +428,16 @@
     opacity: 0;
   }
 
-  /* ---------- Share ---------- */
-
   .share-stage {
     --sky-h: 9rem;
     --card-top: calc(var(--sky-h) + 1.25rem);
     --card-h: 4.25rem;
-    /* From the card's centre (under the horizon) up to the star, 3rem down the sky */
+    /* From the card's centre up to the star, which sits 3rem down the sky */
     --rise-y: calc(3rem - var(--card-top) - var(--card-h) / 2);
     height: 17.25rem;
     padding: 0;
   }
 
-  /* Phones: a lower sky, so the stage is no taller than it needs to be */
   @media (width < 40rem) {
     .share-stage {
       --sky-h: 7.5rem;
@@ -484,7 +445,7 @@
     }
   }
 
-  /* The Lore Catalog as a small sky; z-index makes it its own layer, so its stars sit on it */
+  /* z-index makes it its own layer, so its stars sit on it */
   .share-sky {
     position: absolute;
     inset: 0 0 auto;
@@ -515,7 +476,6 @@
     inset: 0;
   }
 
-  /* The horizon: a band of violet mist between your desk and the catalog's sky */
   .share-horizon {
     position: absolute;
     left: 0;
@@ -555,8 +515,6 @@
     opacity: 0;
   }
 
-  /* The entry, under the horizon, centred and never wider than the stage. It stays there: it
-     is still in its Project when it is published. */
   .share-card,
   .share-ascent {
     position: absolute;
@@ -572,7 +530,6 @@
     padding: 0.625rem 1rem;
   }
 
-  /* Locked: dim. Entry public: a little brighter. Both public: in full light, glowing gold. */
   .share-card[data-entry="false"] {
     filter: saturate(0.35) brightness(0.7);
   }
@@ -588,7 +545,6 @@
       0 0 30px 0 color-mix(in oklab, var(--color-gold-400) 50%, transparent);
   }
 
-  /* The lock and the globe share one spot: the lock until the entry is public, then the globe */
   .share-status {
     display: inline-grid;
   }
@@ -611,9 +567,8 @@
     opacity: 0;
   }
 
-  /* The card's light: a gold copy of the card (same padding, so its words sit exactly on the
-     card's) that rises into the sky and shrinks to the star's point. Its finished look is
-     "gone into the star", so it shows only while it moves. */
+  /* A gold copy of the card (same padding, so its words line up) that rises into the star. Its
+     finished look is gone, so it shows only while it moves. */
   .share-ascent {
     padding: 0.625rem 1rem;
     color: var(--color-gold-300);
@@ -681,7 +636,7 @@
     opacity: 0;
   }
 
-  /* The star the entry becomes: a point 3rem down the sky; its pieces are placed around it */
+  /* A point 3rem down the sky (see --rise-y); its pieces are placed around it */
   .share-star {
     position: absolute;
     left: 50%;
@@ -806,8 +761,7 @@
     box-shadow: 0 0 8px 1px color-mix(in oklab, var(--color-lantern-300) 60%, transparent);
   }
 
-  /* High-contrast mode replaces background colours with the page colour, which would hide the
-     knob; system colours keep it visible, and "on" in the highlight colour */
+  /* Forced colours would hide the knob's background, so system colours keep it visible */
   @media (forced-colors: active) {
     .share-switch-knob {
       background-color: CanvasText;
@@ -818,7 +772,6 @@
     }
   }
 
-  /* The readable list: the step being shown gets a lavender edge; the last one lights up */
   .share-rule[data-state="current"] {
     border-color: color-mix(in oklab, var(--color-lantern-300) 50%, transparent);
     box-shadow: 0 0 22px -10px color-mix(in oklab, var(--color-lantern-300) 70%, transparent);
@@ -834,8 +787,6 @@
     color: var(--color-gold-300);
     filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-gold-400) 70%, transparent));
   }
-
-  /* ---------- Explore ---------- */
 
   /* Fixed heights, so the flight from the saved card to its new star is the same at any width */
   .explore-stage {
@@ -990,8 +941,7 @@
     min-width: 0;
   }
 
-  /* The title never shrinks below its own width (so the "dragon" matches stay readable, also
-     with larger text spacing); when the row is too narrow, the badge gives way instead */
+  /* The title keeps its width, so the "dragon" matches stay readable; the badge gives way */
   .explore-row-title {
     flex: 1 0 auto;
     white-space: nowrap;
@@ -1007,8 +957,6 @@
     overflow: hidden;
   }
 
-  /* The narrowest phones keep the whole title (so the "dragon" matches can be read) and leave
-     out the category badge, which the story doesn't need */
   @media (width < 22.5rem) {
     .explore-row .badge {
       display: none;
@@ -1058,7 +1006,6 @@
     stroke: var(--color-gold-300);
   }
 
-  /* The count: the old and the new number share one cell; the new one rolls in from below */
   .explore-count {
     display: inline-grid;
     overflow: hidden;
@@ -1085,7 +1032,6 @@
     color: var(--color-parchment-100);
   }
 
-  /* The saved entry's light and its trail, starting at the save star */
   .explore-flight {
     position: absolute;
     left: var(--src-x);
@@ -1109,21 +1055,15 @@
     opacity: 0;
   }
 
-  /* ---------- Still pictures ---------- */
-
-  /* A still showcase shows the finished picture without playing up to it, so its parts drop
-     their entrance animations (a paused one would show its first, invisible keyframe). The
-     scene itself keeps its fade, so a still picture can fade out when the loop starts over. */
+  /* Stills drop entrance animations, which would hold an invisible first keyframe. The scene
+     keeps its fade, so a still can fade out when the loop starts over. */
   .showcase[data-still="true"] .showcase-scene *,
   .showcase[data-still="true"] .showcase-scene *::before,
   .showcase[data-still="true"] .showcase-scene *::after {
     animation: none !important;
   }
 
-  /* ---------- All motion ---------- */
-
   @media (prefers-reduced-motion: no-preference) {
-    /* Stardust drifts and twinkles, each mote on its own timing */
     .stardust-mote {
       animation: showcase-mote-drift var(--duration) ease-in-out var(--delay) infinite alternate;
     }
@@ -1132,7 +1072,6 @@
       animation: showcase-fade-out 800ms ease-in both;
     }
 
-    /* A card is drawn: the light runs round its edge, then the card fills in behind it */
     .light-card[data-on="true"] {
       animation: showcase-card-in 900ms ease-out 550ms both;
     }
@@ -1156,7 +1095,6 @@
       animation-delay: calc(var(--i) * var(--letter-gap));
     }
 
-    /* Create */
     .create-link[data-dust="true"] .create-dust-mote {
       animation: showcase-dust-fall 1500ms ease-in-out both;
       animation-delay: calc(var(--i) * 110ms);
@@ -1232,7 +1170,6 @@
       animation: showcase-pop 600ms cubic-bezier(0.3, 1.5, 0.5, 1) 450ms both;
     }
 
-    /* Share */
     .share-horizon[data-on="true"] {
       animation: showcase-fade-in 900ms ease-out both;
     }
@@ -1334,7 +1271,6 @@
         filter 500ms ease-out;
     }
 
-    /* Explore */
     .explore-constellation[data-on="true"] .explore-strip-line:not(.explore-strip-new-line) {
       animation: showcase-trace 1400ms ease-out 200ms both;
     }
@@ -1399,8 +1335,6 @@
     }
   }
 }
-
-/* ---------- Keyframes (a missing "to" means: end on the finished look) ---------- */
 
 @keyframes showcase-trace {
   from {
@@ -1518,7 +1452,6 @@
   }
 }
 
-/* One letter: it flares white-lavender as the "pen" passes, then cools to parchment */
 @keyframes showcase-letter {
   0% {
     opacity: 0;
@@ -1560,7 +1493,6 @@
   }
 }
 
-/* The bead of light runs down the thread in the first half, then rests out of sight */
 @keyframes showcase-pulse {
   0% {
     stroke-dashoffset: 0.3;
@@ -1597,7 +1529,6 @@
   }
 }
 
-/* The form becomes a card: its edge firms up and a violet halo breathes once */
 @keyframes showcase-settle {
   0% {
     border-color: transparent;
@@ -1610,7 +1541,7 @@
   }
 }
 
-/* Keeps the sweep's band visible while it moves; it is hidden again afterwards */
+/* Shows the band only while it moves; its finished look is hidden */
 @keyframes showcase-sweep-show {
   0%,
   100% {
@@ -1647,9 +1578,6 @@
   }
 }
 
-/* The card's light brightens right over the card (its words turn gold), then lifts off like a
-   card of its own, floats up through the parted mist and loses its card shape (dark body,
-   corners, border), rounding into a point of light where the star appears */
 @keyframes showcase-ascent {
   0% {
     opacity: 0;
@@ -1688,7 +1616,6 @@
   }
 }
 
-/* The copy's words melt into its light while it shrinks, so it ends as a clean point */
 @keyframes showcase-ascent-words {
   0%,
   40% {
@@ -1701,7 +1628,6 @@
   }
 }
 
-/* The golden stardust gathers into the star's point as it rises */
 @keyframes showcase-trail {
   0% {
     opacity: 0;
@@ -1740,7 +1666,6 @@
   }
 }
 
-/* Light from the entry tries to rise but fades out at the horizon */
 @keyframes showcase-blocked {
   0% {
     opacity: 0;
@@ -1863,7 +1788,6 @@
   }
 }
 
-/* An arc: up first, then gliding across to the new star */
 @keyframes showcase-fly {
   0% {
     opacity: 0;

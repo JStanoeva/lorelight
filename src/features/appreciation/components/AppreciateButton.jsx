@@ -11,36 +11,26 @@ import { getAppreciationErrorMessage } from "../utils/appreciationErrors.js";
 import "../../../shared/styles/pill-button.css";
 import "../styles/appreciate-button.css";
 
-// The Appreciate button on Lore Details: one pill that holds the action and the count
-// ("♡ Appreciate | 7"). Its name is always "Appreciate" and aria-pressed says whether the user
-// appreciates the entry. The number is hidden from screen readers inside the pill and read as its
-// description instead ("7 appreciations"), so the name never changes while the count does.
-// Only for entries others can see (the database accepts appreciations of public lore only).
-// Nothing claims success before the database has accepted it: while the request is on its way the
-// pill shows that it's being processed, and only then does it light up (or go out) and the count
-// change. `onCountChange(change)` updates the count on the page: 1 for an appreciation, -1 for a removal.
+// The count is read as the description, not part of the name, so the name never changes.
+// Nothing changes before the database answers; onCountChange gets 1 or -1.
 export default function AppreciateButton({ entry, onCountChange }) {
   const { user, isAuthLoading } = useAuth();
   const location = useLocation();
   const { hasAppreciated, isLoading, error: statusError, refetch, setHasAppreciated } = useAppreciation(entry.id);
   const descriptionId = useId();
-  // isPending is true from the click until the request (the async function given to
-  // startTransition) has finished and its result is on screen
   const [isPending, startTransition] = useTransition();
   const [saveError, setSaveError] = useState("");
-  // Counts the failed requests: a new key per failure, so the same message is announced again
+  // A new key per failure, so the same message is announced again
   const [failedAttempts, setFailedAttempts] = useState(0);
-  // Bumped on each new appreciation, so the heart's "pop" plays again (the key below remounts it)
+  // Used as the heart's key, so bumping it replays the "pop"
   const [popCount, setPopCount] = useState(0);
-  // True from a click until its request has finished. Two clicks in the same moment both still see
-  // the old isPending value, but a ref changes at once, so the second click is ignored.
+  // A ref, not isPending: two clicks in the same moment both still see the old isPending
   const isRequestingRef = useRef(false);
   const pillRef = useRef(null);
 
   const count = entry.appreciation_count;
 
-  // Guests go to Login, which sends them back to this entry afterwards (GuestGuard reads state.from).
-  // A link, because it leads to another page; it isn't a toggle for them, so there's no aria-pressed.
+  // Guests get a link to Login (GuestGuard returns them via state.from), not a toggle
   if (!isAuthLoading && !user) {
     return (
       <div className="appreciate">
@@ -61,11 +51,8 @@ export default function AppreciateButton({ entry, onCountChange }) {
     );
   }
 
-  // Until the session and the user's appreciation are loaded, the button can't be "pressed" or
-  // "not pressed" yet. While a request is on its way, the current state stays until the answer comes.
   const isStatusKnown = !isAuthLoading && !isLoading && !statusError;
-  // A click does nothing then. aria-disabled instead of disabled: a disabled button would drop
-  // keyboard focus to the page, so the user would lose their place.
+  // Used for aria-disabled, not disabled: a disabled button would drop keyboard focus to the page
   const isWaiting = !isStatusKnown || isPending;
   const isPressed = isStatusKnown && hasAppreciated;
 
@@ -76,7 +63,6 @@ export default function AppreciateButton({ entry, onCountChange }) {
     statusNote = ". Checking whether you've appreciated it…";
   }
 
-  // Until the answer comes, the old state is still the true one
   let pendingNote = "";
   if (isPending) {
     pendingNote = hasAppreciated ? "Removing your appreciation…" : "Saving your appreciation…";
@@ -91,8 +77,6 @@ export default function AppreciateButton({ entry, onCountChange }) {
     isRequestingRef.current = true;
     setSaveError("");
 
-    // An async Action: isPending stays true until this function has finished, so the pill shows
-    // that the request is being processed. Nothing else changes before the database has answered.
     startTransition(async () => {
       try {
         if (isAppreciating) {
@@ -101,8 +85,7 @@ export default function AppreciateButton({ entry, onCountChange }) {
           await appreciationService.removeAppreciation(entry.id, user.id);
         }
 
-        // State updates after an await only belong to the transition when they're wrapped in
-        // startTransition again. Then they reach the screen together with the end of isPending.
+        // Updates after an await join the transition only when wrapped in startTransition again
         startTransition(() => {
           setHasAppreciated(isAppreciating);
           onCountChange(isAppreciating ? 1 : -1);
@@ -111,14 +94,12 @@ export default function AppreciateButton({ entry, onCountChange }) {
           }
         });
       } catch (error) {
-        // Nothing was changed, so there's nothing to undo: only say what went wrong
         const action = isAppreciating ? "saved" : "removed";
         startTransition(() => {
           setSaveError(`Your appreciation couldn't be ${action}. ${getAppreciationErrorMessage(error)}`);
           setFailedAttempts((current) => current + 1);
-          // After a failed removal the heart is still filled. The breathing replaced its pop
-          // animation, so the pop would play again when the breathing stops. Resetting popCount
-          // remounts the heart (new key) without the pop, so no celebration plays with the error.
+          // Remount the still-filled heart without the pop, which would otherwise replay when
+          // the pending animation stops
           if (!isAppreciating) {
             setPopCount(0);
           }
@@ -129,7 +110,7 @@ export default function AppreciateButton({ entry, onCountChange }) {
     });
   }
 
-  // The Try again button disappears with the error, so focus moves to the pill instead of the page
+  // Try again disappears with the error, so focus moves to the pill instead of the page
   function handleRetry() {
     refetch();
     pillRef.current.focus();
@@ -156,8 +137,6 @@ export default function AppreciateButton({ entry, onCountChange }) {
           />
           Appreciate
         </span>
-        {/* While the request is on its way the count isn't known yet, so "…" covers it. The number
-            stays in place (invisible), so the pill keeps its width under the pointer. */}
         <span className="appreciate-count" aria-hidden="true">
           <span className="appreciate-count-number">{formatPillCount(count)}</span>
           {isPending && <span className="appreciate-count-pending">…</span>}
@@ -167,9 +146,8 @@ export default function AppreciateButton({ entry, onCountChange }) {
         {formatAppreciationCount(count)}
         {statusNote}
       </span>
-      {/* Focus stays on the pill, and a changed description isn't announced, so this hidden status
-          line tells screen reader users that the request is being processed. It's always rendered,
-          so a screen reader notices when its text changes. */}
+      {/* A changed description isn't announced, so this always-rendered status line announces
+          the pending request */}
       <span role="status" className="sr-only">
         {pendingNote}
       </span>

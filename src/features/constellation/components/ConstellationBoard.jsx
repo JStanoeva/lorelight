@@ -14,16 +14,8 @@ import "../styles/constellation.css";
 
 const CHIPS_LABEL = "Filter by category";
 
-// A Constellation as a pin board: the category chips (the threads' key and the filter), the count
-// line, and the framed board with the cards (or an error or empty notice; while loading, the ghost
-// cards on their own). Everything comes in as props, so a creator's profile can show the same board
-// read-only (isOwner false).
-//   entries                 the saves, newest first; isLoading / error / onRetry: the load's state
-//   isOwner                 the viewer's own Constellation: Remove buttons
-//   ownerId, ownerName      whose Constellation it is (the id seeds the board's stars)
-//   category                the chosen category ("" for all); onCategoryChange(value) changes it
-//   onRemove(loreId)        sends the removal and returns its Promise
-//   onRemoved(loreId)       takes the entry off `entries` once the database has confirmed it
+// Props only, so a creator's profile can show the same board read-only (isOwner false).
+// onRemove(loreId) returns the request's Promise; onRemoved(loreId) runs once it's confirmed.
 export default function ConstellationBoard({
   entries,
   isLoading,
@@ -37,12 +29,10 @@ export default function ConstellationBoard({
   onRemove,
   onRemoved,
 }) {
-  // The count line: it stays in place, so focus moves there when what had it disappears
+  // The count line stays mounted, so focus moves there when the focused element disappears
   const countRef = useRef(null);
-  // The last confirmed removal. `count` goes up with every one, so the line is replaced and
-  // announced again even when two removed entries share a title.
   const [removal, setRemoval] = useState({ title: "", count: 0 });
-  // Filtering happens here: every save is loaded anyway, so the counts come for free
+  // Filtered here, not in the query: every save is loaded anyway, so the counts come for free
   const counts = useMemo(() => countByCategory(entries), [entries]);
   const shownEntries = useMemo(
     () => (category ? entries.filter((entry) => getCategory(entry.category).value === category) : entries),
@@ -55,28 +45,27 @@ export default function ConstellationBoard({
 
   function handleCategoryChange(nextCategory) {
     const focused = document.activeElement;
-    // The chip of a category without entries disappears once another one is chosen. flushSync
-    // renders the change right away, so we can tell whether the focused chip has left the page.
+    // A chip without entries disappears once another is chosen; flushSync renders that now, so
+    // we can tell whether the focused chip has left the page
     flushSync(() => onCategoryChange(nextCategory));
     if (focused && !focused.isConnected) {
       countRef.current?.focus();
     }
   }
 
-  // The button disappears with the empty view, so focus moves to the count line. flushSync renders
-  // the change first, so the line already holds the new count when it gets focus.
+  // "Show all" disappears with the empty view; flushSync renders first, so the count line
+  // already holds the new count when it gets focus
   function handleShowAll() {
     flushSync(() => onCategoryChange(""));
     countRef.current?.focus();
   }
 
-  // Try again disappears with the error, so focus moves to the count line, as above
+  // Try again disappears with the error, so focus moves to the count line
   function handleRetry() {
     onRetry();
     countRef.current?.focus();
   }
 
-  // Runs inside the card's transition, after the database has confirmed the removal
   function handleRemoved(entry) {
     setRemoval((current) => ({ title: entry.title, count: current.count + 1 }));
     onRemoved(entry.id);
@@ -84,9 +73,8 @@ export default function ConstellationBoard({
 
   let board;
   if (isLoading) {
-    // The loading animation on its own: the glowing ghost cards and the Loader, but no frame and no
-    // placeholder chips. An empty Constellation has no chips (and its frame sits higher), so those
-    // would appear and then vanish or jump. The chips, the frame and the cards appear once known.
+    // No frame or chips while loading: an empty Constellation has no chips (its frame sits
+    // higher), so placeholders would vanish or jump once the saves arrive
     board = (
       <div className="board-loading">
         <BoardNotice kind="loading" isOwner={isOwner} />
@@ -132,11 +120,8 @@ export default function ConstellationBoard({
 
       <div className="constellation-board site-column">
         <div className="board-summary">
-          {/* Stays mounted (empty while loading), so screen readers hear every new count.
-              tabIndex -1: it can take focus from code, but isn't a Tab stop. An empty Constellation
-              says so in its notice below, so "Nothing pinned yet" is hidden (screen readers still
-              read it), except while the line has keyboard focus (after the last card is removed):
-              then it shows, so the focus ring surrounds words instead of nothing. */}
+          {/* Stays mounted, so every new count is announced. "Nothing pinned yet" shows only while
+              focused (after the last removal), so the focus ring surrounds words. */}
           <p ref={countRef} tabIndex={-1} role="status" className="board-count group">
             {isLoaded && entries.length > 0 && (
               <>
@@ -149,8 +134,7 @@ export default function ConstellationBoard({
             )}
           </p>
 
-          {/* Always rendered, so screen readers notice when the text appears. Shown only after the
-              database has confirmed a removal. */}
+          {/* Always rendered, so screen readers notice when the text appears */}
           <p role="status" className="board-removed">
             {removal.title && (
               <>

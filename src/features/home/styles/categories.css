@@ -1,12 +1,7 @@
 @reference "../../../index.css";
 
-/*
-  Categories: an "atlas index" of entries separated by hairlines, instead of a wall of cards.
-  The section background (the sky band) and its star layer live in home.css.
-*/
 @layer components {
-  /* Each entry draws the hairline below itself, and the list draws the first one above
-     (border-t in CategoryList). The rules stay right even when the last row is not full. */
+  /* Hairlines below each entry (the list draws the top one), so a short last row stays right */
   .category-item {
     @apply relative min-w-0 border-b border-night-700 px-4 py-6;
   }
@@ -22,8 +17,7 @@
     @apply inline-flex items-center gap-1.5 text-sm font-semibold text-gold-400 no-underline;
   }
 
-  /* Stretched link: the link's ::after covers the whole entry (the nearest positioned
-     ancestor), so the entire item is clickable while the link keeps a short, unique name. */
+  /* Stretched link: covers the whole entry, while the link keeps a short, unique name */
   .category-link::after {
     content: "";
     position: absolute;
@@ -34,8 +28,7 @@
     filter: drop-shadow(0 0 10px currentColor);
   }
 
-  /* Same condition as Tailwind's hover: variant, so a tap on a phone never leaves an entry
-     stuck in its hover look */
+  /* Like Tailwind's hover: variant, so a tap never leaves an entry stuck in its hover look */
   @media (hover: hover) {
     .category-item:hover {
       background-color: color-mix(in oklab, var(--color-night-900) 50%, transparent);
@@ -50,8 +43,7 @@
     }
   }
 
-  /* The focus ring goes around the whole entry, because that is the area the link covers.
-     A browser without :has() keeps the link's own ring instead. */
+  /* The ring wraps the whole clickable entry; without :has() the link keeps its own ring */
   @supports selector(:has(*)) {
     .category-item:has(.category-link:focus-visible) {
       z-index: 1; /* keeps the ring above the neighbouring entries */
@@ -64,7 +56,6 @@
     }
   }
 
-  /* Motion is opt-in: with reduced motion only the glow changes */
   @media (prefers-reduced-motion: no-preference) {
     .category-item {
       transition: background-color 150ms ease-out;

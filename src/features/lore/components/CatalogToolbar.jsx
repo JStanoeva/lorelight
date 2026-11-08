@@ -5,10 +5,8 @@ import { DEFAULT_SORT, SORT_OPTIONS } from "../constants/sortOptions.js";
 import { hasActiveFilters } from "../utils/catalogFilters.js";
 import { getCategory } from "../utils/getCategory.js";
 
-// The line above the cards: how many entries match ("2 entries for “glass” in Location, oldest
-// first"), the active filters as removable chips with "Clear all", and the sort select.
-// `count` is null while the lore loads or failed to load. `countRef` points at the count line,
-// where the page moves focus after a filter button disappears.
+// count is null while the lore loads or failed to load. The page moves focus to countRef
+// after a filter button disappears.
 export default function CatalogToolbar({
   count,
   filters,
@@ -27,8 +25,7 @@ export default function CatalogToolbar({
   return (
     <div className="catalog-toolbar">
       <div className="catalog-summary">
-        {/* Stays mounted (empty while loading), so screen readers hear every new count.
-            tabIndex -1: it can take focus from code, but isn't a Tab stop. */}
+        {/* Stays mounted (empty while loading), so screen readers hear every new count */}
         <p ref={countRef} tabIndex={-1} role="status" className="catalog-count">
           {count !== null && (
             <>

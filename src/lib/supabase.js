@@ -9,8 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-// The app never signs in through a link (no OAuth, magic link, password reset or email
-// confirmation), so the client must not pick up a session from tokens in the URL.
+// The app never signs in through a link, so it must not pick up a session from URL tokens.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: { detectSessionInUrl: false },
 });

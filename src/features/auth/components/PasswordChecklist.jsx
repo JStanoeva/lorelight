@@ -17,11 +17,8 @@ function getStrengthValueClassName(password, isComplete) {
   return isComplete ? "pw-meter-value pw-meter-value-strong" : "pw-meter-value";
 }
 
-// The "night sky" panel under the Register password field: the strength meter and the five
-// password rules, each marked with a star that fills in once the rule is met. Everything is
-// derived from the password during render, so the panel needs no state of its own.
-// `id` goes on the rules list and `${id}-note` on the note about allowed characters under it, so
-// the password input can point at both with aria-describedby.
+// `id` goes on the rules list and `${id}-note` on the note under it, so the password input can
+// point at both with aria-describedby.
 export default function PasswordChecklist({ id, password }) {
   const checks = getPasswordChecks(password);
   const strength = getPasswordStrength(password);
@@ -49,7 +46,6 @@ export default function PasswordChecklist({ id, password }) {
             <svg className="pw-rule-star" viewBox="-2 -2 28 38" aria-hidden="true" focusable="false">
               <path className="pw-star-path" d={STAR_PATH} />
             </svg>
-            {/* The hidden prefix tells screen readers what the star's colour and fill show */}
             <span>
               <span className="sr-only">{check.isMet ? "Met: " : "Not met: "}</span>
               {check.label}
@@ -62,8 +58,8 @@ export default function PasswordChecklist({ id, password }) {
         Latin letters (A–Z), numbers and symbols only, with no spaces. Up to {PASSWORD_MAX_LENGTH} characters.
       </p>
 
-      {/* The only live text: one short sentence that changes only when the number of met rules
-          changes, so a screen reader never re-reads the whole list on every keystroke */}
+      {/* The only live text: it changes only when the number of met rules does, so a screen
+          reader never re-reads the whole list on every keystroke */}
       <p className="sr-only" aria-live="polite">
         {getStrengthSummary(password, strength)}
       </p>

@@ -28,7 +28,7 @@ export default function EditProjectPage() {
     navigate(`/projects/${project.id}`);
   }
 
-  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  // Try again disappears when pressed, so focus moves to the heading, which stays
   function handleRetry() {
     refetch();
     headingRef.current.focus();
@@ -50,7 +50,6 @@ export default function EditProjectPage() {
     content = <ErrorMessage message={getErrorMessage(error)} onRetry={handleRetry} />;
   } else {
     content = (
-      // Only the owner may edit; anyone else is sent to the project's details page
       <OwnerGuard ownerId={project.owner_id} redirectTo={`/projects/${project.id}`}>
         <p className="mb-8 text-parchment-300 wrap-anywhere">
           Editing <span className="font-semibold text-parchment-100">{project.title}</span>

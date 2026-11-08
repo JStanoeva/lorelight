@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 // True while the element with this id is fully visible below the sticky header.
-// The state is set only inside the observer's callback, never directly in the effect.
 export function useIsBelowHeader(elementId, isEnabled) {
   const [isBelowHeader, setIsBelowHeader] = useState(true);
 
@@ -15,8 +14,8 @@ export function useIsBelowHeader(elementId, isEnabled) {
       return;
     }
 
-    // rootMargin accepts only px or %, so the header height (4rem, as --header-height in
-    // index.css) is converted here. That keeps it right when the default font size is larger.
+    // rootMargin accepts only px or %, so the 4rem header height (--header-height) is converted
+    // here, which keeps it right when the default font size is larger.
     const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
     const observer = new IntersectionObserver(
       // 0.99 rather than 1 allows for sub-pixel rounding

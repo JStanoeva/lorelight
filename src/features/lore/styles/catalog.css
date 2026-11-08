@@ -1,18 +1,7 @@
-/*
-  Lore Catalog ("Star Atlas"): the night-sky hero with the search bar, the results toolbar and
-  the notices that replace the cards. The cards themselves are LoreCard's (lore-card.css), the
-  category chips CategoryChips' (category-chips.css). Imported by LoreCatalogPage.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer after
-  components.css, so they can adjust .btn and .input, and a Tailwind utility on the same element
-  still wins (the category colour classes rely on that).
-  Nothing here animates; the few hover transitions only run without reduced motion.
-*/
+/* In the components layer after components.css, so these rules can adjust .btn and .input, and a
+   Tailwind utility on the same element still wins (the category colour classes rely on that). */
 @layer components {
-  /* ---------- Hero: a short night sky (about 267px tall on desktop, 214px on phones) ---------- */
-
-  /* The top padding, the eyebrow and the title come from .page-hero (styles/components.css), shared
-     with My Projects and My Constellation. overflow: hidden also cuts off the strip of the sky that
-     lies under the scrollbar (below). */
+  /* overflow: hidden also cuts off the strip of the 100vw sky that lies under the scrollbar */
   .catalog-hero {
     position: relative;
     isolation: isolate;
@@ -21,9 +10,8 @@
     background: var(--color-night-950);
   }
 
-  /* The sky is as wide as the whole window (100vw includes the scrollbar), not the page, like
-     the site-column utility: everything placed in percentages inside it stays in place when a
-     scrollbar appears or disappears, e.g. when "All" brings enough cards to scroll. */
+  /* As wide as the window (100vw includes the scrollbar), like site-column, so the sky stays in
+     place when a scrollbar appears or disappears */
   .catalog-sky {
     position: absolute;
     inset: 0 auto 0 0;
@@ -38,7 +26,6 @@
       radial-gradient(34% 70% at 94% 20%, color-mix(in oklab, var(--color-lantern-700) 38%, transparent), transparent 70%);
   }
 
-  /* The horizon: a hairline that fades out at both ends, so the band has no hard box edge */
   .catalog-sky::after {
     content: "";
     position: absolute;
@@ -52,7 +39,7 @@
     position: absolute;
   }
 
-  /* A planisphere: rings and meridians around a pole below the band, fading out upwards */
+  /* Rings and meridians around a pole below the band, fading out upwards */
   .catalog-sky-chart {
     inset: 0;
     background:
@@ -70,13 +57,8 @@
     mask-image: radial-gradient(ellipse 70% 125% at 50% 100%, #000 20%, transparent 78%);
   }
 
-  /* The Home page's star field (one dot per layer on coprime tile sizes, so the pattern never
-     visibly repeats), plus three brighter stars with a soft halo. Still.
-     Two masks, and a star shows only where both let it through (intersect): the field fades out
-     towards the bottom, and an ellipse around the eyebrow, the title and the search bar stays
-     clear, so no star ever sits on the text. The ellipse is centred on the hero, which is the
-     middle of that block. Its size was measured to keep the eyebrow and the title well inside the
-     clear part from 320px up; phones get a narrower one. */
+  /* Coprime tile sizes, so the star field never visibly repeats. The two masks intersect: the
+     field fades out downwards, and an ellipse around the text stays clear of stars. */
   .catalog-sky-stars {
     --star: var(--color-parchment-100);
     --text-clearing: radial-gradient(26rem 8.75rem at 50% 50%, transparent 90%, #000 100%);
@@ -115,7 +97,7 @@
     }
   }
 
-  /* Two constellations at the sides, only where they stay clear of the centred text */
+  /* Shown only where they stay clear of the centred text */
   .catalog-constellation {
     display: none;
     color: var(--color-lantern-300);
@@ -158,8 +140,6 @@
     position: relative;
     padding-inline: 1rem;
   }
-
-  /* ---------- Search bar: one rounded pill with the Search button inside ---------- */
 
   .catalog-search {
     display: flex;
@@ -216,8 +196,6 @@
     font-size: 0.9375rem;
   }
 
-  /* ---------- Results ---------- */
-
   .catalog-results {
     padding: 1.75rem 1rem 4rem;
   }
@@ -241,9 +219,8 @@
     min-width: 0;
   }
 
-  /* It takes focus after a filter is removed or after "Try again" (tabIndex -1); the radius
-     rounds its focus ring. One line tall even while empty (loading), so the cards below don't
-     move up and back. */
+  /* The radius rounds its focus ring. One line tall even while empty (loading), so the cards
+     below don't move up and back. */
   .catalog-count {
     min-height: 1lh;
     margin: 0;
@@ -268,7 +245,6 @@
     list-style: none;
   }
 
-  /* A removable filter is an action, so its hover turns gold */
   .catalog-active-chip {
     display: inline-flex;
     align-items: center;
@@ -340,20 +316,16 @@
     min-height: 2.5rem;
   }
 
-  /* Shown when the catalog returned as many entries as it loads at most */
   .catalog-limit {
     margin: -0.5rem 0 1.5rem;
     font-size: 0.875rem;
     color: var(--color-parchment-500);
   }
 
-  /* The previous cards while new filters load: dimmed and not clickable */
   .catalog-results-pending {
     opacity: 0.5;
     pointer-events: none;
   }
-
-  /* ---------- Empty catalog / no results ---------- */
 
   .catalog-notice {
     display: flex;
@@ -398,9 +370,8 @@
     fill: var(--color-parchment-300);
   }
 
-  /* The single star, as tall as the chart (the svg rule above sizes it), in the lantern's violet
-     (never gold: gold means "action"). Moved up a little, so its waist (y 20 of 34) sits on the
-     chart's centre. */
+  /* Violet, never gold (gold means "action"). Moved up a little, so its waist (y 20 of 34) sits
+     on the chart's centre. */
   .catalog-notice-star {
     position: absolute;
     inset: 0;
@@ -432,8 +403,6 @@
     margin-top: 0.75rem;
   }
 
-  /* ---------- Sizes ---------- */
-
   @media (width >= 40rem) {
     .catalog-hero-content,
     .catalog-results {
@@ -445,7 +414,7 @@
     }
   }
 
-  /* Phones: a shorter hero and 40px touch targets (the chips row: category-chips.css) */
+  /* Phones: a shorter hero and 40px touch targets */
   @media (width < 40rem) {
     .catalog-hero {
       padding-bottom: 2.25rem;

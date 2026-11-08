@@ -7,8 +7,7 @@ export function useLoreEntry(entryId) {
   const [reloadCount, setReloadCount] = useState(0);
   const [result, setResult] = useState({ key: null, data: null, error: null });
 
-  // A new key means "a new request is needed": a different entryId, a different viewer or a
-  // refetch(). No key while the session is still being read, so nothing loads for the wrong viewer.
+  // No key while the session is still being read, so nothing loads for the wrong viewer
   const requestKey = viewerKey && `${entryId}|${viewerKey}|${reloadCount}`;
 
   useEffect(() => {
@@ -16,7 +15,6 @@ export function useLoreEntry(entryId) {
       return;
     }
 
-    // Mount / update: fetch whenever the key changes.
     let isStale = false;
 
     loreService.getLoreById(entryId).then(
@@ -28,7 +26,6 @@ export function useLoreEntry(entryId) {
       },
     );
 
-    // Unmount / before the next fetch: ignore this request's late response.
     return () => {
       isStale = true;
     };
@@ -36,10 +33,8 @@ export function useLoreEntry(entryId) {
 
   const refetch = useCallback(() => setReloadCount((count) => count + 1), []);
 
-  // Applies a change to the entry it already has (e.g. the appreciation count after the database
-  // accepted a new appreciation), so the screen updates without reloading.
-  // `updater(entry)` returns the new entry. Only the data of this request key is changed, like
-  // useProject's updateData, and an entry that wasn't found stays not found.
+  // Updates the loaded entry without reloading (e.g. its appreciation count). Only this request
+  // key's data changes, and an entry that wasn't found stays not found.
   const updateData = useCallback(
     (updater) =>
       setResult((current) =>

@@ -1,41 +1,26 @@
 import { useEffect, useRef } from "react";
 
-// Degrees per second of the slow idle turn: one full turn every six minutes, slow enough to
-// read the names while they move
+// Degrees per second: one full turn every six minutes
 const IDLE_SPEED = 1;
-// How quickly the idle turn fades in and out (higher = quicker), e.g. when the pointer rests on
-// the wheel
+// How quickly the idle turn fades in and out (higher = quicker)
 const IDLE_EASE = 2.6;
-// Stiffness of the spring that turns a chosen star to the reading position (higher = quicker).
-// At 10 a star from the far side lands under the mark in well under a second (a neighbour in
-// about half a second).
+// Stiffness of the spring that turns a chosen star to the top (higher = quicker)
 const TURN_SPRING = 10;
-// The flare starts when the chosen star is this close to the top (in degrees), while the wheel
-// is still gliding in, so the light and the landing overlap instead of following each other
+// Degrees from the top at which the flare starts, so the light overlaps the landing
 const ARRIVAL_ANGLE = 3;
-// A long gap between frames (a slow phone, a breakpoint) counts as 50 ms, so the wheel never jumps
+// Longer frame gaps (a slow phone, a breakpoint) count as 50 ms, so the wheel never jumps
 const MAX_FRAME_SECONDS = 0.05;
-// During the slow idle turn, --turn is written only once the wheel has moved this far (in
-// degrees, about a fifth of a pixel at the names), not on every frame (see step below)
+// The idle turn rewrites --turn only after moving this many degrees (about 0.2 px at the names)
 const MIN_IDLE_WRITE_ANGLE = 0.05;
 
-// The version of `target` (± 360°) closest to `current`, so the wheel always takes the short
-// way round: from 350° to 10° it turns 20°, not 340°.
+// `target` ± 360° closest to `current`, so the wheel takes the short way (350° → 10° is 20°)
 function closestAngle(current, target) {
   const difference = ((((target - current) % 360) + 540) % 360) - 180;
   return current + difference;
 }
 
-// Turns the orrery. The angle lives in a ref and goes straight to the CSS variable --turn on
-// the wheel element (each frame during a pick turn, in small steps during the idle turn), so
-// the turning never re-renders React; the CSS reads --turn to place every star and to rotate
-// the engraved rings.
-//   isLooping     – may the wheel move at all (motion allowed, on screen, tab visible). When it
-//                   turns false the loop stops at once and the wheel stays where it is.
-//   isIdleTurning – should the slow idle turn run (nothing chosen, no pointer or keyboard on it)
-//   targetAngle   – null, or the --turn that brings the chosen star to the top
-// When a chosen star reaches the top, the wheel gets data-arrived="true" (the CSS starts the
-// star's flare from it). React never renders that attribute, so it never overwrites it.
+// The angle goes straight to the CSS variable --turn, so turning never re-renders React.
+// React never renders data-arrived (the flare's cue), so it never overwrites it.
 export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle }) {
   const angleRef = useRef(0);
   const speedRef = useRef(0);
@@ -47,21 +32,18 @@ export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle 
       return;
     }
 
-    // A different choice (or none): the flare may play again when the next star arrives
     if (targetAngle !== arrivedTargetRef.current) {
       arrivedTargetRef.current = null;
       delete wheel.dataset.arrived;
     }
 
     if (!isLooping) {
-      // Stopped where it is; when it may move again, it starts from rest
       speedRef.current = 0;
       return;
     }
 
     let frameId = 0;
     let previousTime = null;
-    // The angle last written to --turn by this run (null = nothing written yet)
     let writtenAngle = null;
 
     function step(time) {
@@ -74,10 +56,8 @@ export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle 
       let isSettled = false;
 
       if (targetAngle !== null) {
-        // A spring pulls the wheel towards the goal, and the second term brakes it in
-        // proportion to its speed. With exactly this much braking ("critically damped") the
-        // wheel speeds up, slows down and lands on the mark without swinging past it. Pressing
-        // an arrow key again mid-turn just bends the motion, because the speed is kept.
+        // Critically damped spring: lands on the mark without overshooting. The speed is kept,
+        // so another arrow press mid-turn just bends the motion.
         const goal = closestAngle(angle, targetAngle);
         speed += (TURN_SPRING ** 2 * (goal - angle) - 2 * TURN_SPRING * speed) * seconds;
         angle += speed * seconds;
@@ -93,7 +73,7 @@ export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle 
           isSettled = true;
         }
       } else {
-        // The idle turn eases in and out instead of starting or stopping with a jerk
+        // Exponential ease towards the wanted speed, so the idle turn never jerks
         const wantedSpeed = isIdleTurning ? IDLE_SPEED : 0;
         speed += (wantedSpeed - speed) * (1 - Math.exp(-IDLE_EASE * seconds));
         angle += speed * seconds;
@@ -107,9 +87,8 @@ export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle 
       angleRef.current = angle;
       speedRef.current = speed;
 
-      // Every element in the wheel inherits --turn, so each write restyles the whole wheel.
-      // The idle turn moves only about 0.02° per frame, so it is written once it has moved a
-      // visible amount; a pick turn and the final resting angle are always written.
+      // Each --turn write restyles the whole wheel, so the idle turn writes only once it has moved
+      // visibly; a pick turn and the resting angle are always written.
       const hasMovedVisibly =
         writtenAngle === null || Math.abs(angle - writtenAngle) >= MIN_IDLE_WRITE_ANGLE;
       if (targetAngle !== null || isSettled || hasMovedVisibly) {
@@ -117,7 +96,6 @@ export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle 
         writtenAngle = angle;
       }
 
-      // Nothing left to move: stop asking for frames until something changes
       if (!isSettled) {
         frameId = requestAnimationFrame(step);
       }
@@ -125,8 +103,6 @@ export function useOrreryTurn(wheelRef, { isLooping, isIdleTurning, targetAngle 
 
     frameId = requestAnimationFrame(step);
 
-    // The cleanup cancels the loop whenever one of the inputs changes (a new one starts with
-    // the new values), on unmount, and in StrictMode's extra mount, so only one ever runs
     return () => cancelAnimationFrame(frameId);
   }, [wheelRef, isLooping, isIdleTurning, targetAngle]);
 }

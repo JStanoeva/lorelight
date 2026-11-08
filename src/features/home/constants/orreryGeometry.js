@@ -1,6 +1,5 @@
-// Sizes of the category orrery, in its engraving's 1000 × 1000 SVG box (the centre is 0, 0).
-// They are the one source of truth: OrreryEngraving draws the circles with them, and
-// ORRERY_CSS_SIZES hands the ones orrery.css needs to the wheel as CSS custom properties.
+// Units of the engraving's 1000 × 1000 SVG box (centre 0, 0); orrery.css reads them via
+// ORRERY_CSS_SIZES.
 export const STAR_RING = 300;
 export const LENS_RADIUS = 250;
 export const BAND_INNER = 262;
@@ -9,9 +8,7 @@ export const HUB_RADIUS = 58;
 export const LIMB_INNER = 482;
 export const LIMB_OUTER = 496;
 
-// The same sizes as shares of the wheel's width (the box is 1000 units wide), so the star
-// buttons, the lens and the orbiting lights in CSS sit exactly on the circles of the drawing.
-// CategoryOrrery sets them on the wheel element (style={ORRERY_CSS_SIZES}).
+// As shares of the wheel's width, so the CSS parts sit exactly on the drawn circles.
 export const ORRERY_CSS_SIZES = {
   "--star-ring": STAR_RING / 1000,
   "--lens-radius": LENS_RADIUS / 1000,

@@ -1,46 +1,35 @@
 import { FRAGMENT_SHADER, MAX_TEXT_BOXES, VERTEX_SHADER } from "../shaders/nebula.js";
 
-// Nebulae are soft, so the sky is painted at a lower resolution and CSS stretches it up: far
-// less work for the GPU, and nobody can see the difference. Screens with very dense pixels are
-// capped too (a phone at 3x would otherwise paint nine times as many pixels as needed).
+// Soft nebulae paint at a lower resolution and CSS stretches them; dense screens are capped too
 const MAX_PIXEL_RATIO = 1.5;
 const RENDER_SCALE = 0.7;
 // Phones, tablets and small windows start lower: their GPUs are usually weaker
 const SMALL_SCREEN_QUERY = "(width < 48rem), (pointer: coarse)";
 const SMALL_SCREEN_RENDER_SCALE = 0.5;
-// If the first two seconds of motion still run slower than about 36 frames per second, the
-// resolution drops once more, to 70% of what it was
+// Slower than about 36 fps over the first two seconds of motion: the resolution drops to 70%
 const SPEED_CHECK_SECONDS = 2;
 const SLOW_FRAME_SECONDS = 1 / 36;
 const SLOW_DEVICE_FACTOR = 0.7;
 // One slow frame (a busy page) never makes the sky jump: a frame counts as 1/20 s at most
 const MAX_FRAME_SECONDS = 0.05;
-// The canvas fades in over the CSS painting (2 s, nebula.css) while it still paints the CSS
-// light, so the glow keeps its size; afterwards the light turns into the sky's own over three
-// seconds
+// The canvas fades in (2 s, nebula.css) still painting the CSS light, then takes it over in 3 s
 const INTRO_HOLD_SECONDS = 2;
 const INTRO_SECONDS = 3;
-// The same breakpoint as hero.css, where the light moves to the bottom-right corner
+// Must match hero.css's breakpoint, where the light moves to the bottom-right corner
 const COMPACT_QUERY = "(width < 48rem), (height <= 500px)";
-// Set on the canvas's host box once the first frame is on screen: nebula.css then fades the
-// canvas in and shows the star and flares above it
 const READY_CLASS = "is-ready";
-// The hero's small text: embers and stars fade right behind these boxes. HomeCtas is shared
-// with the closing strip, so its row is found by its class instead of a data attribute.
+// The small text that embers and stars fade behind. HomeCtas is shared with the closing strip,
+// so its row is matched by class instead of a data attribute.
 const TEXT_SELECTOR = "[data-sky-guard], .home-ctas";
-// An unused text box: far off the canvas and zero in size
 const NO_BOX = [-100000, -100000, 0, 0];
 
-// How far an element is moved by its CSS `translate` right now, in px. The text slides a little
-// while it fades in (useSectionReveal), so its box is measured where it will settle, and the
-// calm zones behind it never jump when the fade-in ends.
+// The CSS `translate` in px: text slides while fading in, so boxes are measured where it settles
 function readTranslate(element) {
   const [x, y] = getComputedStyle(element).translate.split(" ").map(parseFloat);
   return { x: Number.isFinite(x) ? x : 0, y: Number.isFinite(y) ? y : 0 };
 }
 
-// Every line of small text as (centre x, centre y, half width, half height) in CSS px, measured
-// from the hero's bottom-left corner like the shader's coordinates
+// Each box as (centre x, centre y, half width, half height) in CSS px from the hero's bottom-left
 function measureTextBoxes(hero) {
   const heroRect = hero.getBoundingClientRect();
   const elements = Array.from(hero.querySelectorAll(TEXT_SELECTOR)).slice(0, MAX_TEXT_BOXES);
@@ -52,7 +41,6 @@ function measureTextBoxes(hero) {
       continue;
     }
     const rect = element.getBoundingClientRect();
-    // The fade-in's slide is set on the text line or on its wrapper (the buttons' row)
     const slide = readTranslate(element.closest("[data-reveal-item]") ?? element);
     boxes.push(
       rect.left - slide.x - heroRect.left + rect.width / 2,
@@ -64,8 +52,6 @@ function measureTextBoxes(hero) {
   return new Float32Array(boxes);
 }
 
-// --- Reading the hero's CSS, so the shader's light sits exactly where the CSS star is ---
-
 function readPercent(style, name, fallback) {
   const value = parseFloat(style.getPropertyValue(name));
   return Number.isFinite(value) ? value / 100 : fallback;
@@ -76,7 +62,6 @@ function readPercentPair(style, name, fallback) {
   return parts.length === 2 && parts.every(Number.isFinite) ? [parts[0] / 100, parts[1] / 100] : fallback;
 }
 
-// "2rem" or "32px" in CSS pixels
 function readLength(style, name, fallback, rootFontSize) {
   const raw = style.getPropertyValue(name).trim();
   const value = parseFloat(raw);
@@ -101,21 +86,18 @@ function readSkyLayout(hero, rootFontSize) {
   };
 }
 
-// How much of the CSS light the sky still paints after `seconds` of running: 1 at first, then
-// a smooth S-curve down to 0
+// Share of the CSS light the sky still paints: 1 during the hold, then a smoothstep down to 0
 function getIntro(seconds) {
   const progress = Math.min(Math.max((seconds - INTRO_HOLD_SECONDS) / INTRO_SECONDS, 0), 1);
   return 1 - progress * progress * (3 - 2 * progress);
 }
-
-// --- WebGL setup ---
 
 function compileShader(gl, type, source) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    // Only a warning: the visitor still sees the CSS painting. The log says why it failed.
+    // Only a warning: the CSS painting stays visible
     console.warn(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
@@ -144,10 +126,8 @@ function createProgram(gl) {
   return program;
 }
 
-// Builds the painted sky inside `host` (an empty element inside the .hero section) and returns
-// { start, stop, setIsStill, destroy }, or null when WebGL isn't available: then the CSS
-// painting underneath simply stays. All the per-frame work happens here, outside React, so
-// painting the sky never re-renders a component.
+// Returns { start, stop, setIsStill, destroy }, or null without WebGL (the CSS painting stays).
+// All per-frame work happens here, outside React, so painting never re-renders a component.
 export function createNebulaRenderer(host) {
   const hero = host.closest(".hero");
   const canvas = document.createElement("canvas");
@@ -169,7 +149,7 @@ export function createNebulaRenderer(host) {
     return null;
   }
 
-  // One triangle that covers the whole canvas (see shaders/nebula.js)
+  // One triangle that covers the whole canvas
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -178,7 +158,6 @@ export function createNebulaRenderer(host) {
   gl.enableVertexAttribArray(positionLocation);
   gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-  // Where each uniform (the shader's inputs) lives, looked up once
   const uniformNames = [
     "uResolution", "uHeroSize", "uPixelScale", "uTime", "uBloom", "uCore", "uHalo", "uHaze",
     "uRead", "uStarFade", "uPointer", "uWind", "uPointerPresence", "uScroll", "uDrift",
@@ -188,18 +167,16 @@ export function createNebulaRenderer(host) {
     uniformNames.map((name) => [name, gl.getUniformLocation(program, name)]),
   );
 
-  // Everything that changes over time lives in plain variables, not React state
   let renderScale = window.matchMedia(SMALL_SCREEN_QUERY).matches
     ? SMALL_SCREEN_RENDER_SCALE
     : RENDER_SCALE;
-  // Measured by resize() below, before the first frame
   let heroWidth = 1;
   let heroHeight = 1;
   let rootFontSize = 16;
   let layout = null;
   let textBoxes = null;
-  let elapsed = 0; // the sky's own clock: it only moves while the sky runs
-  let scroll = 0; // how far the page is scrolled past the hero (0 to 1), read while running
+  let elapsed = 0; // seconds, counted only while the sky runs
+  let scroll = 0; // 0 to 1: how far the page is scrolled past the hero
   let lastFrameTime = null;
   let frameId = 0;
   let readyFrameId = 0;
@@ -207,12 +184,11 @@ export function createNebulaRenderer(host) {
   let isStill = false;
   let isLost = false;
   let isDestroyed = false;
-  // The speed check: how many frames the first seconds of motion took
   let checkedFrames = 0;
   let checkedSeconds = 0;
   let isSpeedChecked = false;
 
-  // The cursor: where it is aiming (target) and where the shader sees it (smoothed)
+  // target* is the real cursor; x/y are the smoothed values the shader sees
   const pointer = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5, presence: 0, isOver: false };
   const wind = { x: 0, y: 0, targetX: 0, targetY: 0 };
 
@@ -228,14 +204,11 @@ export function createNebulaRenderer(host) {
     textBoxes = measureTextBoxes(hero);
   }
 
-  // Paints one frame with the current values
   function draw() {
     if (isLost) {
       return;
     }
-    // The still picture is the sky at the top of the page, with its own light straight away and
-    // no embers (a frozen ember would show as a short dash). In motion, the embers appear as the
-    // CSS light hands over.
+    // A still shows the sky's own light and no embers (a frozen ember would look like a dash)
     const intro = isStill ? 0 : getIntro(elapsed);
 
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -261,7 +234,6 @@ export function createNebulaRenderer(host) {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
-  // Lowers the resolution once if the first frames are slow (a weak phone or laptop GPU)
   function checkSpeed(seconds) {
     checkedFrames += 1;
     checkedSeconds += seconds;
@@ -275,8 +247,6 @@ export function createNebulaRenderer(host) {
     }
   }
 
-  // One animation frame: move the clock on, ease the cursor values, paint, and ask the browser
-  // for the next frame
   function frame(now) {
     frameId = requestAnimationFrame(frame);
     const seconds = lastFrameTime === null ? 0 : Math.min((now - lastFrameTime) / 1000, MAX_FRAME_SECONDS);
@@ -285,8 +255,7 @@ export function createNebulaRenderer(host) {
     if (seconds > 0 && !isSpeedChecked) {
       checkSpeed(seconds);
     }
-    // Scrolling down dims the sky. The scroll is read only here, so a stopped frame that has to
-    // be painted again (after a resize) keeps the look it had when it stopped.
+    // Read only here, so a stopped frame repainted after resizing keeps the look it stopped with
     scroll = Math.min(Math.max(window.scrollY / heroHeight, 0), 1);
 
     // Ease the cursor values, so the wind swells and settles instead of snapping
@@ -310,13 +279,11 @@ export function createNebulaRenderer(host) {
     frameId = requestAnimationFrame(frame);
   }
 
-  // Stopping keeps the last frame on the canvas
   function stop() {
     isRunning = false;
     cancelAnimationFrame(frameId);
   }
 
-  // For reduced motion: the still picture instead of the first frame of the motion
   function setIsStill(value) {
     isStill = value;
     draw();
@@ -344,17 +311,15 @@ export function createNebulaRenderer(host) {
     pointer.isOver = false;
   }
 
-  // If the GPU drops the context (driver reset, too many tabs), fade the canvas out: the CSS
-  // painting underneath takes over
+  // The GPU can drop the context (driver reset, too many tabs): the CSS painting takes over
   function handleContextLost() {
     stop();
     isLost = true;
     host.classList.remove(READY_CLASS);
   }
 
-  // Resizing a canvas clears it, so it is painted again straight away (also while stopped).
-  // The text lines are watched too: when one changes size (the signed-in visitor's buttons
-  // arrive, a font loads), its protected box is measured again.
+  // Resizing a canvas clears it, so it is repainted at once, even while stopped. Text lines are
+  // watched too, so their boxes follow size changes (buttons arriving, a font loading).
   const resizeObserver = new ResizeObserver(() => {
     resize();
     draw();

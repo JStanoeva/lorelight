@@ -1,9 +1,6 @@
 import StarRule from "./StarRule.jsx";
 
-// Chapter heading for About, Categories and FAQ. The eyebrow matches the header link, and its
-// numeral is hidden from screen readers so "I" is never read out as a word.
-// `children` is the optional intro paragraph. The star rule, eyebrow, title and intro are the
-// first parts of the section's fade-in (useSectionReveal), before the section's own content.
+// The numeral is hidden from screen readers, so "I" is never read out as a word
 export default function SectionHeading({ titleId, numeral, eyebrow, title, children }) {
   return (
     <div className="section-heading">

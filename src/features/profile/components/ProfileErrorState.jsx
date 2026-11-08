@@ -5,10 +5,6 @@ import { PENDING_SEED } from "../utils/profileArt.js";
 import ProfileAvatar from "./ProfileAvatar.jsx";
 import ProfileHero from "./ProfileHero.jsx";
 
-// A profile (or "All …" page) that couldn't be loaded: the header card's frame with an unlit
-// crest, the page's h1 and the error with Try again. Nothing below it, so it can't be mistaken
-// for a profile that is still loading. `headingRef` lets the page move focus to the h1 after
-// another failed Try again.
 export default function ProfileErrorState({ error, onRetry, headingRef }) {
   return (
     <div className="profile-page profile-page-pending">

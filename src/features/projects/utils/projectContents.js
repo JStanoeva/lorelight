@@ -1,26 +1,21 @@
 import { changeAppreciationCount } from "../../appreciation/utils/appreciationCount.js";
 
-// Helpers for the project workspace (sidebar and lore grid).
-
-// The entries of one folder, or the unfiled ones when folderId is null.
-// Entries arrive sorted by title, and filter() keeps that order.
+// A null folderId gives the unfiled entries
 export function getFolderEntries(entries, folderId) {
   return entries.filter((entry) => entry.folder_id === folderId);
 }
 
-// Entries whose title contains the filter text, ignoring upper/lower case.
 export function filterEntries(entries, filterText) {
   const query = filterText.trim().toLowerCase();
   return query ? entries.filter((entry) => entry.title.toLowerCase().includes(query)) : entries;
 }
 
-// Alphabetical and case-insensitive, like the database's own sorting.
+// Case-insensitive, like the database's own sorting
 export function sortFolders(folders) {
   return [...folders].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
 }
 
-// These go to useProject's updateData, so a change shows at once without reloading the project.
-// A folder was created or renamed in the sidebar: put it in the list, in alphabetical order.
+// The with* helpers are updaters for useProject's updateData
 export function withSavedFolder(data, savedFolder) {
   return {
     ...data,
@@ -28,7 +23,7 @@ export function withSavedFolder(data, savedFolder) {
   };
 }
 
-// A folder was deleted: the database moved its entries to the top level, so do the same here.
+// Like the database, which moves a deleted folder's entries to the top level
 export function withoutFolder(data, folderId) {
   return {
     ...data,
@@ -37,7 +32,6 @@ export function withoutFolder(data, folderId) {
   };
 }
 
-// A lore entry was deleted on Lore Details: take it out of the project's entries.
 export function withoutEntry(data, entryId) {
   return {
     ...data,
@@ -45,8 +39,6 @@ export function withoutEntry(data, entryId) {
   };
 }
 
-// An entry was appreciated (change 1) or its appreciation removed (change -1) on Lore Details:
-// update its count here too, so the overview's cards show the new number.
 export function withAppreciationChange(data, entryId, change) {
   return {
     ...data,
@@ -60,7 +52,6 @@ export function formatEntryCount(count) {
   return `${count} entries`;
 }
 
-// The Create Lore form pre-selects the project (and the folder) from these URL parameters.
 export function getNewEntryPath(projectId, folderId = null) {
   const path = `/lore/create?projectId=${projectId}`;
   return folderId ? `${path}&folderId=${folderId}` : path;

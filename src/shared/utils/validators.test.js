@@ -7,7 +7,7 @@ describe("countCharacters", () => {
   });
 
   it("counts an emoji as one character", () => {
-    // "🐉".length is 2 in JavaScript; countCharacters counts it once, like the database
+    // "🐉".length is 2 in JavaScript
     expect(countCharacters("🐉")).toBe(1);
     expect(countCharacters("Fire 🐉")).toBe(6);
   });

@@ -3,10 +3,6 @@ import { createSkyStars, starPath } from "../utils/profileArt.js";
 
 const SPARK_PATH = starPath(0, 0, 1, 0.2);
 
-// The creator's own night sky behind the top of the profile: a nebula wash in their star colour
-// (CSS) and a star field seeded by their id, so every creator's sky is different and stays the
-// same. It fades out towards the bottom, and the header card's frosted background keeps it off
-// the text. Decorative only.
 export default function ProfileSky({ seed }) {
   const { dust, sparks } = useMemo(() => createSkyStars(seed), [seed]);
 
@@ -24,7 +20,7 @@ export default function ProfileSky({ seed }) {
             className={star.isTinted ? "profile-sky-dust profile-sky-dust-tinted" : "profile-sky-dust"}
           />
         ))}
-        {/* An inner <svg> at x%, y% places each spark in percentages; the spark is drawn around 0, 0 */}
+        {/* Each spark sits in an inner <svg> at x%, y% and is drawn around 0, 0 */}
         {sparks.map((spark) => (
           <svg key={spark.key} x={`${spark.x}%`} y={`${spark.y}%`} overflow="visible">
             <g

@@ -5,9 +5,6 @@ import Icon from "../../../shared/components/Icon.jsx";
 import ProjectSidebar from "./ProjectSidebar.jsx";
 import "../styles/workspace.css";
 
-// The workspace frame: the contents sidebar on the left and the page's own content (`children`)
-// on the right. Below 1024px a "Contents" bar opens the sidebar as a drawer instead.
-// ProjectWorkspaceLayout renders it, so it stays mounted while the page beside it changes.
 export default function ProjectWorkspace({
   project,
   folders,
@@ -19,11 +16,9 @@ export default function ProjectWorkspace({
   children,
 }) {
   const { pathname } = useLocation();
-  // The page the drawer was opened on. It's open only on that page, so it also closes when the
-  // browser's Back or Forward button changes the page beside it.
+  // The drawer is open only on the page it was opened on, so Back or Forward also closes it
   const [openedOnPath, setOpenedOnPath] = useState(null);
-  // Another page took over: forget the old one, so coming back to it doesn't reopen the drawer
-  // (adjusting state during render, so no effect is needed)
+  // Reset during render (no effect needed), so coming back to that page doesn't reopen the drawer
   if (openedOnPath !== null && openedOnPath !== pathname) {
     setOpenedOnPath(null);
   }
@@ -37,13 +32,12 @@ export default function ProjectWorkspace({
     closeButtonRef.current.focus();
   }
 
-  // Closed with the close button, Escape or the backdrop: focus goes back to the Contents button
   function closeContents() {
     setOpenedOnPath(null);
     contentsButtonRef.current.focus();
   }
 
-  // A link inside was followed: just close, the new page takes over
+  // No focus return: a followed link or tabbing out has already moved focus
   function handleNavigate() {
     setOpenedOnPath(null);
   }

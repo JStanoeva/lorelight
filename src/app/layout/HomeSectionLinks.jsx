@@ -1,9 +1,7 @@
 import { HOME_SECTIONS } from "../../features/home/constants/homeSections.js";
 
-// Plain #anchors instead of <Link>: the browser scrolls natively (stopping below the sticky header),
-// and clicking the same link a second time scrolls again.
-// Below lg they sit in the dropdown. From lg up they sit inline in the bar, or, with
-// isInlineFromXl, only from xl up (between lg and xl they are hidden then).
+// Plain #anchors instead of <Link>: the browser scrolls natively (stopping below the sticky
+// header), and clicking the same link again scrolls again.
 export default function HomeSectionLinks({ activeSectionId, onNavigate, isInlineFromXl = false }) {
   const breakpointClasses = isInlineFromXl ? "lg:hidden xl:flex" : "";
 
@@ -12,7 +10,6 @@ export default function HomeSectionLinks({ activeSectionId, onNavigate, isInline
       aria-label="On this page"
       className={`mb-2 flex flex-col gap-1 border-b border-night-700 pb-3 lg:mr-1 lg:mb-0 lg:flex-row lg:items-center lg:border-b-0 lg:border-r lg:pr-3 lg:pb-0 ${breakpointClasses}`}
     >
-      {/* The nav's aria-label already names it, so this visible label is hidden from screen readers */}
       <p
         aria-hidden="true"
         className="px-3 pb-1 text-xs font-semibold uppercase tracking-[0.2em] text-parchment-500 lg:hidden"

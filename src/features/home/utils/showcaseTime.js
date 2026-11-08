@@ -1,11 +1,8 @@
-// Small helpers shared by the three About showcases.
-
-// The cue moments of a script ({ name: ms }) as the sorted list useShowcasePlayback waits on
+// Script cues ({ name: ms }) as the sorted list of times useShowcasePlayback waits on
 export function toCueList(cues) {
   return Object.values(cues).sort((a, b) => a - b);
 }
 
-// "idle" before a step starts, "current" while it plays, "done" after it ended
 export function getStepState(time, from, to) {
   if (time >= to) {
     return "done";
@@ -13,8 +10,7 @@ export function getStepState(time, from, to) {
   return time >= from ? "current" : "idle";
 }
 
-// A tiny seeded random generator (Park–Miller), so the stardust is scattered the same way on
-// every visit and nothing random runs during render
+// Seeded (Park–Miller), so the stardust is the same on every visit and render stays pure
 function createRandom(seed) {
   let state = seed;
   return () => {
@@ -23,7 +19,6 @@ function createRandom(seed) {
   };
 }
 
-// Positions, sizes and timings of the drifting stardust behind a stage
 export function createStardust(count, seed) {
   const random = createRandom(seed);
   return Array.from({ length: count }, (_, index) => ({

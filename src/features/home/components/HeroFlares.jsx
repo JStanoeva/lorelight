@@ -1,8 +1,8 @@
 import { HERO_FLARES } from "../constants/heroFlares.js";
 import StarGlyph from "./StarGlyph.jsx";
 
-// The hero's bright flares (.hero-flare in hero.css). HeroBackdrop paints them into the CSS sky,
-// and NebulaCanvas paints them again above the canvas, so they stay crisp over the moving sky.
+// HeroBackdrop paints them into the CSS sky, and NebulaCanvas paints them again above the
+// canvas, so they stay crisp over the moving sky.
 export default function HeroFlares() {
   return (
     <>

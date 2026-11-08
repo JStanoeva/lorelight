@@ -2,9 +2,6 @@ import { useId } from "react";
 import { describeTags, TAGS_MAX } from "../utils/tags.js";
 import "../styles/lore-form.css";
 
-// The Tags field: one comma-separated text input, plus a "Saved as" preview of the tags exactly
-// as they will be saved (lowercase, without duplicates), with every problem marked on its tag.
-// The preview is derived from the text on every render, so it needs no state of its own.
 export default function TagsField({ value, onChange, onBlur, error }) {
   const id = useId();
   const hintId = `${id}-hint`;
@@ -29,8 +26,7 @@ export default function TagsField({ value, onChange, onBlur, error }) {
         className="input"
       />
 
-      {/* Not a live region on purpose: announcing the chips on every keystroke would be noise.
-          Problems reach screen readers through the error message linked to the input. */}
+      {/* Not a live region on purpose: announcing the chips on every keystroke would be noise */}
       {count > 0 && (
         <div className="tags-preview">
           <div className="tags-preview-head">

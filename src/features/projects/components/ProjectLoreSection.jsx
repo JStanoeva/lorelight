@@ -3,7 +3,6 @@ import LoreCard from "../../lore/components/LoreCard.jsx";
 import Icon from "../../../shared/components/Icon.jsx";
 import { getNewEntryPath } from "../utils/projectContents.js";
 
-// The project's lore as a grid of cards, or an empty state (different for the owner and visitors).
 export default function ProjectLoreSection({ projectId, entries, folders, isOwner }) {
   const folderNames = Object.fromEntries(folders.map((folder) => [folder.id, folder.name]));
 

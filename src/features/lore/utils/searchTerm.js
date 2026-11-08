@@ -1,17 +1,13 @@
-// The longest search term the catalog sends; a longer search is cut to this many characters.
 export const SEARCH_TERM_MAX = 100;
 
-// Characters with a meaning in Supabase's filter syntax (, ( ) { } " \) or in LIKE patterns
-// (% _ * are wildcards). Each one becomes "_" (LIKE's "any one character"), which means nothing
-// in the filter syntax: no search text can break the query, and "taxes, flood" still finds
-// "taxes, flood". A "_" may also match another character ("50%" finds "500" too).
+// Characters with a meaning in Supabase's filter syntax or LIKE patterns become "_" (any one
+// character), so no search text can break the query. "50%" may then also find "500".
 const SPECIAL_CHARACTERS = /[,(){}"\\%_*]/g;
 
-// Control characters (a tab, a NUL) become spaces: a NUL can't be stored in Postgres text, so it
-// would make the request fail.
+// Control characters become spaces: Postgres text can't store a NUL, so the request would fail.
 const CONTROL_CHARACTERS = /\p{Cc}/gu;
 
-// Turns the text from the search box into a safe search term ("" means: don't search).
+// "" means: don't search
 export function toSearchTerm(text) {
   const term = String(text ?? "")
     .normalize("NFC")

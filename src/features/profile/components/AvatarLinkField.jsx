@@ -9,13 +9,10 @@ import ProfileAvatarImage from "./ProfileAvatarImage.jsx";
 
 const FAILED_TEXT = "This link doesn't open a picture, so your profile would show your nebula instead.";
 
-// The avatar link field with a live preview in the star crest. The link is checked once the typing
-// pauses (useDebouncedValue + useImageCheck): until the new link has been checked the portrait stays
-// empty (so the nebula never flashes before a picture), then it shows the picture, or the nebula
-// when there is no working link. The star colour re-tints the crest through --star.
+// The link is checked once typing pauses; until then the portrait stays empty, so the nebula
+// never flashes before a picture
 export default function AvatarLinkField({ seed, value, starColor, error, onChange, onBlur, onClear, onMouseDown }) {
-  // Only after the user changed the link: on load, the saved link is checked silently (a broken
-  // saved link still gets its warning)
+  // The saved link is checked silently on load (a broken one still gets its warning)
   const [isEdited, setIsEdited] = useState(false);
   // Links the status line to the field, so its warning is read again whenever the field gets focus
   const statusId = useId();
@@ -24,8 +21,8 @@ export default function AvatarLinkField({ seed, value, starColor, error, onChang
   const checkStatus = useImageCheck(isHttpUrl(debouncedLink) ? debouncedLink : null);
   const color = getStarColor(starColor);
 
-  // "none" (no full link, so there's nothing to check), "waiting" (the typing hasn't paused yet,
-  // so the last check was about the previous link), "checking", "loaded" or "failed"
+  // "none" (no full link), "waiting" (typing hasn't paused, so the last check was for the previous
+  // link), "checking", "loaded" or "failed"
   let status = checkStatus;
   if (!isHttpUrl(link)) {
     status = "none";
@@ -65,7 +62,6 @@ export default function AvatarLinkField({ seed, value, starColor, error, onChang
           )}
         </ProfileAvatar>
 
-        {/* The slot keeps its height, so nothing moves when the button comes or goes */}
         <div className="edit-avatar-clear">
           {link !== "" && (
             <button type="button" onMouseDown={onMouseDown} onClick={handleClear} className="btn btn-ghost">
@@ -76,7 +72,7 @@ export default function AvatarLinkField({ seed, value, starColor, error, onChang
       </div>
 
       <div className="edit-avatar-field">
-        {/* "photo" (a link to the user's picture) tells browsers and assistive tools what this field is for */}
+        {/* "photo" is the autocomplete token for a link to the user's picture */}
         <FormField
           label="Avatar link (optional)"
           name="avatar_url"
@@ -93,7 +89,7 @@ export default function AvatarLinkField({ seed, value, starColor, error, onChang
         />
 
         {/* A warning, not an error: a broken link can still be saved. While the field shows an error
-            the link isn't checked, so the line gives up the room it keeps for two lines */}
+            the link isn't checked, so the line gives up its reserved room */}
         <p id={statusId} role="status" className={error ? `${statusClass} edit-avatar-status-collapsed` : statusClass}>
           {statusText}
           {status === "loaded" && isEdited && <span className="sr-only">The link opens a picture.</span>}

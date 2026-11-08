@@ -1,7 +1,6 @@
 import { LORE_CATEGORIES } from "../../lore/constants/categories.js";
 
-// The three About cards (Create, Share, Explore) and the copy of the panel each one opens.
-// `id` also picks the card's icon and its showcase.
+// `id` also picks each card's icon and showcase.
 export const ABOUT_ITEMS = [
   {
     id: "create",
@@ -10,7 +9,6 @@ export const ABOUT_ITEMS = [
     lead: "Every world starts as a Project.",
     body: "A Project holds one world, with a title, an optional description and an optional cover image link. Inside it you write Lore Entries: each has a title, a category and a description, plus optional tags and an image link.",
     points: [
-      // Counted from the category list, so the number stays right if a category is added
       `${LORE_CATEGORIES.length} categories, from characters and locations to artifacts and events`,
       "Descriptions of up to 5,000 characters and up to 10 tags per entry",
       "Edit an entry whenever your world changes, or move it to another of your Projects",

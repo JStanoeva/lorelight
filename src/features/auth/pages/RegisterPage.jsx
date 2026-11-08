@@ -34,12 +34,12 @@ export default function RegisterPage() {
   const rulesId = useId();
   const matchId = useId();
 
-  // The red error replaces the calm match hint, so the two never say the same thing twice
+  // The error replaces the match hint, so the two never say the same thing twice
   const matchState = getShownError("repeatPassword")
     ? ""
     : getMatchState(values.password, values.repeatPassword);
 
-  // The submit button was disabled, so focus goes back into the form, to the field to correct
+  // The submit button was disabled, so focus moves to the field to correct
   function showServerError(form, message, fieldName) {
     setServerError(message);
     setFailedAttempts((count) => count + 1);
@@ -73,8 +73,8 @@ export default function RegisterPage() {
         username,
       });
 
-      // With a session, GuestGuard sees the new user and redirects: nothing to do here.
-      // Without one (a Supabase project that requires email confirmation), no redirect comes.
+      // With a session, GuestGuard redirects. Without one (email confirmation required),
+      // nothing would happen.
       if (!session) {
         showServerError(form, NO_SESSION_MESSAGE, "email");
       }
@@ -89,13 +89,11 @@ export default function RegisterPage() {
       subtitle="Start writing, organizing and sharing the lore of your worlds."
     >
       <PageTitle title="Register" />
-      {/* A new key on every failure re-creates the alert, so it is announced again even
-          when the message is the same as last time */}
+      {/* A new key per failure re-creates the alert, so a repeated message is announced again */}
       {serverError && <AuthAlert key={failedAttempts} message={serverError} />}
 
       <form className="auth-form" noValidate onSubmit={handleSubmit}>
-        {/* People log in with their email, so password managers must save the email as the
-            account name: the email field is marked "username", this public name "nickname" */}
+        {/* Not "username": password managers must save the email as the account name */}
         <FormField
           label="Username"
           name="username"
@@ -124,7 +122,6 @@ export default function RegisterPage() {
           className="auth-input"
         />
 
-        {/* One wrapper, so the rules panel sits close under the password field */}
         <div className="auth-field">
           <PasswordInput
             label="Password"

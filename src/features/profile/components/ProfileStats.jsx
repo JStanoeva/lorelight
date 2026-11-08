@@ -1,5 +1,4 @@
-// The four figures under the bio, each with its label in the singular or plural. A description
-// list, so a screen reader hears "Projects, 5"; the CSS shows the number above its label.
+// dt before dd, so a screen reader hears "Projects, 5"; the CSS shows the number above its label
 const STATS = [
   { key: "projects", one: "Project", other: "Projects" },
   { key: "lore", one: "Lore entry", other: "Lore entries" },
@@ -7,7 +6,6 @@ const STATS = [
   { key: "saves", one: "Save", other: "Saves" },
 ];
 
-// `stats` comes from getProfileStats (utils/profileStats.js)
 export default function ProfileStats({ stats }) {
   return (
     <dl className="profile-stats">

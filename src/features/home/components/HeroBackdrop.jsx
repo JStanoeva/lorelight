@@ -1,10 +1,8 @@
 import HeroFlares from "./HeroFlares.jsx";
 import StarGlyph from "./StarGlyph.jsx";
 
-// The hero's painted night sky: stacked CSS layers (hero.css), painted back to front in DOM
-// order: sky, brush strokes, star field, bright flares, the lantern's light and its star, and
-// paper grain. It is the first paint and stays underneath the animated sky (NebulaCanvas) as
-// its fallback. It is purely decorative, so assistive technology skips it.
+// CSS layers (hero.css) painted back to front in DOM order. It is the first paint and stays
+// under the animated sky (NebulaCanvas) as its fallback.
 export default function HeroBackdrop() {
   return (
     <div className="hero-backdrop" aria-hidden="true">

@@ -12,9 +12,7 @@ import { toProfileFormValues } from "../utils/profileValidation.js";
 import "../styles/profile.css";
 import "../styles/edit-profile.css";
 
-// The same page as Edit Project and Edit Lore (a centred column, the title, one line naming what is
-// edited, one card with the form), plus a live avatar preview at the top of the card. Only the
-// logged-in user's own profile can be edited, so the address has no id.
+// Only the logged-in user's own profile can be edited, so the address has no id
 export default function EditProfilePage() {
   const navigate = useNavigate();
   const { profile, isLoading, error, refetch } = useOwnProfile();
@@ -31,7 +29,7 @@ export default function EditProfilePage() {
     navigate(`/profile/${profile.id}`);
   }
 
-  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  // Try again disappears once pressed, so focus moves to the page's h1, which stays
   function handleRetry() {
     refetch();
     headingRef.current.focus();
@@ -72,7 +70,6 @@ export default function EditProfilePage() {
     <section className="page">
       <PageTitle title="Edit Profile" />
       <div className="mx-auto max-w-2xl">
-        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
         <h1 ref={headingRef} tabIndex={-1} className="page-title">
           Edit Profile
         </h1>

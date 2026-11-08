@@ -1,9 +1,6 @@
 import { useId, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
-// A password field with a show/hide toggle. Label, error and aria wiring work like FormField.
-// `children` render between the input and the error (Register puts the match hint there).
-// `describedById` links extra help text, such as the password rules, to the input.
 export default function PasswordInput({
   label,
   name,
@@ -24,16 +21,13 @@ export default function PasswordInput({
   // The error comes first, so a screen reader reads the problem before the longer help text
   const describedBy = [error && errorId, describedById].filter(Boolean).join(" ");
 
-  // A mouse click or tap on the toggle would move focus to the button (and close the phone
-  // keyboard), and the input's blur would show its error. Preventing the default keeps focus
-  // in the input, so peeking at the password doesn't count as leaving the field.
-  // Keyboard use is unaffected.
+  // Keeps focus in the input on a mouse press or tap, so peeking at the password doesn't blur
+  // it (showing its error and closing the phone keyboard).
   function handleToggleMouseDown(event) {
     event.preventDefault();
   }
 
-  // Changing an input's type can move its caret to the start, so the next key would land in
-  // front of the password. The caret (or selection) is saved first and put back right after.
+  // Changing an input's type can move its caret to the start, so the selection is put back.
   function handleToggleClick() {
     const input = inputRef.current;
     const { selectionStart, selectionEnd } = input;
@@ -45,8 +39,8 @@ export default function PasswordInput({
       return;
     }
 
-    // Measuring the input makes the browser finish the type change now. Otherwise Chrome
-    // moves the caret to the start a moment later, after it has been put back.
+    // Measuring forces the type change to finish now; otherwise Chrome moves the caret to the
+    // start a moment after it has been put back.
     input.getBoundingClientRect();
     input.setSelectionRange(selectionStart, selectionEnd);
   }

@@ -1,5 +1,3 @@
-// The server error above the Login and Register forms. role="alert" makes screen readers
-// read it out as soon as it appears.
 export default function AuthAlert({ message }) {
   return (
     <div role="alert" className="alert-error auth-alert">

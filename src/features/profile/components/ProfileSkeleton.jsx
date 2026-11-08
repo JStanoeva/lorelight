@@ -7,12 +7,7 @@ import ProfileHero from "./ProfileHero.jsx";
 const GHOST_STATS = [1, 2, 3, 4];
 const GHOST_CARDS = [1, 2, 3];
 
-// While the profile loads: the same sky, card, crest, figures, "Currently worldbuilding" row, tab
-// bar and three cards in a quiet night blue, with faint bars where the text will be, so little
-// moves when the data arrives. `isOwnProfile` (the page knows it from the URL before anything
-// loads) also keeps the room of the owner's Edit profile button and of the note under the tabs.
-// The shapes are decorative; the Loader's status line tells screen reader users what is happening.
-// `headingRef` lets the page move focus to the (visually hidden) h1 after Try again.
+// `isOwnProfile` (known from the URL) keeps room for the owner's Edit profile button and tab note.
 export default function ProfileSkeleton({ isOwnProfile = false, headingRef }) {
   return (
     <div className="profile-page profile-page-pending profile-page-loading">
@@ -86,7 +81,6 @@ export default function ProfileSkeleton({ isOwnProfile = false, headingRef }) {
               </div>
             ))}
           </div>
-          {/* In the row where the panel's heading will be */}
           <div className="profile-skeleton-status">
             <Loader label="Loading profile…" />
           </div>

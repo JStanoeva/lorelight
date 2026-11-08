@@ -1,9 +1,5 @@
-/*
-  LoreCard: a lore entry as a card (Project Details, the Lore Catalog and Creator Profiles).
-  The category colour arrives as currentColor through the category's text class on the body.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
+/* The category colour arrives as currentColor through the category's text class on the body.
+   In the components layer, so a Tailwind utility on the same element always wins. */
 @layer components {
   .lore-card {
     display: flex;
@@ -11,8 +7,7 @@
     flex-direction: column;
   }
 
-  /* The picture strip: flush with the card's edges; the card's rounded corners and
-     overflow: hidden clip its top corners. The image or the emblem print fills it. */
+  /* The card's rounded corners and overflow: hidden clip its top corners */
   .lore-card-picture {
     position: relative;
     aspect-ratio: 16 / 7;
@@ -20,8 +15,8 @@
     background: var(--color-night-900);
   }
 
-  /* A thin category-coloured line along the top (right under the picture), fading to the right,
-     and a soft glow of the same colour behind the text. Every text inside sets its own colour. */
+  /* A category-coloured line under the picture and a glow behind the text. Every text inside
+     sets its own colour. */
   .lore-card-body {
     display: flex;
     flex: 1;
@@ -53,8 +48,8 @@
     color: var(--color-parchment-300);
   }
 
-  /* "Hidden" (a public entry in a private project): VisibilityBadge's lantern tone, so it reads
-     differently from "Private". lantern-300 stays above 7.4:1 on the card. */
+  /* VisibilityBadge's lantern tone, so it reads differently from "Private". lantern-300 stays
+     above 7.4:1 on the card. */
   .lore-card-hidden {
     color: var(--color-lantern-300);
   }
@@ -100,8 +95,6 @@
     overflow-wrap: anywhere;
   }
 
-  /* ---------- Catalog variant (variant="catalog"): world, tags and author ---------- */
-
   .lore-card-world {
     display: flex;
     align-items: center;
@@ -126,8 +119,7 @@
     white-space: nowrap;
   }
 
-  /* One line of tags on every card width: when they don't fit, the tags shrink and end in "…"
-     (the full tags are on Lore Details), and "+N" keeps its size */
+  /* One line of tags: tags that don't fit shrink and end in "…", and "+N" keeps its size */
   .lore-card-tags {
     display: flex;
     gap: 0.375rem;
@@ -161,7 +153,7 @@
   }
 
   /* Above the title's stretched link (.card-link::after covers the whole card), so a click here
-     opens the profile. The pill radius gives its focus ring a rounded shape. */
+     opens the profile */
   .lore-card-author {
     position: relative;
     z-index: 1;
@@ -198,8 +190,7 @@
     text-underline-offset: 3px;
   }
 
-  /* Scoped to the catalog card: a long author name shrinks (ellipsis), the count never does.
-     The project card's footer keeps its own balance between folder and count. */
+  /* A long author name shrinks (ellipsis), the count never does */
   .lore-card-catalog .lore-card-appreciations {
     flex: none;
   }

@@ -1,9 +1,3 @@
-/*
-  "Emblem Print" lore placeholder (LorePlaceholder.jsx). Every line is drawn with currentColor,
-  which comes from the category's text colour class on the root.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
 @layer components {
   .emblem-print {
     --emblem-print-bg: #0d1226;
@@ -34,7 +28,7 @@
     height: 100%;
   }
 
-  /* The parts of an emblem. No stroke-width here: each <use> sets its own, and the parts inherit it */
+  /* No stroke-width here: each <use> sets its own, and the parts inherit it */
   .emblem-print-line {
     fill: none;
     stroke: currentColor;
@@ -53,7 +47,6 @@
     stroke: none;
   }
 
-  /* The lattice lines between the emblems */
   .emblem-print-rule {
     fill: none;
     stroke: currentColor;
@@ -87,7 +80,7 @@
     pointer-events: none;
   }
 
-  /* The cartouche: shown on wide banners only (see the container rules below) */
+  /* The cartouche: shown on wide banners only (container rules below) */
   .emblem-print-feature {
     position: absolute;
     top: 46%;
@@ -141,9 +134,8 @@
     vector-effect: non-scaling-stroke;
   }
 
-  /* Wide, low banners: show the cartouche. Not on taller ones (the 4:3 phone banner, or a desktop
-     banner that a long title made taller): the cartouche's size follows the height, so there it
-     would sit behind the title or grow past the right edge */
+  /* Not on taller banners (phones, or a long title): the cartouche's size follows the height, so
+     there it would sit behind the title or grow past the right edge */
   @container emblem-print (min-width: 520px) and (min-aspect-ratio: 9 / 4) {
     .emblem-print-feature {
       display: block;

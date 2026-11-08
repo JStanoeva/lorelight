@@ -4,7 +4,6 @@ import Icon from "../../../shared/components/Icon.jsx";
 import { useOutsideClick } from "../../../shared/hooks/useOutsideClick.js";
 import { getNewEntryPath } from "../utils/projectContents.js";
 
-// Owner only: the "+ New" button at the top of the sidebar and its small menu.
 export default function NewMenu({ projectId, onNewFolder }) {
   const [isOpen, setIsOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -22,8 +21,8 @@ export default function NewMenu({ projectId, onNewFolder }) {
 
   function handleKeyDown(event) {
     if (event.key === "Escape" && isOpen) {
-      // Stop here, so Escape closes only the menu and not the whole Contents drawer.
-      // The focused item disappears with the menu, so focus goes back to the button.
+      // Escape closes only the menu, not the Contents drawer; the focused item goes with the
+      // menu, so focus returns to the button
       event.stopPropagation();
       buttonRef.current.focus();
       close();

@@ -4,10 +4,7 @@ import { formatCollectionCount, getAllPageTitle } from "../utils/profileTabText.
 import ProfileAvatar from "./ProfileAvatar.jsx";
 import ProfileAvatarImage from "./ProfileAvatarImage.jsx";
 
-// The top of an "All …" page: a compact version of the profile's card with the way back to the
-// profile (on the same tab), the small crest, the h1 (it names whose page it is) and how many items
-// there are, plus the owner's note on who can see them. `tab` is one of PROFILE_TABS; `showCount`
-// is false where the list shows its own count (the Constellation board).
+// `showCount` is false where the list shows its own count (the Constellation board)
 export default function AllCollectionHeader({ profile, starColor, tab, total, isOwner, showCount, headingRef }) {
   return (
     <header className="profile-card profile-all-card">

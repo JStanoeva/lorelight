@@ -2,9 +2,8 @@ import { useId } from "react";
 import { createSigil } from "../utils/sigil.js";
 import "../styles/sigil.css";
 
-// The "Archive Sigil": a gold seal generated from `seed` (a record id), so every project gets its
-// own, and the same one on every visit. Shown when there is no image or the image fails to load.
-// The parent sets the size and must be `relative overflow-hidden`.
+// A seal generated from `seed` (a record id), the same on every visit. The parent sets the size
+// and must be `relative overflow-hidden`.
 export default function ImagePlaceholder({ seed }) {
   // Many placeholders share a page, so every gradient and pattern id must be unique.
   const idBase = `sigil-${useId()}`;
@@ -13,10 +12,10 @@ export default function ImagePlaceholder({ seed }) {
 
   const sigil = createSigil(seed);
 
-  // Every line below is drawn with currentColor, so this one colour paints the whole seal.
+  // Everything below is drawn with currentColor, so this one colour paints the whole seal.
   return (
     <div className="sigil" style={{ color: sigil.ink }} aria-hidden="true">
-      {/* Layer 1: fine texture in screen pixels, so it stays delicate at every size */}
+      {/* No viewBox: the texture is in screen pixels, so it stays fine at every size */}
       <svg className="sigil-layer" focusable="false">
         <defs>
           <pattern
@@ -33,8 +32,8 @@ export default function ImagePlaceholder({ seed }) {
         <rect width="100%" height="100%" fill={`url(#${textureId})`} opacity={sigil.textureOpacity} />
       </svg>
 
-      {/* Layer 2: the seal. "meet" keeps it whole and centred at any aspect ratio, and anything
-          drawn outside the viewBox (glow, echo rings, meridian) fills the extra width. */}
+      {/* "meet" keeps the seal whole and centred; anything drawn outside the viewBox (glow, echo
+          rings, meridian) fills the extra width. */}
       <svg className="sigil-layer" viewBox="-100 -100 200 200" preserveAspectRatio="xMidYMid meet" focusable="false">
         <defs>
           {/* User-space units, so the centre disc below samples exactly the same colours */}
@@ -93,7 +92,7 @@ export default function ImagePlaceholder({ seed }) {
           {sigil.vertexDots && <path d={sigil.vertexDots} className="sigil-beads sigil-beads--large" />}
         </g>
 
-        {/* Centre: a clean disc (background + the same glow) under the logo's star, a ring or a small seal */}
+        {/* A clean disc (background + the same glow) under the centre figure */}
         <circle r={sigil.hubRadius} className="sigil-hub" />
         <circle r={sigil.hubRadius} fill={`url(#${glowId})`} />
         {sigil.center.type === "ring" ? (

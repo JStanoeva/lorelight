@@ -12,16 +12,14 @@ function findCategory(value) {
   return LORE_CATEGORIES.find((category) => category.value === value);
 }
 
-// Sample results, with short titles so they stay readable on phones. `from` is the row a card
-// starts in, `to` the row it moves to after the search: the two "dragon" matches rise to the
-// top, the others sink and fade.
+// `from` is the row a card starts in, `to` the row it moves to after the search (the two
+// "dragon" matches rise to the top)
 const RESULTS = [
   { id: "choir", title: "The Glass Choir", category: findCategory("culture"), count: 31, from: 0, to: 2, isMatch: false },
   { id: "ashen", title: "The Ashen Dragon", category: findCategory("creature"), count: 24, from: 1, to: 0, isMatch: true },
   { id: "accord", title: "The Salt Accord", category: findCategory("politics"), count: 12, from: 2, to: 3, isMatch: false },
   { id: "roads", title: "The Dragon Roads", category: findCategory("location"), count: 17, from: 3, to: 1, isMatch: true },
 ];
-// The top match, which is appreciated and saved
 const PICKED_ID = "ashen";
 const MOTES = createStardust(12, 23);
 
@@ -38,24 +36,21 @@ const SAVE_STAR = (
 );
 
 const CUES = {
-  strip: 200, // your Constellation, four saved stars
-  search: 500, // the search field is drawn
-  rows: 800, // four public entries
-  type: 1600, // "dragon" writes itself in
-  filter: 2500, // the matches rise, the rest sink and fade
-  appreciate: 3500, // the top match gets one more appreciation
-  save: 4500, // and is saved
-  fly: 4900, // its light flies up to the Constellation
-  join: 6000, // and joins it as a new star
-  hold: 6800, // the finished picture (also the reduced-motion still)
+  strip: 200,
+  search: 500,
+  rows: 800,
+  type: 1600,
+  filter: 2500,
+  appreciate: 3500,
+  save: 4500,
+  fly: 4900,
+  join: 6000,
+  hold: 6800, // the finished picture, also the reduced-motion still
   fade: 10000,
 };
 const CUE_LIST = toCueList(CUES);
 const LOOP_MS = 10800;
 
-// Explore: a catalog search, the results rearranging, an appreciation, and a saved entry that
-// flies up and becomes a star in the Constellation. The mock is hidden from screen readers; the
-// visible caption says what it shows.
 export default function ExploreShowcase() {
   const { setStageElement, time, isStill, runId, replay, canReplay, motionState } =
     useShowcasePlayback({ cues: CUE_LIST, finalCue: CUES.hold, loopMs: LOOP_MS });
@@ -156,7 +151,6 @@ export default function ExploreShowcase() {
               ))}
             </ul>
 
-            {/* The saved entry's light, with three motes of stardust trailing behind it */}
             <span className="explore-flight" data-on={time >= CUES.fly}>
               {[3, 2, 1, 0].map((index) => (
                 <span key={index} className="explore-flyer" style={{ "--i": index }} />

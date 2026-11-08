@@ -4,8 +4,6 @@ function isDocumentVisible() {
   return document.visibilityState === "visible";
 }
 
-// False while the browser tab is hidden (another tab is in front, or the window is minimised),
-// so an endless animation can stop instead of using the battery for nobody.
 export function useIsPageVisible() {
   const [isPageVisible, setIsPageVisible] = useState(isDocumentVisible);
 

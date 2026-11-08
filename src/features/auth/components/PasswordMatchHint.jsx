@@ -1,8 +1,5 @@
-// The calm note under Repeat password: "Passwords match" (success) or "Passwords don't match"
-// (neutral, because the person may still be typing). The box itself is always in the page,
-// empty when there is nothing to say: a polite live region must exist before its text changes,
-// or screen readers miss the change. React only updates the text when `state` changes, so each
-// change is announced once, never on every keystroke.
+// Always rendered, even when empty: a polite live region must exist before its text changes,
+// or screen readers miss the change.
 export default function PasswordMatchHint({ id, state }) {
   return (
     <div id={id} className="pw-match-region" aria-live="polite">

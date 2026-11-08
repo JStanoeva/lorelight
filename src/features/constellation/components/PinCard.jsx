@@ -10,17 +10,10 @@ import { getConstellationErrorMessage } from "../utils/constellationErrors.js";
 import StarPin from "./StarPin.jsx";
 import "../../../shared/styles/creator-link.css";
 
-// One saved entry, pinned to the board: a small "polaroid" with the picture (the entry's image or
-// its emblem print), the category, the title (a link over the whole card), the world, the author
-// and when it was pinned. The owner can remove it. Nothing changes before the database has
-// confirmed the removal: while the request is on its way the card says it's being removed; only
-// then does it leave the board (`onRemoved` takes it off the list, announces it and moves focus).
-// If the request fails, the card stays and says why. `linkRef` receives the title link, so focus
-// can be moved to it.
+// No optimistic removal: the card shows it's pending and leaves only once the database confirms
 export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemove, onRemoved }) {
   const category = getCategory(entry.category);
   const authorName = entry.author?.display_name ?? "Unknown creator";
-  // isPending is true from the click until the removal has finished and its result is on screen
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState("");
   // A new key per failure, so the same message is announced again
@@ -40,13 +33,10 @@ export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemo
     startTransition(async () => {
       try {
         await onRemove(entry.id);
-        // State updates after an await only belong to the transition when they're wrapped in
-        // startTransition again. So everything onRemoved changes (the list, the confirmation line)
-        // shows up in the same moment as the end of isPending. The card is still on screen while
-        // onRemoved runs, so the board can move focus on before the card disappears.
+        // Updates after an await need startTransition again to join the transition, so the list
+        // change shows up together with the end of isPending
         startTransition(() => onRemoved(entry));
       } catch (error) {
-        // Nothing was removed, so there's nothing to undo: only say what went wrong
         startTransition(() => {
           setErrorMessage(
             `This entry couldn't be removed from your Constellation. ${getConstellationErrorMessage(error, "remove")}`,
@@ -75,7 +65,7 @@ export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemo
             alt=""
             placeholder={<LorePlaceholder seed={entry.id} category={entry.category} />}
           />
-          {/* The visible pending cue, inside the card (the hidden status line below speaks) */}
+          {/* aria-hidden: the status line below announces it */}
           {isPending && (
             <span className="pin-card-stamp" aria-hidden="true">
               <span className="pin-card-spinner" />
@@ -105,9 +95,7 @@ export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemo
             </p>
           )}
 
-          {/* Two tidy lines: the author, then when it was pinned and the Remove button */}
           <div className="pin-card-foot">
-            {/* Above the stretched title link (z-index), so it opens the profile, not the entry */}
             <Link to={`/profile/${entry.author_id}`} className="pin-card-author">
               <span className="creator-avatar" aria-hidden="true">
                 {authorName.charAt(0).toUpperCase()}
@@ -115,14 +103,12 @@ export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemo
               <span className="sr-only">By </span>
               <span className="pin-card-author-name">{authorName}</span>
             </Link>
-            {/* The date itself never breaks, so on a very narrow card it moves under "Pinned" */}
             <time dateTime={entry.saved_at} className="pin-card-date">
               Pinned <span className="pin-card-date-value">{formatDate(entry.saved_at)}</span>
             </time>
 
             {isOwner && (
-              // aria-disabled instead of disabled while waiting: a disabled button would drop
-              // keyboard focus to the page
+              // aria-disabled, not disabled: a disabled button would drop focus to the page
               <button
                 type="button"
                 className="pin-card-remove"
@@ -144,8 +130,7 @@ export default function PinCard({ entry, isOwner, isHighlighted, linkRef, onRemo
         </div>
       </div>
 
-      {/* Focus stays on the button while it waits, so this hidden line tells screen reader users
-          what is happening. Always rendered, so a change of its text is noticed. */}
+      {/* Focus stays on the button while it waits, so this always-rendered line announces it */}
       <span role="status" className="sr-only">
         {isPending ? `Removing “${entry.title}” from your Constellation…` : ""}
       </span>

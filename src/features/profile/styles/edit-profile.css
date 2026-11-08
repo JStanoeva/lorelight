@@ -1,12 +1,5 @@
-/*
-  Edit Profile: the same card as Edit Project and Edit Lore, plus a live avatar preview row at the
-  top and a grid of star colour tiles. The star colour (--star, set on .edit-avatar) only tints the
-  crest; every text keeps the app's own colours.
-  Plain CSS (no @apply), in the components layer like profile.css, so Tailwind utilities still win.
-*/
+/* In the components layer, like profile.css, so Tailwind utilities still win */
 @layer components {
-  /* ---------- Avatar row: crest (+ "Use my nebula") | link field ---------- */
-
   .edit-avatar {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -22,7 +15,6 @@
     gap: 0.5rem;
   }
 
-  /* The small crest (no tick ring, one orbit), a little bigger than on the "All …" pages */
   .edit-avatar .profile-crest.profile-crest-small {
     width: 7rem;
   }
@@ -70,7 +62,7 @@
     color: var(--color-gold-300);
   }
 
-  /* "Checking the link…" stays invisible for its first 400 ms, so a quick check doesn't flash it */
+  /* "Checking the link…" stays invisible for 400 ms, so a quick check doesn't flash it */
   .edit-avatar-status-checking {
     animation: edit-avatar-hold-hidden 400ms;
   }
@@ -103,8 +95,6 @@
       min-height: 0;
     }
   }
-
-  /* ---------- Star colour tiles ---------- */
 
   /* min-width 0: a fieldset is min-content wide by default and could push the card wider */
   .star-color-field {
@@ -192,7 +182,6 @@
     min-width: 0;
   }
 
-  /* From 640px: three per row, with a little more room in each tile */
   @media (width >= 40rem) {
     .star-colors {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -213,8 +202,6 @@
     }
   }
 
-  /* ---------- Motion (only without reduced motion) ---------- */
-
   @media (prefers-reduced-motion: no-preference) {
     .star-color {
       transition:
@@ -224,9 +211,7 @@
     }
   }
 
-  /* ---------- Forced colours (Windows High Contrast) ---------- */
-
-  /* The swatch colour is dropped there: keep the check mark and the thicker border as the signal */
+  /* Forced colours drop the swatch colour, so the check mark and thicker border show the choice */
   @media (forced-colors: active) {
     .star-color:has(.star-color-input:checked) {
       border-color: Highlight;

@@ -1,18 +1,11 @@
-/*
-  Project workspace (Project Details, later Lore Details): the contents sidebar on the left
-  (a slide-over drawer below 1024 px) and the project overview with its lore grid on the right.
-  "ws" = workspace. Plain CSS (no @apply), so it needs no @reference. The rules sit in the
-  components layer, so a Tailwind utility on the same element always wins.
-*/
+/* "ws" = project workspace */
 @layer components {
-  /* ---------- Frame ---------- */
   .ws {
     display: grid;
     grid-template-columns: 18rem minmax(0, 1fr);
     min-height: calc(100dvh - var(--header-height));
   }
 
-  /* ---------- Sidebar ---------- */
   .ws-sidebar {
     position: sticky;
     top: var(--header-height);
@@ -108,7 +101,6 @@
     color: var(--color-parchment-500);
   }
 
-  /* "+ New" */
   .ws-popover-anchor {
     position: relative;
   }
@@ -208,13 +200,12 @@
     color: var(--color-parchment-300);
   }
 
-  /* ---------- Tree ---------- */
   .ws-tree {
     flex: 1;
     padding: 0.75rem 0.625rem 2rem;
   }
 
-  /* The tree takes focus after a folder is deleted (see ProjectSidebar) */
+  /* The tree takes focus from code (see ProjectSidebar) */
   .ws-tree:focus-visible {
     outline-offset: -2px;
   }
@@ -316,7 +307,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* Entries inside a folder hang from a thin guide line, like a file tree */
   .ws-folder-entries {
     position: relative;
     margin: 0.125rem 0 0.375rem 1.0625rem;
@@ -364,8 +354,7 @@
     color: var(--color-parchment-100);
   }
 
-  /* The open entry (Lore Details): highlighted, with a slim gold ribbon hanging on its left,
-     like a bookmark in an old book */
+  /* ::before is the open entry's gold bookmark ribbon */
   .ws-entry.is-active {
     background: linear-gradient(90deg, rgb(232 193 112 / 0.12), var(--color-night-800) 70%);
     color: var(--color-gold-300);
@@ -396,7 +385,6 @@
     color: var(--color-parchment-500);
   }
 
-  /* Filter box above the tree: narrows the entries by title while typing */
   .ws-filter {
     position: relative;
     margin: 0.75rem 0.625rem 0;
@@ -442,7 +430,6 @@
     margin: 0;
   }
 
-  /* Inline name inputs (new folder, rename) */
   .ws-inline-form.is-invalid {
     border-color: var(--color-danger);
   }
@@ -494,8 +481,7 @@
     height: 1.625rem;
   }
 
-  /* Save while the folder saves: aria-disabled keeps keyboard focus on it (see FolderNameForm), so
-     it gets the look of the disabled Cancel beside it, also in High Contrast mode */
+  /* Save is aria-disabled while saving (see FolderNameForm), so it mimics the disabled Cancel */
   .ws-inline-form .ws-icon-button[aria-disabled="true"] {
     cursor: not-allowed;
   }
@@ -506,7 +492,6 @@
     }
   }
 
-  /* ---------- Main column ---------- */
   .ws-main {
     min-width: 0;
   }
@@ -609,7 +594,6 @@
     overflow-wrap: anywhere;
   }
 
-  /* ---------- Lore grid ---------- */
   .ws-lore {
     margin-top: 2.75rem;
   }
@@ -644,7 +628,6 @@
     display: flex;
   }
 
-  /* ---------- Empty state ---------- */
   .ws-empty {
     display: flex;
     flex-direction: column;
@@ -674,7 +657,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* ---------- Wide screens: no mobile bar ---------- */
   @media (width >= 64rem) {
     .ws-mobile-bar,
     .ws-drawer-close,
@@ -683,9 +665,8 @@
     }
   }
 
-  /* ---------- Below 1024px: the sidebar becomes a slide-over drawer ---------- */
   @media (width < 64rem) {
-    /* Keyboard focus and fragment jumps stop below the sticky Contents bar too (it sits under the header) */
+    /* Focus and fragment jumps also stop below the sticky Contents bar under the header */
     .ws-main * {
       scroll-margin-top: 3.75rem;
     }

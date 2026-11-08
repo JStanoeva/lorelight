@@ -1,14 +1,6 @@
-/*
-  Lore Details (LoreArticle with LoreHeader and LoreActions): the picture as a banner with the title
-  on it, the action row, then the text as a comfortable reading column and the tags.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
 @layer components {
-  /* ---------- Banner: the picture with the title on it ---------- */
-  /* The text sits in normal flow at the bottom, so a long title makes the banner taller instead of
-     running off its top edge. overflow: clip (not hidden) keeps that working: aspect-ratio only lets
-     a box grow to fit its content when the box isn't a scroll container. */
+  /* A long title makes the banner taller. overflow: clip, not hidden: aspect-ratio only lets a
+     box grow to fit its content when it isn't a scroll container. */
   .lore-hero {
     position: relative;
     isolation: isolate;
@@ -30,8 +22,7 @@
     overflow: hidden;
   }
 
-  /* Darkens the bottom and the left a little, for the mood; the text's own dark background (below)
-     is what keeps it readable */
+  /* For the mood only; the text's own dark background (below) is what keeps it readable */
   .lore-hero-shade {
     position: absolute;
     inset: 0;
@@ -54,14 +45,12 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
-    /* The right padding leaves room for the emblem print's large framed emblem (centred at 64-86 % of
-       the width) */
+    /* Room on the right for the emblem print's cartouche (centred at 64-86 % of the width) */
     padding: 2.5rem max(1.75rem, 44%) 1.5rem 1.75rem;
   }
 
-  /* The dark background belongs to the text block, so a long title that makes the banner taller never
-     sits on the bare picture. It fades out before the framed emblem, and the mask fades it in over
-     the top padding, so it has no hard top edge. */
+  /* On the text block, so a title that makes the banner taller never sits on the bare picture.
+     The mask fades it in over the top padding, so it has no hard top edge. */
   .lore-hero-text::before {
     content: "";
     position: absolute;
@@ -105,7 +94,6 @@
     font-size: 0.875rem;
   }
 
-  /* A very long project title wraps instead of widening the page on phones */
   .lore-byline > span {
     overflow-wrap: anywhere;
   }
@@ -114,7 +102,6 @@
     font-weight: 600;
   }
 
-  /* Folder and dates: one quiet line under the byline */
   .lore-meta {
     gap: 0.25rem 0.75rem;
     font-size: 0.8125rem;
@@ -142,7 +129,6 @@
     background: var(--color-parchment-500);
   }
 
-  /* ---------- Action row ---------- */
   .lore-toolbar {
     margin-top: 1.25rem;
     padding-bottom: 1.25rem;
@@ -157,9 +143,8 @@
     gap: 0.75rem 1rem;
   }
 
-  /* Appreciate and Save side by side (shared/styles/pill-button.css). It takes the space left of the
-     author's Edit and Delete, so an error line under the pills wraps here instead of pushing them
-     onto a new line. */
+  /* Takes the space left of Edit and Delete, so an error line under the pills wraps here instead
+     of pushing them onto a new line */
   .lore-reactions {
     display: flex;
     flex: 1 1 0;
@@ -168,9 +153,8 @@
     gap: 0.5rem;
   }
 
-  /* Each button's wrapper (its pill and its messages) steps out of the layout, so both pills sit in
-     this row, and each message goes on a full-width line of its own under both pills (order: 1 puts
-     it after them). The row's 0.5rem gap + 0.25rem keeps the messages' usual 0.75rem distance. */
+  /* The wrappers step out of the layout, so both pills share this row and each message gets a
+     full-width line under them (order: 1). Gap + margin keep the usual 0.75rem distance. */
   .lore-reactions .appreciate,
   .lore-reactions .save-to-constellation {
     display: contents;
@@ -183,8 +167,6 @@
     margin-top: 0.25rem;
   }
 
-  /* The count as text, on the author's entries that others can't see (elsewhere the Appreciate
-     button shows it). Gold means appreciation in this theme. */
   .lore-appreciations {
     display: inline-flex;
     flex-wrap: wrap;
@@ -200,21 +182,19 @@
     color: var(--color-gold-400);
   }
 
-  /* Why there's no Appreciate or Save button yet */
   .lore-appreciations-reason {
     font-weight: 400;
     color: var(--color-parchment-500);
   }
 
-  /* A visual separator only: the empty alternative text keeps screen readers from reading the dot */
+  /* The empty alternative text keeps screen readers from reading the dot */
   .lore-appreciations-reason::before {
     content: "·";
     content: "·" / "";
     margin-right: 0.5rem;
   }
 
-  /* align-self: Edit and Delete stay level with the Appreciate and Save pills when an error line
-     appears under them */
+  /* align-self: Edit and Delete stay level with the pills when an error line appears under them */
   .lore-owner-tools {
     display: flex;
     flex-wrap: wrap;
@@ -232,7 +212,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* ---------- Reading column ---------- */
   .lore-reading {
     max-width: 68ch;
     margin-top: 2rem;
@@ -251,7 +230,7 @@
     color: var(--color-parchment-100);
   }
 
-  /* A gold drop cap two lines tall, like the first letter of an old codex page */
+  /* A drop cap two lines tall */
   .lore-text.has-drop-cap::first-letter {
     float: left;
     margin: 0.3rem 0.625rem 0 0;
@@ -304,7 +283,6 @@
     color: var(--color-parchment-500);
   }
 
-  /* ---------- Phones ---------- */
   @media (width < 40rem) {
     /* Taller than the desktop strip, so the picture still shows above the title */
     .lore-hero {
@@ -312,8 +290,7 @@
       border-radius: 0.75rem;
     }
 
-    /* The framed emblem only shows on wide, low banners (lore-placeholder.css), not on this 4:3 one,
-       so the text may use the full width, on a background that darkens it evenly */
+    /* The cartouche only shows on wide, low banners, so the text may use the full width here */
     .lore-hero-text {
       padding: 2rem 1rem 1rem;
     }
@@ -326,8 +303,6 @@
       font-size: 1.625rem;
     }
 
-    /* Appreciate and Save get a row of their own and share it in two equal halves, like Edit and
-       Delete below them */
     .lore-reactions {
       flex-basis: 100%;
     }
@@ -336,7 +311,6 @@
       flex: 1;
     }
 
-    /* Edit and Delete share their own row in two equal halves, so they're easy to tap */
     .lore-owner-tools {
       width: 100%;
     }
@@ -345,7 +319,7 @@
       flex: 1;
     }
 
-    /* The reason gets its own line under the count (lined up with its text), without the dot */
+    /* Its own line under the count, lined up with the count's text */
     .lore-appreciations-reason {
       flex-basis: 100%;
       padding-left: 1.5rem;

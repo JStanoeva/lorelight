@@ -18,10 +18,7 @@ import {
 } from "../utils/loreValidation.js";
 import TagsField from "./TagsField.jsx";
 
-// Shared by Create and Edit. `projects` are the user's own projects (the options of the project
-// select). `currentFolder` ({ id, name }, Edit only) is the folder the entry is saved in.
-// `onSubmit(payload)` saves and navigates away; if it returns a message instead
-// (e.g. the chosen folder was deleted meanwhile), the form shows it above the fields.
+// onSubmit(payload) saves and navigates away, or returns a message for the form to show.
 export default function LoreForm({
   initialValues,
   projects,
@@ -48,37 +45,32 @@ export default function LoreForm({
   const publicId = useId();
   const publicHintId = useId();
 
-  // A folder belongs to one project, so choosing another project starts again with "No folder".
-  // Going back to the starting project brings back its starting folder, so switching away and back
-  // (e.g. with the arrow keys on the select) doesn't quietly take the entry out of its folder.
+  // Going back to the starting project restores its folder, so switching away and back
+  // (e.g. with the arrow keys) doesn't quietly take the entry out of its folder.
   function handleProjectChange(event) {
     handleChange(event);
     const isStartingProject = event.target.value === initialValues.project_id;
     setValue("folder_id", isStartingProject ? initialValues.folder_id : "");
   }
 
-  // Like the submit button: leaving a field can show its error and push the checkbox, its label
-  // and the Cancel link down before the mouse is released, so the click would be lost. Only the
-  // left button, so a middle-click on Cancel still opens a new tab.
+  // Leaving a field can show its error and push the checkbox and Cancel down before mouse-up,
+  // losing the click. Left button only, so a middle-click on Cancel still opens a new tab.
   function handleMouseDown(event) {
     if (event.button === 0) {
       event.preventDefault();
     }
   }
 
-  // The button disappears while the folders load again, so focus moves to the Folder select
-  // first. Otherwise it would fall to the page body.
+  // The button disappears while reloading, so focus moves to the select instead of the page body
   function handleRetryFolders(event) {
     event.currentTarget.form.elements.namedItem("folder_id").focus();
     refetchFolders();
   }
 
-  // The submit button was disabled, so focus goes back into the form: to the Folder select when
-  // the chosen folder is gone, otherwise to the first field. focus() doesn't scroll when that field
-  // already has focus, so the page scrolls to the alert itself; flushSync renders the alert first,
-  // so it's there to scroll to.
+  // The disabled submit button lost focus, so it returns to the form. focus() doesn't scroll when
+  // the field already has focus, so the alert is scrolled to; flushSync renders it first.
   function showServerError(form, message) {
-    // The user left the page (e.g. through a header link) while the request was running
+    // The user left the page while the request was running
     if (!form.isConnected) {
       return;
     }
@@ -93,17 +85,14 @@ export default function LoreForm({
     form.querySelector('[role="alert"]').scrollIntoView({ block: "nearest" });
   }
 
-  // Edit only: if the folders of the entry's own project can't be loaded, the select still offers
-  // the folder the entry is saved in, so saving keeps the entry there instead of quietly taking it
-  // out of its folder. If that folder was deleted meanwhile, the database rejects it (23503) and
-  // the form says so.
+  // Edit only: if the folders can't be loaded, still offer the entry's folder so saving keeps it.
+  // If that folder was deleted meanwhile, the database rejects it (23503).
   const canKeepCurrentFolder =
     Boolean(foldersError && currentFolder) && values.project_id === initialValues.project_id;
   const folderOptions = canKeepCurrentFolder ? [currentFolder] : folders;
 
-  // The chosen folder must be one of the listed folders. One that isn't (a ?folderId= of another
-  // project, or a folder deleted meanwhile) shows as "No folder" and isn't saved.
-  // While the folders are still loading, the choice is kept, so a quick submit doesn't lose it.
+  // An unlisted folder (another project's ?folderId=, or deleted) shows as "No folder" and isn't
+  // saved. While the folders load, the choice is kept so a quick submit doesn't lose it.
   const isFolderListed = folderOptions.some((folder) => folder.id === values.folder_id);
   const folderId = isLoadingFolders || isFolderListed ? values.folder_id : "";
 
@@ -121,8 +110,7 @@ export default function LoreForm({
     try {
       const message = await onSubmit(toLorePayload({ ...values, folder_id: folderId }));
       if (message) {
-        // The folder was deleted elsewhere: clear the choice, so the select shows "No folder" even
-        // if the folders can't be loaded again, and reload the list so the folder leaves it
+        // Cleared so the select shows "No folder" even if the folders can't be loaded again
         if (message === FOLDER_GONE_MESSAGE) {
           setValue("folder_id", "");
           refetchFolders();
@@ -155,8 +143,7 @@ export default function LoreForm({
 
   return (
     <form className="card flex flex-col gap-5" noValidate onSubmit={handleSubmit}>
-      {/* A new key on every failure re-creates the alert, so it is announced again even
-          when the message is the same as last time */}
+      {/* A new key per failure re-creates the alert, so a repeated message is announced again */}
       {serverError && <ErrorMessage key={failedAttempts} message={serverError} />}
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -177,8 +164,7 @@ export default function LoreForm({
           ))}
         </FormField>
 
-        {/* Not disabled while the folders load: a disabled select leaves the Tab order, so a quick
-            Tab after choosing a project would skip it */}
+        {/* Not disabled while the folders load: a disabled select leaves the Tab order */}
         <div className="flex flex-col gap-2">
           <FormField
             as="select"
@@ -189,8 +175,7 @@ export default function LoreForm({
             disabled={!values.project_id}
             hint={folderHint}
           >
-            {/* useFolders reports loading even without a project, until its empty list arrives,
-                so the project check keeps "No folder" from flashing "Loading folders…" */}
+            {/* useFolders reports loading even without a project, hence the project check */}
             <option value="">{values.project_id && isLoadingFolders ? "Loading folders…" : "No folder"}</option>
             {folderOptions.map((folder) => (
               <option key={folder.id} value={folder.id}>
@@ -290,7 +275,7 @@ export default function LoreForm({
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 border-t border-night-700 pt-5">
-        {/* Leaving can't stop a request that's already running: the page would still open the saved entry */}
+        {/* Leaving can't stop a running request: the page would still open the saved entry */}
         {isPending ? (
           <button type="button" disabled className="btn btn-ghost">
             Cancel

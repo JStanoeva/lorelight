@@ -1,16 +1,6 @@
-/*
-  My Constellation ("Star-Thread Pin Board"): the night-sky hero, the count line, the framed board
-  with its star chart, the tilted cards on star-pins, the star-threads between the cards of one
-  category, and the notices that replace the cards. The category chips are CategoryChips'
-  (category-chips.css). Imported by ConstellationHero and ConstellationBoard.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element still wins (the category colour classes rely on that).
-  Motion (the card's swing, the pending wobble, the loading glow) only runs without reduced motion.
-  Layout: one column of cards on phones and small tablets, two from 768px, three from 1024px.
-*/
+/* In the components layer, so a Tailwind utility on the same element still wins (the category
+   colour classes rely on that) */
 @layer components {
-  /* ---------- Page and its night sky ---------- */
-
   /* overflow: hidden also cuts off the strip of the sky layers that lies under the scrollbar */
   .constellation-page {
     position: relative;
@@ -20,9 +10,8 @@
     background: var(--color-night-950);
   }
 
-  /* Violet clouds behind the top of the page, fading out over the board. As wide as the whole
-     window (100vw includes the scrollbar), like .catalog-sky in lore/styles/catalog.css:
-     everything placed in percentages stays put when a scrollbar appears. */
+  /* 100vw (scrollbar included), like .catalog-sky: everything placed in percentages stays put
+     when a scrollbar appears */
   .constellation-sky {
     position: absolute;
     inset: 0 auto auto 0;
@@ -38,22 +27,16 @@
     mask-image: linear-gradient(to bottom, #000 40%, transparent);
   }
 
-  /* ---------- Hero: eyebrow and title, centred ---------- */
-
-  /* The top padding, the eyebrow and the title come from .page-hero (styles/components.css), shared
-     with the Lore Catalog and My Projects. With the chips row's own 1rem, the bottom padding leaves
-     the same 1.75rem under the title as the catalog has above its search bar. */
+  /* Plus the chips row's own 1rem, this leaves the same 1.75rem under the title as the catalog
+     has above its search bar */
   .constellation-hero {
     position: relative;
     isolation: isolate;
     padding-bottom: 0.75rem;
   }
 
-  /* A still star field (one dot per layer on coprime tile sizes, so it never visibly repeats).
-     Two masks, and a star shows only where both let it through (intersect): the field fades out
-     towards the bottom, and an ellipse around the text stays clear, so no star sits on a letter.
-     The ellipse was measured to keep the eyebrow and the title well inside its clear part from
-     320px up; phones get a narrower, taller one. */
+  /* Coprime tile sizes, so the field never visibly repeats. The intersected masks fade it out
+     towards the bottom and keep an ellipse around the text clear. */
   .constellation-hero-stars {
     --star: var(--color-parchment-100);
     --text-clearing: radial-gradient(25rem 8.25rem at 50% calc(50% + 1rem), transparent 90%, #000 100%);
@@ -91,8 +74,6 @@
     padding-inline: 1rem;
   }
 
-  /* ---------- The chips, the board's column and the count line ---------- */
-
   /* The chips row sits closer to the hero here than in the catalog (no search bar above it) */
   .constellation-page .catalog-index {
     padding-top: 1rem;
@@ -111,9 +92,8 @@
     margin-top: 1rem;
   }
 
-  /* It takes focus after the last card is removed, after "Show all" and after "Try again"
-     (tabIndex -1); the radius rounds its focus ring. One line tall even while empty (loading),
-     so the board below doesn't move down and back. */
+  /* Takes focus from code, so the radius rounds its focus ring. One line tall even while empty,
+     so the board below doesn't jump. */
   .board-count {
     display: inline-flex;
     align-items: center;
@@ -143,9 +123,6 @@
     overflow-wrap: anywhere;
   }
 
-  /* ---------- The framed board ---------- */
-
-  /* The dark mat around the surface, with a double rule like the border of a star chart */
   .pin-frame {
     position: relative;
     margin-top: 2rem;
@@ -158,7 +135,7 @@
       inset 0 1px 0 rgb(243 234 215 / 0.06);
   }
 
-  /* Tick marks along the top and bottom of the mat, like the scale on a chart's border */
+  /* Tick marks along the top and bottom of the mat */
   .pin-frame::before,
   .pin-frame::after {
     content: "";
@@ -186,7 +163,6 @@
     bottom: 0.1875rem;
   }
 
-  /* The plaque on the top edge ("Pinned by you") */
   .pin-frame-plaque {
     position: absolute;
     top: 0;
@@ -209,7 +185,6 @@
     color: var(--color-lantern-300);
   }
 
-  /* A small star in each corner of the mat (wider screens) */
   .pin-frame-corner {
     position: absolute;
     display: none;
@@ -239,15 +214,13 @@
     left: 0.375rem;
   }
 
-  /* The surface: nebula glows over a fine chart grid (every fourth line a little brighter). It
-     grows with its cards (no fixed height). No border (the ring is an inset shadow), so the
-     measured pin positions match the threads' SVG exactly. */
+  /* No border (the ring is an inset shadow), so the measured pin positions match the threads'
+     SVG exactly */
   .pin-surface {
     position: relative;
     isolation: isolate;
-    /* clip (not hidden): the corner rings reach past the edges, and with hidden a script or
-       find-in-page could still scroll the surface sideways. clip cuts them off without making the
-       surface a scroll container. */
+    /* clip, not hidden: with hidden, a script or find-in-page could still scroll the surface
+       sideways to the corner rings that reach past its edges */
     overflow: clip;
     padding: 2.25rem 0.875rem 2.5rem;
     border-radius: 0.75rem;
@@ -266,7 +239,7 @@
       inset 0 0 70px rgb(0 0 0 / 0.5);
   }
 
-  /* Planisphere rings in two corners, fading out towards the middle */
+  /* Planisphere rings in two corners */
   .pin-surface::before,
   .pin-surface::after {
     content: "";
@@ -294,8 +267,6 @@
     left: -17rem;
   }
 
-  /* ---------- Stars on the surface (BoardStars) ---------- */
-
   .pin-stars {
     position: absolute;
     inset: 0;
@@ -319,13 +290,8 @@
     fill: var(--color-lantern-300);
   }
 
-  /* ---------- Threads (BoardThreads): pin to pin, behind the cards ---------- */
-
-  /* The SVG lies under the card list (z-index 1), so a thread shows in the gaps and passes under
-     the cards; the star-pins sit on top of the cards and hold its ends. The category's colour
-     class paints it (currentColor). Faint on "All"; the constellation of the card under the
-     mouse or focus (or of the chosen category) glows, the others fade.
-     Phones and small tablets don't draw them (one column: see .pin-drop below). */
+  /* Under the card list (z-index 1), so threads show in the gaps and pass under the cards.
+     Hidden in one column, which uses .pin-drop instead. */
   .pin-threads {
     position: absolute;
     inset: 0;
@@ -347,7 +313,6 @@
     stroke-linecap: round;
   }
 
-  /* A very faint soft line under the dots */
   .pin-thread-glow {
     stroke-width: 6;
     opacity: 0.07;
@@ -370,7 +335,6 @@
     opacity: 0.06;
   }
 
-  /* Lit: bigger dots, each with its own small glow */
   .pin-thread[data-state="lit"] .pin-thread-dots {
     stroke-width: 2.75;
     opacity: 1;
@@ -381,10 +345,7 @@
     opacity: 0.14;
   }
 
-  /* ---------- The cards' arrangement ---------- */
-
-  /* A grid underneath (newest first, row by row), loosened by each card's own drop and tilt. The
-     gaps leave room for the pins and the threads. --pin-row-gap is also the phone thread's length. */
+  /* --pin-row-gap is also the length of the one-column thread (.pin-drop) */
   .pin-list {
     --pin-row-gap: 2.75rem;
     position: relative;
@@ -399,8 +360,8 @@
     list-style: none;
   }
 
-  /* The cell: the drop is padding (not margin), so the cell still starts on the row line and the
-     space above a lowered card belongs to it (pointing there lights up its constellation too) */
+  /* The drop is padding, not margin, so the space above a lowered card belongs to its cell
+     (pointing there lights up its constellation too) */
   .pin-item {
     position: relative;
     display: flex;
@@ -426,8 +387,6 @@
     scale: 1.02;
   }
 
-  /* One column, a category chosen: a straight thread from each card down to the next card's pin.
-     A small SVG (a lit .pin-thread), so its dots and glow are the board threads' own. */
   .pin-drop {
     position: absolute;
     top: 100%;
@@ -444,10 +403,6 @@
     display: block;
   }
 
-  /* ---------- One pinned card (PinCard) ---------- */
-
-  /* The card itself: .card-interactive gives the border, the rounded corners and the gold focus
-     ring; this adds a "polaroid" sheen and a deeper shadow, as if it lay on the board */
   .pin-card-paper {
     display: flex;
     flex: 1;
@@ -464,7 +419,7 @@
       0 0 0 1px rgb(95 108 168 / 0.5);
   }
 
-  /* The picture, inset like a photo on a card. CoverImage needs relative + overflow: hidden. */
+  /* CoverImage needs relative + overflow: hidden */
   .pin-card-picture {
     position: relative;
     overflow: hidden;
@@ -474,7 +429,6 @@
     background: var(--color-night-900);
   }
 
-  /* A thin light edge over the picture */
   .pin-card-picture::after {
     content: "";
     position: absolute;
@@ -484,8 +438,7 @@
     pointer-events: none;
   }
 
-  /* The category colour arrives as currentColor (its text class): a soft glow behind the text.
-     Every text inside sets its own colour. */
+  /* currentColor is the category colour (its text class); every text inside sets its own colour */
   .pin-card-body {
     display: flex;
     flex: 1;
@@ -534,8 +487,7 @@
     white-space: nowrap;
   }
 
-  /* Two tidy lines: the author across the whole card, then the date with the Remove button on
-     the right. The author gets the full width, so a name is cut short ("…") only when it's long. */
+  /* The author gets a row of its own, so a name is cut short ("…") only when it's long */
   .pin-card-foot {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -552,9 +504,8 @@
     justify-self: start;
   }
 
-  /* Above the title's stretched link (.card-link::after covers the whole card), so a click here
-     opens the profile. The pill radius gives its focus ring a rounded shape. 40px tall for
-     touch in one column, like the Remove button (both get smaller from two columns). */
+  /* Above the title's stretched link (.card-link::after), so a click here opens the profile.
+     2.5rem tall for touch in one column, like the Remove button. */
   .pin-card-author {
     position: relative;
     z-index: 1;
@@ -594,8 +545,7 @@
     text-underline-offset: 3px;
   }
 
-  /* When the cell is too narrow (very small phones, or larger letter spacing set by the user), the
-     date wraps under "Pinned" instead of running under the Remove button */
+  /* In a too-narrow cell the date wraps under "Pinned" instead of under the Remove button */
   .pin-card-date {
     min-width: 0;
     font-size: 0.75rem;
@@ -629,7 +579,6 @@
     color: var(--color-gold-300);
   }
 
-  /* Waiting for the database: a click does nothing (aria-disabled keeps the focus in place) */
   .pin-card-remove[aria-disabled="true"] {
     cursor: progress;
     border-style: dashed;
@@ -637,7 +586,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* A small ring; it turns when motion is allowed (below) */
   .pin-card-spinner {
     flex: none;
     width: 0.75rem;
@@ -647,10 +595,8 @@
     border-radius: 999px;
   }
 
-  /* While the removal is on its way the card stays fully opaque (nothing shows through it): a gold
-     dashed line runs around it (an outline: 2px, where a thin border can render as 0.67px), its
-     picture darkens under a "Removing…" stamp, and its pin loosens. It only leaves the board once
-     the database has confirmed it. */
+  /* Pending: the card stays fully opaque, so nothing shows through it. An outline, because a thin
+     border can render as 0.67px. */
   .pin-card[data-pending] .pin-card-paper {
     outline: 2px dashed rgb(232 193 112 / 0.75);
     outline-offset: 3px;
@@ -703,9 +649,6 @@
     color: var(--color-danger);
   }
 
-  /* ---------- The star-pin ---------- */
-
-  /* Centred on the middle of the card's top edge, half above the card. Its colour class paints it. */
   .star-pin {
     position: absolute;
     top: 0;
@@ -744,13 +687,11 @@
     opacity: 0.5;
   }
 
-  /* While a constellation glows, the pins of the other categories fade: a lit thread that passes
-     under one of those cards then reads as passing by, and only the bright pins hold its ends */
+  /* While a constellation glows, the other pins fade, so a lit thread passing under their cards
+     reads as passing by */
   .pin-list[data-lit] .pin-card:not([data-highlighted]) .star-pin {
     opacity: 0.4;
   }
-
-  /* ---------- Board hint, notices, loading ---------- */
 
   /* On its own dark backing, so no star of the board sits behind the words */
   .pin-board-hint {
@@ -782,7 +723,7 @@
     min-height: 20rem;
   }
 
-  /* The art takes the notice's colour: lantern violet, or the chosen category's (a text class) */
+  /* The art paints with currentColor: lantern violet, or the category's text class */
   .pin-notice {
     position: relative;
     z-index: 1;
@@ -862,9 +803,6 @@
     text-align: left;
   }
 
-  /* While the saves load: the glowing ghost cards and the Loader on their own, without the frame.
-     An empty Constellation's frame sits higher than a full one's (it has no chips above it), so a
-     frame shown while loading would have to jump; the frame appears once, in its final place. */
   .board-loading {
     display: flex;
     justify-content: center;
@@ -877,8 +815,8 @@
     gap: 1.5rem;
   }
 
-  /* Each card leans a little (--tilt) and the lantern reaches it --delay into the 4.5s loop.
-     Phones show two cards, so the second one waits half the loop and the beat stays even. */
+  /* The lantern reaches each card --delay into the 4.5s loop. Phones show two cards, so the
+     second one waits half the loop and the beat stays even. */
   .pin-ghost {
     --delay: 0s;
     position: relative;
@@ -899,8 +837,7 @@
     display: none;
   }
 
-  /* Its pin: dim gold at rest, like the stars on My Projects' ghost folders. It sits above the
-     card's light (::after). */
+  /* The pin, above the card's light (::after) */
   .pin-ghost::before {
     content: "";
     position: absolute;
@@ -916,10 +853,8 @@
     opacity: 0.45;
   }
 
-  /* The card in lantern light: a gold edge over the dashed one, a warm wash spreading from the top
-     (amber, because a paler gold turns grey on the night blue; the lower half gets a little more
-     night blue for the same reason), a halo around the edge and the lantern's wider glow above it.
-     The light is a layer of its own that only fades in and out, so the card itself never moves. */
+  /* Amber, since a paler gold turns grey on the night blue. A layer of its own that only fades in
+     and out, so the card itself never moves. */
   .pin-ghost::after {
     content: "";
     position: absolute;
@@ -936,8 +871,7 @@
     pointer-events: none;
   }
 
-  /* Still (reduced motion): the lantern rests on the second card, the right one on phones and the
-     middle one from 640px */
+  /* Still (reduced motion): the lantern rests on the second card */
   .pin-ghost:nth-child(2)::before {
     opacity: 0.9;
   }
@@ -946,9 +880,6 @@
     opacity: 0.8;
   }
 
-  /* ---------- Sizes ---------- */
-
-  /* Phones: a narrower, taller clearing around the text, and a smaller title */
   @media (width < 40rem) {
     /* 1.375rem under the title (with the chips row's 1rem), like the catalog's search bar */
     .constellation-hero {
@@ -959,8 +890,7 @@
       --text-clearing: radial-gradient(21rem 10.5rem at 50% calc(50% + 0.75rem), transparent 90%, #000 100%);
     }
 
-    /* One line for the title (Cinzel is wide, and "My Constellation" is long), so the first card
-       comes sooner */
+    /* Keeps "My Constellation" on one line in the wide Cinzel font */
     .constellation-hero .page-hero-title {
       font-size: 1.875rem;
     }
@@ -1012,7 +942,6 @@
       height: 8.5rem;
     }
 
-    /* Three ghost cards, 1.5s apart */
     .pin-ghost:nth-child(2) {
       --delay: 1.5s;
     }
@@ -1023,15 +952,13 @@
     }
   }
 
-  /* Two columns and more: the board draws its threads, the cards hang loosely (a drop and the
-     full tilt), and the author link and the remove button can be a little smaller */
   @media (width >= 48rem) {
     .pin-list {
       --pin-row-gap: 4rem;
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    /* One or two cards: as many columns as cards, at most 19rem wide, in the middle */
+    /* One or two cards: one column each, in the middle */
     .pin-list-few {
       grid-template-columns: repeat(var(--pin-count), minmax(0, 19rem));
     }
@@ -1068,8 +995,6 @@
     }
   }
 
-  /* ---------- Motion (only without reduced motion) ---------- */
-
   @media (prefers-reduced-motion: no-preference) {
     /* A little swing as a card straightens, like paper settling on its pin */
     .pin-card {
@@ -1094,8 +1019,7 @@
         stroke-width 220ms ease-out;
     }
 
-    /* When a constellation lights up, its stardust drifts along the threads for a moment and
-       settles (once, so nothing keeps moving next to the text) */
+    /* Runs once, so nothing keeps moving next to the text */
     .pin-thread[data-state="lit"] .pin-thread-dots {
       animation: pin-thread-drift 2.4s ease-out;
     }
@@ -1110,13 +1034,11 @@
       animation: pin-spin 0.9s linear infinite;
     }
 
-    /* The pin loosens while the card is being removed */
     .pin-card[data-pending] .star-pin {
       animation: pin-loosen 0.8s ease-in-out infinite alternate;
     }
 
-    /* The lantern passes over the ghost cards: only their pin and their light fade in and out.
-       "backwards" keeps a card dim until the lantern reaches it. */
+    /* "backwards" keeps a card dim until the lantern reaches it */
     .pin-ghost::before {
       animation: pin-ghost-pin 4.5s ease-in-out var(--delay) infinite backwards;
     }
@@ -1180,9 +1102,6 @@
     }
   }
 
-  /* ---------- Windows High Contrast: threads and pins keep a visible outline ---------- */
-
-  /* Threads: plain dots in the text colour, the lit constellation in the highlight colour */
   @media (forced-colors: active) {
     .pin-thread {
       opacity: 1;
@@ -1205,8 +1124,7 @@
       opacity: 0.5;
     }
 
-    /* The card's gradient is dropped in this mode, so it gets a solid background again: the
-       threads pass under the cards and must not run across their text */
+    /* This mode drops gradients; a solid fill keeps the threads under the cards off their text */
     .pin-card-paper {
       background: Canvas;
     }
@@ -1219,13 +1137,11 @@
       outline-color: Highlight;
     }
 
-    /* Ghost cards: outlines and pins in the text colour, the lit card's edge in the highlight
-       colour (this mode drops the light's gradients and shadows). The pins stay fully lit, and
-       forced-color-adjust makes sure no browser swaps their background for the page colour. */
     .pin-ghost {
       border-color: CanvasText;
     }
 
+    /* forced-color-adjust: none, so no browser swaps the pins' background for the page colour */
     .pin-ghost::before,
     .pin-ghost:nth-child(2)::before {
       forced-color-adjust: none;

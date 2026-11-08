@@ -1,8 +1,6 @@
 import { PIN_STAR_PATH } from "../utils/pinLayout.js";
 
-// The glowing star-pin that holds a card on the board, in its category's colour (`colorClassName`,
-// a text colour class: the SVG paints with currentColor). `data-pin` lets usePinPositions find it,
-// so the threads start and end here. Decorative: the card names its category in text.
+// usePinPositions finds the pin by `data-pin`, so the threads start and end here
 export default function StarPin({ colorClassName }) {
   return (
     <span className={`star-pin ${colorClassName}`} data-pin="true" aria-hidden="true">

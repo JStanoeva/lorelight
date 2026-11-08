@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { HomeMotionContext } from "../context/HomeMotionContext.js";
 
-// Returns { isMotionPaused, setIsMotionPaused, prefersReducedMotion, isMotionAllowed }.
 export function useHomeMotion() {
   const context = useContext(HomeMotionContext);
 

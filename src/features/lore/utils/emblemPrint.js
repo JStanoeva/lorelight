@@ -1,20 +1,16 @@
 import { chance, createRandom, hashString, pick } from "../../../shared/utils/seededRandom.js";
 import { LORE_EMBLEMS } from "../constants/loreEmblems.js";
 
-// Geometry for the "Emblem Print" lore placeholder: the category's emblem repeated edge to edge,
-// like a block-printed book endpaper. One pattern tile is described in screen pixels and the
-// browser repeats it. Every choice comes from the seeded random generator.
+// One pattern tile is described in screen pixels and the browser repeats it.
 
 const EMBLEM_BOX = 100; // emblems are drawn in a 100-unit box (-50..50)
 const MOTIF_BOX = 20; // motifs in a 20-unit box (-10..10)
-// The cartouche's emblem line width is worked out for one reference size: the cartouche is 58 % of
-// the banner height (.emblem-print-feature in lore-placeholder.css), and the widest Lore Details
-// banner is about 880 × 293 px, so about 170 px. Smaller or larger cartouches get slightly thinner or
-// thicker lines.
+// The cartouche's size on the widest Lore Details banner (58 % of its 293 px height), which its
+// emblem line width is worked out for
 const FEATURE_PIXELS = 170;
-const FEATURE_VIEWBOX = 120; // the cartouche <svg> in LorePlaceholder.jsx is 120 units wide (-60..60)
+const FEATURE_VIEWBOX = 120; // the cartouche <svg> in LorePlaceholder.jsx (-60..60)
 
-// Small shapes that sit between the emblems. Deliberately not stars (those belong to the Constellation).
+// Deliberately not stars: those belong to the Constellation
 const MOTIFS = {
   dot: { dots: [[0, 0, 2.6]] },
   diamond: { lines: ["M0 -6.5L5 0L0 6.5L-5 0Z"], dots: [[0, 0, 1.3]] },
@@ -37,12 +33,8 @@ function strokeFor(pixels, renderedSize, box) {
   return round((pixels * box) / renderedSize);
 }
 
-/*
-  Lattices: each one returns a single tile (its size), the emblem slots and the motif slots.
-  A slot that crosses the tile edge is listed once per side it touches (e.g. x = 0 and x = width),
-  because a pattern clips its tile: the halves meet up in the neighbouring tiles. Secondary slots
-  can be drawn smaller or mirrored, so the print doesn't look like a plain grid.
-*/
+// Lattices: a slot that crosses the tile edge is listed once per side it touches, because a
+// pattern clips its tile: the halves meet up in the neighbouring tiles.
 
 // Harlequin: a diamond trellis, one emblem in the middle and one on the corners.
 function harlequin(size, random) {
@@ -158,7 +150,7 @@ function wave(size, random) {
 
 const LATTICES = { harlequin, brick, halfDrop, wave };
 
-// The cartouche on wide banners: one large emblem in a frame that interrupts the print.
+// Frames for the cartouche, the one large emblem on wide banners
 const FEATURE_SHAPES = [
   // Cut-corner tablet
   {
@@ -167,7 +159,7 @@ const FEATURE_SHAPES = [
     emblemSize: 74,
     beads: "M-47 -49h0.01M47 -49h0.01M-47 49h0.01M47 49h0.01",
   },
-  // A diamond, like one cell of the harlequin trellis grown large
+  // A diamond, like one harlequin cell grown large
   {
     outer: "M0 -58L58 0L0 58L-58 0Z",
     inner: "M0 -49L49 0L0 49L-49 0Z",
@@ -185,7 +177,6 @@ const FEATURE_SHAPES = [
 
 const NIGHT = "11 16 32"; // night-950 as RGB numbers, for the see-through vignette colours
 
-// A darker edge so the print fades into the card: a pool of light, a side fade or an even frame.
 function createVignette(random, focusX) {
   const kind = pick(random, ["pool", "pool", "side", "frame"]);
   if (kind === "pool") {
@@ -199,17 +190,14 @@ function createVignette(random, focusX) {
   return `radial-gradient(ellipse at 50% 50%, transparent 40%, rgb(${NIGHT} / 0.7) 100%)`;
 }
 
-// Everything LorePlaceholder needs to draw one print, decided by the seed and the category.
 export function createEmblemPrint(seed, category) {
-  // The prefix gives lore prints their own random sequence, separate from the project sigil's
-  // (which hashes the bare id)
+  // The prefix keeps this sequence apart from the project sigil's, which hashes the bare id
   const random = createRandom(hashString(`emblem-print:${seed}`));
   const emblem = LORE_EMBLEMS[category] ?? LORE_EMBLEMS.other;
   const size = round(26 + random() * 12);
   const lattice = LATTICES[pick(random, Object.keys(LATTICES))](size, random);
 
-  // Secondary emblems are mirrored in some prints (never turned: they must stay easy to read), and
-  // either the same size or a bit smaller, so no row of the print looks empty
+  // Secondary emblems may be mirrored, never turned, so they stay easy to read
   const mirrorsSecondary = chance(random, 0.4);
   const secondaryScale = chance(random, 0.5) ? 1 : round(0.62 + random() * 0.12);
   const motifName = pick(random, Object.keys(MOTIFS));

@@ -118,7 +118,6 @@ describe("getLoreSaveErrorMessage", () => {
     const folderError = { code: "23503", message: "violates foreign key lore_entries_folder_fkey" };
 
     expect(getLoreSaveErrorMessage(projectError)).toBe(projectGone);
-    // 42501: the database only accepts lore in the user's own projects, so the chosen one is gone
     expect(getLoreSaveErrorMessage({ code: "42501" })).toBe(projectGone);
     expect(getLoreSaveErrorMessage(folderError)).toBe(
       'The chosen folder no longer exists. Choose another folder, or "No folder".',

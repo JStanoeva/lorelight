@@ -1,9 +1,3 @@
-/*
-  "Archive Sigil" image placeholder (ImagePlaceholder.jsx). Every line is drawn with currentColor,
-  the seeded gold ink set on the root.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-*/
 @layer components {
   .sigil {
     --sigil-bg: #0d1328;
@@ -32,7 +26,6 @@
     stroke-linecap: round;
   }
 
-  /* Strokes keep the same pixel width whether the sigil is 64 px or 1100 px wide */
   .sigil-line {
     fill: none;
     stroke: currentColor;
@@ -68,7 +61,6 @@
     background: radial-gradient(ellipse at center, transparent 42%, rgb(11 16 32 / 0.72) 100%);
   }
 
-  /* Thin rules near the edge, like the tooled border of an old book cover */
   .sigil-frame {
     position: absolute;
     inset: 8px;
@@ -81,7 +73,7 @@
     outline-offset: 2px;
   }
 
-  /* Large banners: slightly heavier lines so the engraving doesn't look faint */
+  /* Large banners get heavier lines, so the engraving doesn't look faint */
   @container sigil (min-width: 640px) {
     .sigil-line {
       stroke-width: 1.3px;
@@ -104,7 +96,7 @@
     }
   }
 
-  /* Tiny squares: drop the fine details that would turn into noise */
+  /* Tiny squares drop the fine details that would turn into noise */
   @container sigil (max-width: 120px) {
     .sigil-detail,
     .sigil-frame {

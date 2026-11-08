@@ -6,11 +6,7 @@ import { getProfileTab } from "../utils/getProfileTab.js";
 import ProfileTabPanel from "./ProfileTabPanel.jsx";
 import ProfileTabs from "./ProfileTabs.jsx";
 
-// The tab bar and the four panels under the profile's header. The chosen tab lives in the URL
-// (?tab=lore), so it survives a refresh and can be shared; a missing or unknown value shows
-// Projects. Switching tabs replaces the history entry, so Back still leaves the profile.
-// `collections` = { projects, lore, constellation, appreciated }: the lists useProfile loaded.
-// The owner sees one sentence beside the tabs on who can see the chosen tab.
+// Switching tabs replaces the history entry, so Back still leaves the profile
 export default function ProfileCollections({ collections, profile, isOwner }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = getProfileTab(searchParams.get("tab"));

@@ -3,10 +3,7 @@ import Icon from "../../../shared/components/Icon.jsx";
 import ConstellationBoard from "../../constellation/components/ConstellationBoard.jsx";
 import { getCategoryFilter } from "../../lore/utils/catalogFilters.js";
 
-// A creator's whole Constellation on their "All saved" page: the same pin board as My Constellation,
-// read-only for everyone (Remove lives on My Constellation, which the owner gets a link to). The
-// chosen category lives in the URL (?category=location), as on My Constellation.
-//   entries  the saves, newest first     profile  whose Constellation it is
+// Read-only for everyone, the owner included: Remove lives on My Constellation
 export default function ProfileConstellationBoard({ entries, profile, isOwner }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const category = getCategoryFilter(searchParams);

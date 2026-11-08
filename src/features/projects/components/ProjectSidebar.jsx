@@ -10,11 +10,8 @@ import NewMenu from "./NewMenu.jsx";
 import SidebarEntry from "./SidebarEntry.jsx";
 import SidebarFolder from "./SidebarFolder.jsx";
 
-// The project's contents: a filter box, the folders with their entries, and the unfiled entries.
-// It stays mounted across Project Details and Lore Details (see ProjectWorkspaceLayout), where
-// `activeEntryId` marks the open entry.
-// On wide screens it's a fixed column; below 1024px it's a drawer: `onClose` closes it (close button,
-// Escape), `onNavigate` closes it when a link inside is followed or focus leaves it.
+// Below 1024px it's a drawer: onClose (close button, Escape) and onNavigate (a followed link,
+// focus leaving) both close it
 export default function ProjectSidebar({
   project,
   folders,
@@ -30,26 +27,22 @@ export default function ProjectSidebar({
 }) {
   const [filterText, setFilterText] = useState("");
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  // The last deleted folder, read out by screen readers since its row is gone. `count` goes up with
-  // every delete, so the line is replaced and announced again even when two folders share a name.
+  // Announced since the row is gone; count re-announces it even when two folders share a name
   const [deleted, setDeleted] = useState({ name: "", count: 0 });
   const filterId = useId();
   const treeRef = useRef(null);
 
-  // The filter box is hidden without entries (e.g. after the last one is deleted), so then any text
-  // left in it is ignored: otherwise it would hide every folder
+  // The filter box is hidden without entries, so leftover text there must not hide every folder
   const isFiltering = entries.length > 0 && filterText.trim() !== "";
   const shownEntries = filterEntries(entries, filterText);
-  // While filtering, folders without a match are hidden
   const shownFolders = isFiltering
     ? folders.filter((folder) => getFolderEntries(shownEntries, folder.id).length > 0)
     : folders;
   const unfiledEntries = getFolderEntries(shownEntries, null);
   const isEmpty = folders.length === 0 && entries.length === 0;
 
-  // The form is gone after saving, so focus moves to the new folder's button, and screen readers
-  // hear its name. flushSync shows the folder (and removes the form) first. While filtering, the
-  // empty new folder is hidden, so the tree takes focus instead.
+  // The form is gone, so focus moves to the new folder (flushSync renders it first), or to the
+  // tree while filtering hides the empty folder
   async function handleCreateFolder(name) {
     const folder = await folderService.createFolder(project.id, name);
     flushSync(() => {
@@ -67,9 +60,8 @@ export default function ProjectSidebar({
     treeRef.current.focus();
   }
 
-  // The deleted folder and its menu button are gone, so focus moves to the tree instead of the top
-  // of the page. flushSync removes the folder (and its open dialog) first: nothing outside an open
-  // dialog can take focus.
+  // Focus moves to the tree, not the page top; flushSync first removes the folder and its open
+  // dialog, since nothing outside an open dialog can take focus
   function handleFolderDeleted(folderId) {
     const folder = folders.find((item) => item.id === folderId);
     flushSync(() => onFolderDeleted(folderId));
@@ -151,7 +143,6 @@ export default function ProjectSidebar({
               autoComplete="off"
             />
           </div>
-          {/* Screen readers hear how many entries match while the user types */}
           <p className="ws-filter-status" aria-live="polite">
             {isFiltering &&
               (shownEntries.length === 0
@@ -161,8 +152,7 @@ export default function ProjectSidebar({
         </>
       )}
 
-      {/* A short name, so focus landing here (after a folder is deleted or the new-folder form is
-          cancelled) isn't read as every folder and entry inside */}
+      {/* A short name, so focus landing here isn't read as every folder and entry inside */}
       <div ref={treeRef} className="ws-tree" tabIndex={-1} role="group" aria-label="Folders and entries">
         {(shownFolders.length > 0 || (isOwner && !isFiltering)) && <p className="ws-tree-label">Folders</p>}
 
@@ -218,8 +208,7 @@ export default function ProjectSidebar({
         {isEmpty && <p className="ws-tree-note">{isOwner ? "No lore entries yet" : "No public lore yet"}</p>}
       </div>
 
-      {/* Always rendered, so a change of its text is noticed. A new key per delete replaces the
-          text, so it's announced every time */}
+      {/* Always rendered, so changes are noticed; a new key per delete re-announces the text */}
       <p role="status" className="sr-only">
         {deleted.name && <span key={deleted.count}>Deleted the folder “{deleted.name}”.</span>}
       </p>

@@ -11,20 +11,16 @@ import GuestNavLinks from "./GuestNavLinks.jsx";
 import HomeSectionLinks from "./HomeSectionLinks.jsx";
 import UserNavLinks from "./UserNavLinks.jsx";
 
-// Every other page, and Home as soon as any hero text reaches the bar
 const FROSTED_CLASSES = "border-night-700 bg-night-900/90 backdrop-blur";
-// Home while all of the hero text sits below the bar. The border stays 1px wide, so the height never shifts.
+// The border stays 1px wide, so the height never shifts.
 const TRANSPARENT_CLASSES = "border-transparent bg-transparent";
 // Below lg, an open dropdown keeps the bar frosted, so the bar and the panel read as one surface.
-// From lg up there is no dropdown, so these classes do nothing there.
 const MENU_OPEN_CLASSES = "max-lg:border-night-700 max-lg:bg-night-900/90 max-lg:backdrop-blur";
 
 export default function Header({ isHome = false, isLoggingOut = false, onLogout }) {
   const { user, isAuthLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const activeSectionId = useActiveSection(HOME_SPY_SECTION_IDS, isHome);
-  // The bar turns frosted the moment the hero's first line of text reaches it,
-  // so text never runs beneath a transparent header
   const isHeroTextClear = useIsBelowHeader(HERO_EYEBROW_ID, isHome);
 
   const isTransparent = isHome && isHeroTextClear;
@@ -33,8 +29,7 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
     : TRANSPARENT_CLASSES;
   const surfaceClasses = isTransparent ? transparentClasses : FROSTED_CLASSES;
 
-  // While the stored session is being restored, neither set of account links shows,
-  // so a logged-in user never sees the guest links flash on refresh
+  // Neither link set shows while the session restores, so guest links never flash on refresh
   const isLoggedIn = !isAuthLoading && Boolean(user);
   const isGuest = !isAuthLoading && !user;
 
@@ -49,8 +44,8 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
   function handleBrandClick() {
     closeMenu();
 
-    // Already on Home, the link alone wouldn't move the page. With no behavior given,
-    // the scroll follows the CSS: smooth on Home, unless reduced motion is on.
+    // On Home the link alone wouldn't scroll; with no behavior given, the CSS decides (smooth
+    // unless reduced motion is on).
     if (isHome) {
       window.scrollTo({ top: 0 });
     }
@@ -64,14 +59,13 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
   function handleKeyDown(event) {
     if (event.key === "Escape" && isMenuOpen) {
       closeMenu();
-      // The focused link disappears with the dropdown, so focus goes back to the menu button
+      // The focused link disappears with the dropdown, so focus returns to the menu button
       document.getElementById("menu-button")?.focus();
     }
   }
 
-  // Tabbing out of the open dropdown closes it, so it never covers the element that gets focus.
-  // relatedTarget is empty when a click lands on something that can't take focus (Safari
-  // doesn't focus clicked buttons), so such clicks never close the menu.
+  // Tabbing out closes the dropdown. relatedTarget is empty for clicks on things that can't take
+  // focus (Safari doesn't focus clicked buttons), so those clicks never close it.
   function handleBlur(event) {
     if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) {
       closeMenu();
@@ -121,14 +115,12 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
           </svg>
         </button>
 
-        {/* A dropdown panel below lg (scrollable on short screens, with a shadow so it visibly
-            floats above the page), an inline row from lg up */}
+        {/* A dropdown panel below lg, an inline row from lg up */}
         <div
           id="main-menu"
           className={`${isMenuOpen ? "flex" : "hidden"} absolute inset-x-0 top-full max-h-[calc(100svh-var(--header-height))] flex-col overflow-y-auto border-b border-night-700 bg-night-900 p-4 shadow-lg shadow-black/40 lg:static lg:flex lg:max-h-none lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none`}
         >
-          {/* A logged-in user's links are longer, so for them (and until the session is known)
-              the section links only fit inline in the bar from xl up */}
+          {/* Logged-in links are longer, so the section links only fit inline from xl up */}
           {isHome && (
             <HomeSectionLinks
               activeSectionId={activeSectionId}
@@ -137,7 +129,7 @@ export default function Header({ isHome = false, isLoggingOut = false, onLogout 
             />
           )}
 
-          {/* py-3 gives 44px touch targets in the dropdown; lg:py-2 keeps the inline row compact */}
+          {/* py-3 gives 44px touch targets in the dropdown */}
           <nav aria-label="Main" className="flex flex-col gap-1 lg:flex-row lg:items-center lg:gap-2">
             {/* end: /lore/create and /lore/:id/edit aren't the catalog page */}
             <NavLink to="/lore" end onClick={closeMenu} className="nav-link py-3 lg:py-2">

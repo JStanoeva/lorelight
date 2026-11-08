@@ -6,10 +6,7 @@ import CategoryOrrery from "./CategoryOrrery.jsx";
 import SectionHeading from "./SectionHeading.jsx";
 import "../styles/categories.css";
 
-// The intro names no number of categories, so it stays true when one is added.
-// From lg the orrery shows the categories (every star is a button, and its lens holds the same
-// description, examples and link as the list); below lg the list does. The section fades in
-// the first time it comes into view: its heading, then the orrery or the list.
+// From lg the orrery shows the categories; below lg the list does, with the same content
 export default function CategoriesSection() {
   const setSectionElement = useSectionReveal();
 
@@ -20,7 +17,6 @@ export default function CategoriesSection() {
       aria-labelledby="categories-title"
       className="home-section categories-section"
     >
-      {/* A faint, still star layer behind the content (the "sky band") */}
       <div className="starfield categories-stars" aria-hidden="true" />
 
       <div className="home-container">

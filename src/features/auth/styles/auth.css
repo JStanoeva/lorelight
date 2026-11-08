@@ -1,26 +1,6 @@
-/*
-  Login and Register: the starry page, the card, the password field with its show/hide toggle,
-  the strength constellation, the rules checklist and the "passwords match" hint.
-  Plain CSS (no @apply), so it needs no @reference. The rules sit in the components layer, so a
-  Tailwind utility on the same element always wins.
-
-  Colour rules:
-  - Gold means "action": the submit button, links, the focus ring and the toggle's hover.
-  - A met rule is a status, so its star is success green (never gold).
-  - The strength constellation lights in lantern-300 while the password is incomplete and turns
-    success green only at 5 of 5, because only then can the form be sent.
-  - Unlit stars are hollow outlines and lit stars are filled, so the shape changes as well as
-    the colour.
-  Tailwind outputs a theme variable (like --color-success) only when a source file mentions
-  it. It reads this file too, so every theme colour used here is defined in the build.
-*/
 @layer components {
-  /* ===== Page (AuthPanel) ===== */
-
-  /* flex-grow 1 fills the rest of <main> (a column in MainLayout), so the sky reaches the footer.
-     isolation keeps the sky's z-index: -1 inside this box instead of behind the page.
-     The card isn't centred with justify-content: it places itself (see .auth-card), and the two
-     glows sit at 50vw, the middle of the whole window, so they stay behind it. */
+  /* isolation keeps the sky's z-index: -1 inside this box. The glows sit at 50vw, the window's
+     middle, so they stay behind the card, which centres itself (see .auth-card). */
   .auth-page {
     position: relative;
     isolation: isolate;
@@ -42,9 +22,6 @@
     }
   }
 
-  /* A still star field behind the card: each gradient is one dot that repeats on its own
-     tile size (the sizes share no common factor), so the pattern never visibly repeats.
-     It fades out towards the bottom. */
   .auth-sky {
     position: absolute;
     inset: 0;
@@ -53,6 +30,8 @@
     pointer-events: none;
   }
 
+  /* Each gradient is one dot repeating on its own tile size (no common factors), so the
+     pattern never visibly repeats. */
   .auth-sky::before {
     content: "";
     position: absolute;
@@ -70,8 +49,7 @@
     mask-image: linear-gradient(to bottom, #000 30%, transparent 90%);
   }
 
-  /* Three of the logo's stars, far out on wide screens only. -59% puts the star's crossing
-     point (12, 20 in its 24 × 34 box) on the given position. */
+  /* -59% puts the star's crossing point (12, 20 in its 24 × 34 box) on the given position */
   .auth-flare {
     position: absolute;
     display: none;
@@ -109,11 +87,8 @@
     opacity: 0.5;
   }
 
-  /* ===== Card (AuthPanel) ===== */
-
-  /* Centred in the whole window (100vw includes the scrollbar), like the site-column utility, so
-     the card doesn't move sideways when the longer Register form brings a scrollbar and Login
-     doesn't. The 1rem is the page's side padding; on narrow screens the margin is 0. */
+  /* Centred on 100vw like site-column, so the card doesn't shift when only Register has a
+     scrollbar. The 1rem is the page's side padding. */
   .auth-card {
     position: relative;
     width: 100%;
@@ -123,7 +98,6 @@
     border: 1px solid var(--color-night-700);
     border-radius: 1rem;
     background-color: var(--color-night-900);
-    /* Violet light falling on the top of the card */
     background-image: radial-gradient(90% 9rem at 50% 0%, color-mix(in oklab, var(--color-lantern-700) 24%, transparent), transparent);
     box-shadow:
       inset 0 1px 0 color-mix(in oklab, var(--color-parchment-100) 5%, transparent),
@@ -136,7 +110,6 @@
     }
   }
 
-  /* Starlight catching the top edge */
   .auth-card::before {
     content: "";
     position: absolute;
@@ -157,7 +130,6 @@
     text-align: center;
   }
 
-  /* Hairline, the logo's star, mirrored hairline (the same ornament as the Home chapters) */
   .auth-emblem {
     display: flex;
     align-items: center;
@@ -183,10 +155,7 @@
     filter: drop-shadow(0 0 8px var(--color-lantern-500));
   }
 
-  /* Cinzel never goes below 24px. The title stays at 24px up to a 400px-wide screen, so
-     "Create your account" (about 285px wide at 24px) fits on one line at 375px. At 360px it
-     may wrap; text-wrap: balance then splits it into two even lines. It grows to 32px by a
-     600px-wide screen. */
+  /* 24px up to a 400px screen, so "Create your account" fits on one line at 375px; 32px by 600px */
   .auth-title {
     margin-top: 1rem;
     font-size: clamp(1.5rem, 0.5rem + 4vw, 2rem);
@@ -204,7 +173,6 @@
     color: var(--color-parchment-300);
   }
 
-  /* Server error above the form (.alert-error gives the colours) */
   .auth-alert {
     display: flex;
     align-items: flex-start;
@@ -220,8 +188,6 @@
     height: 1.25rem;
   }
 
-  /* ===== Form ===== */
-
   .auth-form {
     display: flex;
     flex-direction: column;
@@ -229,21 +195,18 @@
     margin-top: 1.5rem;
   }
 
-  /* One field: label, control and messages, with the same spacing as FormField (flex-col
-     gap-1.5). Register also wraps PasswordInput and PasswordChecklist in one, so the rules
-     panel sits close under the password field. */
+  /* The same spacing as FormField (gap-1.5) */
   .auth-field {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
   }
 
-  /* 44px tall: a comfortable tap target, and the height the password toggle fills */
+  /* 44px: a comfortable tap target, and the height the password toggle fills */
   .auth-input {
     min-height: 2.75rem;
   }
 
-  /* Hints and errors that wrap on a phone don't leave one word alone on the last line */
   .auth-form .field-hint,
   .auth-form .field-error {
     text-wrap: pretty;
@@ -266,8 +229,8 @@
     color: var(--color-parchment-300);
   }
 
-  /* Gold alone is too close to the parchment text around it (WCAG 1.4.1), so the link is
-     underlined. The padding makes a 44px tall target; the negative margin keeps the line height. */
+  /* Underlined: gold alone is too close to the text around it (WCAG 1.4.1). The padding makes a
+     44px target; the negative margin keeps the line height. */
   .auth-switch a {
     display: inline-block;
     padding: 0.75rem 0.125rem;
@@ -281,13 +244,11 @@
     text-decoration-color: currentColor;
   }
 
-  /* ===== Password field with show/hide toggle (PasswordInput) ===== */
-
   .pw-input-wrap {
     position: relative;
   }
 
-  /* Room for the toggle, so the text never runs under it (.input sets padding-inline) */
+  /* Room for the toggle, so the text never runs under it */
   .pw-input {
     padding-inline-end: 3rem;
   }
@@ -298,7 +259,6 @@
     display: none;
   }
 
-  /* A 44 × 44 hit area that fills the right end of the input */
   .pw-toggle {
     position: absolute;
     top: 0;
@@ -331,9 +291,6 @@
     stroke-linejoin: round;
   }
 
-  /* ===== Password panel: strength constellation + rules checklist (PasswordChecklist) ===== */
-
-  /* A darker well, like a window onto the night sky */
   .pw-panel {
     margin-top: 0.25rem;
     padding: 0.875rem 1rem 1rem;
@@ -347,7 +304,6 @@
     border-color: color-mix(in oklab, var(--color-success) 45%, var(--color-night-700));
   }
 
-  /* Shared star shape for the meter and the rules: hollow until lit */
   .pw-star-path {
     fill: transparent;
     stroke: currentColor;
@@ -360,15 +316,12 @@
     fill: currentColor;
   }
 
-  /* Strength: the five-star constellation on the left, the word on the right */
   .pw-meter {
     display: flex;
     align-items: center;
     gap: 1rem;
   }
 
-  /* Stars and line ends share the same percentages, so the drawing scales with the width
-     (StrengthMeter) */
   .pw-meter-sky {
     position: relative;
     flex: 1 1 auto;
@@ -385,7 +338,7 @@
     overflow: visible;
   }
 
-  /* Lines and stars take their colour from `color` (forced-colours mode overrides it below) */
+  /* Colour comes from `color`, so forced-colours mode can override it below */
   .pw-meter-line {
     color: var(--color-night-700);
     stroke: currentColor;
@@ -457,7 +410,6 @@
     color: var(--color-success);
   }
 
-  /* Checklist: one star per rule */
   .pw-rules {
     display: flex;
     flex-direction: column;
@@ -496,10 +448,7 @@
     filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-success) 45%, transparent));
   }
 
-  /* ===== Repeat password: the match hint (PasswordMatchHint) ===== */
-
-  /* The live region stays in the page while empty (so its changes are announced), but an
-     empty box must not add a gap to the field: this cancels the .auth-field gap above it. */
+  /* The empty live region must stay in the page; this cancels the .auth-field gap above it */
   .pw-match-region:empty {
     margin-top: -0.375rem;
   }
@@ -538,10 +487,8 @@
     stroke-linejoin: round;
   }
 
-  /* Forced colours: no glows; the hollow/filled shapes still tell the states apart */
   @media (forced-colors: active) {
-    /* SVG keeps author colours in forced-colours mode, so the meter is recoloured with system
-       colours: unlit parts muted, lit parts in the text colour */
+    /* SVG keeps author colours in forced-colours mode, so the meter uses system colours */
     .pw-meter-star,
     .pw-meter-line {
       color: GrayText;
@@ -579,7 +526,6 @@
     }
   }
 
-  /* All motion is opt-in, one-shot, and under half a second */
   @media (prefers-reduced-motion: no-preference) {
     .pw-toggle {
       transition: color 150ms ease-out;
@@ -610,7 +556,6 @@
       transition: border-color 300ms ease-out;
     }
 
-    /* A star "ignites" once when its rule is met (the class is added) */
     .pw-rule-met .pw-rule-star,
     .pw-meter-star-lit {
       animation: pw-ignite 450ms ease-out;

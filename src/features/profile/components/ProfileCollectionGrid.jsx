@@ -3,14 +3,8 @@ import LoreCard from "../../lore/components/LoreCard.jsx";
 import ProjectCard from "../../projects/components/ProjectCard.jsx";
 import "../../constellation/styles/constellation.css";
 
-// One collection of a profile as a grid of the app's own cards (their titles are h3s: the grid
-// always sits under an h2, the tab panel's or the "All …" page's hidden one):
-//   projects       ProjectCard (the owner sees Public / Private on each)
-//   lore           LoreCard without the author line (the page already says whose lore it is)
-//   constellation  PinCard on its star-pin, read-only (Remove lives on My Constellation)
-//   appreciated    LoreCard with the author, since it is usually someone else's lore
-// The owner's own private or hidden lore is marked on the card (LoreCard's isOwner). Other people's
-// entries in the Appreciated list are always public, so they never get a marker.
+// Card titles are h3s: the grid always sits under an h2 (the tab panel's or a hidden one).
+// Pins stay read-only even for the owner: Remove lives on My Constellation.
 export default function ProfileCollectionGrid({ collection, items, isOwner }) {
   if (collection === "projects") {
     return (

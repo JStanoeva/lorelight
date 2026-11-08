@@ -37,13 +37,12 @@ export default function LoginPage() {
 
     try {
       await login({ email: values.email.trim(), password: values.password });
-      // Nothing to do after a successful login: GuestGuard sees the user and redirects
+      // On success, GuestGuard sees the user and redirects
     } catch (error) {
       setServerError(getAuthErrorMessage(error));
       setFailedAttempts((count) => count + 1);
       setIsPending(false);
-      // The submit button was disabled, so focus goes back to the field to correct
-      // (usually the password). The email stays filled in.
+      // The submit button was disabled, so focus moves to the field to correct
       const fieldName = getAuthErrorField(error) === "email" ? "email" : "password";
       form.elements.namedItem(fieldName).focus();
     }
@@ -52,8 +51,7 @@ export default function LoginPage() {
   return (
     <AuthPanel title="Welcome back" subtitle="Log in to continue to your worlds.">
       <PageTitle title="Log in" />
-      {/* A new key on every failure re-creates the alert, so it is announced again even
-          when the message is the same as last time */}
+      {/* A new key per failure re-creates the alert, so a repeated message is announced again */}
       {serverError && <AuthAlert key={failedAttempts} message={serverError} />}
 
       <form className="auth-form" noValidate onSubmit={handleSubmit}>

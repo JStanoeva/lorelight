@@ -1,9 +1,8 @@
 import { Link } from "react-router";
 import StarGlyph from "./StarGlyph.jsx";
 
-// The panel an About card opens. The outer element always exists, so the card's aria-controls
-// always points at something; `hidden` hides it while closed. Its content mounts only while open,
-// so a showcase starts fresh every time its panel opens, and its timer stops when it closes.
+// The outer element always exists, so the card's aria-controls has a target. The content mounts
+// only while open, so a showcase starts fresh each time and its timer stops on closing.
 export default function AboutPanel({ item, isOpen, onClose, children }) {
   function handleKeyDown(event) {
     if (event.key === "Escape") {
@@ -21,7 +20,7 @@ export default function AboutPanel({ item, isOpen, onClose, children }) {
       className="about-panel md:col-span-3 md:row-start-2"
     >
       {isOpen && (
-        // The grid sits on this inner element, never on the one with `hidden`
+        // The grid sits here, because display: grid on the element with `hidden` would override it
         <div className="about-panel-inner">
           <div className="min-w-0">
             <h4 className="about-panel-lead">{item.lead}</h4>

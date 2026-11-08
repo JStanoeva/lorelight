@@ -18,9 +18,7 @@ export default function CreateLorePage() {
   const { projects, isLoading, error, refetch } = useProjects(user.id);
   const headingRef = useRef(null);
 
-  // "Add Lore", the sidebar's "New lore entry" and a folder's "New lore entry here" link here
-  // through getNewEntryPath (?projectId=…&folderId=…). The project is used only if it is one of
-  // the user's own. Database ids are lowercase, so lowercasing lets a hand-typed uppercase id match.
+  // Database ids are lowercase, so lowercasing lets a hand-typed uppercase id match
   const projectIdParam = searchParams.get("projectId")?.toLowerCase();
   const folderIdParam = searchParams.get("folderId")?.toLowerCase();
   const projectFromUrl = projects.find((project) => project.id === projectIdParam);
@@ -34,7 +32,6 @@ export default function CreateLorePage() {
       folder_id: folderIdParam ?? "",
     };
   } else if (projects.length === 1) {
-    // Only one project: there is nothing to choose
     initialValues = { ...EMPTY_LORE_VALUES, project_id: projects[0].id };
   }
 
@@ -47,7 +44,7 @@ export default function CreateLorePage() {
     }
   }
 
-  // Try again disappears as soon as it's pressed, so focus moves to the page heading (h1), which stays
+  // Try again disappears when pressed, so focus moves to the heading, which stays
   function handleRetry() {
     refetch();
     headingRef.current.focus();
@@ -72,9 +69,8 @@ export default function CreateLorePage() {
     );
   } else {
     content = (
-      // The form reads initialValues only when it mounts. A different ?projectId or ?folderId
-      // gives a new key, so the form starts fresh (e.g. the header's Create Lore link from
-      // /lore/create?projectId=…); on a plain /lore/create the key stays the same
+      // The form reads initialValues only when it mounts, so a different ?projectId or ?folderId
+      // gives a new key and a fresh form
       <LoreForm
         key={searchParams.toString()}
         initialValues={initialValues}
@@ -91,7 +87,6 @@ export default function CreateLorePage() {
     <section className="page">
       <PageTitle title="Create Lore" />
       <div className="mx-auto max-w-2xl">
-        {/* tabIndex -1: it can take focus from code (after Try again), but isn't a Tab stop */}
         <h1 ref={headingRef} tabIndex={-1} className="page-title">
           Create Lore
         </h1>

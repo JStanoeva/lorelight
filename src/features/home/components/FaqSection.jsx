@@ -4,7 +4,6 @@ import { useSectionReveal } from "../hooks/useSectionReveal.js";
 import FaqItem from "./FaqItem.jsx";
 import SectionHeading from "./SectionHeading.jsx";
 
-// The section fades in the first time it comes into view: its heading, then the questions.
 export default function FaqSection() {
   const setSectionElement = useSectionReveal();
 
