@@ -1,29 +1,75 @@
-# Lorelight
+<p align="center">
+  <img src="docs/logo.svg" alt="The Lorelight lantern logo" width="140">
+</p>
 
-Lorelight is a worldbuilding platform for writing, organizing and sharing fictional lore.
+<h1 align="center">Lorelight</h1>
 
-**Live app:** https://lorelight.vercel.app
+<p align="center"><sub>✦ &nbsp; A &nbsp; W O R L D B U I L D I N G &nbsp; A R C H I V E &nbsp; ✦</sub></p>
+
+> *Every world begins as scattered notes: a name in a margin, a map on the back of a receipt, a war remembered in a single line. Lorelight is the lantern you carry through them.*
+
+<p align="center">
+  <a href="https://lorelight.vercel.app"><img src="https://img.shields.io/badge/live_app-lorelight.vercel.app-f0cd80?style=for-the-badge&amp;labelColor=1d0d43" alt="Live app: lorelight.vercel.app"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-f0cd80?logo=react&amp;logoColor=white&amp;labelColor=1d0d43" alt="React 19">
+  <img src="https://img.shields.io/badge/React_Router-8-f0cd80?logo=reactrouter&amp;logoColor=white&amp;labelColor=1d0d43" alt="React Router 8">
+  <img src="https://img.shields.io/badge/Vite-8-f0cd80?logo=vite&amp;logoColor=white&amp;labelColor=1d0d43" alt="Vite 8">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-f0cd80?logo=tailwindcss&amp;logoColor=white&amp;labelColor=1d0d43" alt="Tailwind CSS 4">
+  <img src="https://img.shields.io/badge/Supabase-Postgres_%2B_Auth-f0cd80?logo=supabase&amp;logoColor=white&amp;labelColor=1d0d43" alt="Supabase: Postgres and Auth">
+  <img src="https://img.shields.io/badge/tested_with-Vitest-f0cd80?logo=vitest&amp;logoColor=white&amp;labelColor=1d0d43" alt="Tested with Vitest">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f0cd80?labelColor=1d0d43" alt="License: MIT"></a>
+</p>
+
+![The Lorelight home page: the title glowing over a painted violet nebula](docs/screenshots/home.webp)
+
+## ✦ I · Kindle a World
+
+Every world begins as a **Project**. Name it, choose its format (a novel, a tabletop campaign, a video game…) and its genre, and give it a cover, or let Lorelight engrave a sigil for it. Folders keep its lore in order as it grows.
+
+## ✦ II · Write Its Lore
+
+Characters, places, factions, relics, creatures, wars: every **Lore Entry** belongs to one of twelve categories, each with its own colour and emblem. Tag it, link a picture (or let its category's emblem stand in), and file it in a folder.
+
+## ✦ III · Share It When It's Ready
+
+Nothing leaves your desk until you say so. New worlds and entries start private, and an entry steps into the light only when both the entry and its Project are public. If it goes private again, it quietly leaves every Constellation.
+
+## ✦ IV · Wander the Catalog
+
+Public lore from every world gathers in the **Lore Catalog**. Search by title, text or tag, follow a single category, sort by newest or oldest, and see what other creators are dreaming up. Anyone can wander in; appreciating, saving and writing need an account.
+
+## ✦ V · Gather a Constellation
+
+Appreciate the entries you love and pin them to your **Constellation**, a board where threads of stardust join lore of the same kind.
+
+## ✦ VI · Meet the Creators
+
+Every creator has a profile: a framed avatar, a star colour of their choosing, a title earned from the lore they write most, and tabs for everything they've shared.
+
+## ✦ A Glimpse Inside
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/my-projects.webp" alt="My Projects, with two worlds and their engraved covers"><br><sub><b>My Projects</b> · every world, with engraved covers</sub></td>
+    <td width="50%"><img src="docs/screenshots/project.webp" alt="A Project page with its folders and entries in the sidebar"><br><sub><b>Project workspace</b> · folders and entries in the sidebar</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/lore-details.webp" alt="A lore entry beside its world's folders"><br><sub><b>Lore Details</b> · an entry with its world beside it</sub></td>
+    <td><img src="docs/screenshots/catalog.webp" alt="The Lore Catalog, a grid of public lore cards"><br><sub><b>Lore Catalog</b> · public lore from every world</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/constellation.webp" alt="My Constellation, a pin board of saved lore joined by threads of stardust"><br><sub><b>My Constellation</b> · saved lore, joined by category</sub></td>
+    <td><img src="docs/screenshots/profile.webp" alt="A creator profile with a framed avatar, a creator title and stats"><br><sub><b>Creator Profile</b> · title, stats and star colour</sub></td>
+  </tr>
+</table>
 
 ---
 
-## Features
+## ✦ Light Your Own Lantern
 
-Writers, game masters and worldbuilders often keep the notes for their fictional worlds scattered across many files. Lorelight gives that lore one home.
-
-- **Projects for your worlds:** each Project has a format (such as a novel, a tabletop RPG or a video game), an optional genre, and a cover image or a generated one. Folders keep its lore in order.
-- **Lore Entries:** write about characters, locations, factions, artifacts and more, in 12 categories, with tags and an optional image link.
-- **Private until you share it:** new Projects and entries start private. An entry is public only when both the entry and its Project are public.
-- **Lore Catalog:** browse everyone's public lore, search by title, description or tag, filter by category and sort by date.
-- **Appreciate and save:** appreciate the entries you love and pin them to your Constellation, a personal pin board where dotted lines join entries of the same category.
-- **Creator profiles:** every creator has a profile with stats, a creator title, a star colour and tabs for their Projects, lore, Constellation and appreciated lore.
-
-Anyone can browse the catalog, public Projects and profiles. Creating, appreciating and saving need an account, and you can register on the live app.
-
----
-
-## Getting Started
-
-The quickest way to try Lorelight is the live app above. To run it on your own computer, follow these steps.
+The quickest way to explore Lorelight is the [live app](https://lorelight.vercel.app). To run your own copy on your computer, follow these steps.
 
 ### Prerequisites
 
@@ -82,7 +128,9 @@ The quickest way to try Lorelight is the live app above. To run it on your own c
 
 ---
 
-## Architecture
+## ✦ How the Archive Is Built
+
+For the curious, here's what holds the lanterns up.
 
 ### Tech Stack
 
@@ -167,3 +215,12 @@ The database enforces the rules itself (Row Level Security policies, column priv
 - Guests can only read, and nobody can change ids, owners, usernames or dates through the API.
 
 The database tables, rules, triggers and policies are stored as numbered SQL files in `supabase/migrations/`.
+
+---
+
+<p align="center">
+  <img src="docs/screenshots/categories.webp" alt="The twelve lore categories as a wheel of stars on the home page" width="70%"><br>
+  <sub><i>Twelve stars, one for every kind of lore.</i></sub>
+</p>
+
+<p align="center"><sub>✦ &nbsp; Made by <a href="https://github.com/JStanoeva">JStanoeva</a> &nbsp;·&nbsp; <a href="LICENSE">MIT License</a> &nbsp; ✦</sub></p>
